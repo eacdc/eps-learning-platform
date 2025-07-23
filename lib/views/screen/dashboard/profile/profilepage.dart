@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/controllers/profile/profile_controller.dart';
+import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/dialogsheet/logout_sheet.dart';
 import 'package:test_your_learing/views/screen/dashboard/profile/profileItems/account_security.dart';
@@ -15,9 +18,14 @@ import '../../../../helper/sharedpreference_helper.dart'
     show SharedPreferencesService;
 import '../../authentication/login.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   ProfilePage({Key? key}) : super(key: key);
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   final List<Widget> itemWidgets = [
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_profile_logo.png',
@@ -25,9 +33,7 @@ class ProfilePage extends StatelessWidget {
       description: 'Information account',
       onTap: () {
         print('User Profile clicked');
-        Get.to(DetailedProfilePage(),
-        
-       );
+        Get.to(DetailedProfilePage());
       },
     ),
     InfoItem(
@@ -36,7 +42,7 @@ class ProfilePage extends StatelessWidget {
       description: 'Information about your account',
       onTap: () {
         print('Settings clicked');
-         Get.to(AccountSecurityPage() );
+        Get.to(AccountSecurityPage());
       },
     ),
 
@@ -56,7 +62,7 @@ class ProfilePage extends StatelessWidget {
       description: 'check notifications & updates ',
       onTap: () {
         print('Settings clicked');
-         Get.to(NottificationSettingPage() );
+        Get.to(NottificationSettingPage());
       },
     ),
 
@@ -66,7 +72,7 @@ class ProfilePage extends StatelessWidget {
       description: 'Get support from experts',
       onTap: () {
         print('Settings clicked');
-         Get.to(HelpCenterPage() );
+        Get.to(HelpCenterPage());
       },
     ),
 
@@ -76,202 +82,259 @@ class ProfilePage extends StatelessWidget {
       description: 'Our privacy policy',
       onTap: () {
         print('Settings clicked');
-         Get.to(PrivacyPolicyPage() );
+        Get.to(PrivacyPolicyPage());
       },
     ),
-    // Add more InfoItem widgets here...
-
-    /*    SingleChildScrollView(
-  child: Column(
-    children: [
-      InfoItem(...),
-      InfoItem(...),
-      InfoItem(...),
-    ],
-  ),
-) */
   ];
+
+  late final ProfileController profileController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    profileController = findOrPut(() => ProfileController());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final token = SharedPreferencesService.getAccessToken() ?? '';
+      profileController.getUserProfile(token: token, context: context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: whitecolor,
 
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Circular Image
-                /*  ClipOval(
-                  child: Image.asset(
-                    'assets/icons/png_user.png',
-                    
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.contain,
-                  ),
-                ), */
-                Container(
-                  padding: EdgeInsets.all(16),
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: graylight,
-                    shape: BoxShape.circle,
-                    /*  image: DecorationImage(
-                      image: AssetImage('assets/icons/png_user.png'),
-                      fit: BoxFit.contain,
-                    ), */
-                  ),
-                  child: Image.asset(
-                    'assets/icons/png_user.png',
-                    height: 24,
-                    width: 24,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Obx(() {
+                  final profileImage =
+                      profileController.userProfile.value?.profilePicture ?? '';
+                  final name =
+                      profileController.userProfile.value?.username ?? '-';
+                  final phone =
+                      profileController.userProfile.value?.phone ?? '-';
+                  final isLoading = profileController.isLoading.value;
 
-                const SizedBox(width: 16), // Spacing between image and text
-                // Title & Description
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  return Row(
                     children: [
-                      Text(
-                        'Hii, Username',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                      // Profile Image or Shimmer
+                      isLoading
+                          ? Shimmer.fromColors(
+                            baseColor: shimmerBaseColor,
+                            highlightColor: shimmerHighlightColor,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          )
+                          : Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: graylight,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: graylight, width: 1.0),
+                            ),
+                            child:
+                                profileImage.isNotEmpty
+                                    ? ClipOval(
+                                      child: Image.network(
+                                        profileImage,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Image.asset(
+                                                  'assets/icons/png_user.png',
+                                                  fit: BoxFit.none,
+                                                ),
+                                      ),
+                                    )
+                                    : Image.asset(
+                                      'assets/icons/png_user.png',
+                                      fit: BoxFit.none,
+                                    ),
+                          ),
+
+                      const SizedBox(width: 16),
+
+                      // Name and Phone or Shimmer
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:
+                              isLoading
+                                  ? [
+                                    Shimmer.fromColors(
+                                      baseColor: shimmerBaseColor,
+                                      highlightColor: shimmerHighlightColor,
+                                      child: Container(
+                                        width: 120,
+                                        height: 18,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Shimmer.fromColors(
+                                      baseColor: shimmerBaseColor,
+                                      highlightColor: shimmerHighlightColor,
+                                      child: Container(
+                                        width: 80,
+                                        height: 14,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]
+                                  : [
+                                    Text(
+                                      'Hi, $name',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      phone,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: graytext,
+                                      ),
+                                    ),
+                                  ],
                         ),
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        'username@gmail.com',
-                        style: TextStyle(fontSize: 14, color: graytext),
-                      ),
                     ],
-                  ),
+                  );
+                }),
+              ),
+
+              SizedBox(height: 1),
+
+              Expanded(
+                child: ListView.builder(
+                  itemCount: itemWidgets.length,
+                  itemBuilder: (context, index) {
+                    return itemWidgets[index];
+                  },
                 ),
-              ],
-            ),
-          ),
+              ),
+              SizedBox(height: 8),
 
-          SizedBox(height: 1),
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 2,
+                  left: 12,
+                  right: 12,
+                  bottom: 12,
+                ),
+                child: SizedBox(
+                  width: double.infinity, // ➔ Full width
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // oepnLogoutDialog(context);
 
-          Expanded(
-            child: ListView.builder(
-              itemCount: itemWidgets.length,
-              itemBuilder: (context, index) {
-                return itemWidgets[index];
-              },
-            ),
-          ),
-           SizedBox(height: 8),
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        builder: (context) {
+                          return LogoutSheet();
+                        },
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
 
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 2,
-              left: 12,
-              right: 12,
-              bottom: 12,
-
-            ),
-            child: SizedBox(
-              width: double.infinity, // ➔ Full width
-              child: OutlinedButton(
-                onPressed: () {
-                 // oepnLogoutDialog(context);
-
-                   showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        side: BorderSide(color: textBlack), // ➔ Black border
                       ),
                     ),
-                    builder: (context) {
-                      return LogoutSheet();
-                    },
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                    side: BorderSide(color: textBlack), // ➔ Black border
+                    child: Text(
+                      'Logout',
+                      style: TextStyle(fontSize: 16, color: textBlack),
+                    ),
                   ),
                 ),
+              ),
+
+              /* GestureDetector(
+                onTap: () {
+                  oepnLogoutDialog(context);
+                },
                 child: Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 16, color: textBlack),
+                  "Logout?",
+                  style: TextStyle(color: redcolor, fontWeight: FontWeight.w600),
+                ),
+              ),
+              
+               */
+              SizedBox(height: 24),
+            ],
+          ),
+          /* 
+          Obx(
+            () => Visibility(
+              visible: profileController.isLoading.value,
+              child: Center(
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primarycolor.withOpacity(0.3),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 2), // changes position of shadow
+                      ),
+                    ],
+                    color: whitecolor,
+                  ),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4.5,
+                    color: primarycolor.withOpacity(0.8),
+                    strokeCap: StrokeCap.round,
+                  ),
                 ),
               ),
             ),
           ),
-
-          /* GestureDetector(
-            onTap: () {
-              oepnLogoutDialog(context);
-            },
-            child: Text(
-              "Logout?",
-              style: TextStyle(color: redcolor, fontWeight: FontWeight.w600),
-            ),
-          ),
-          
-           */
-          SizedBox(height: 24),
+         */
         ],
       ),
     );
   }
-}
-
-Future<void> oepnLogoutDialog(BuildContext context) async {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: true, // user must tap button!
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Logout'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text('Are you sure to Logout?', style: TextStyle(fontSize: 16)),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: Text('Confirm'),
-            onPressed: () {
-              print('Confirmed');
-              Navigator.of(context).pop();
-
-              SharedPreferencesService.clearAllPreferences();
-              SharedPreferencesService.setFirstTimeStatus(
-                false,
-              ); // for not showing onboard screen
-              Get.offAll(() => LoginPage());
-            },
-          ),
-        ],
-      );
-    },
-  );
 }
 
 class InfoItem extends StatelessWidget {

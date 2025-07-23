@@ -19,8 +19,6 @@ Color graylight = const Color(0xFFbfbfbf);
 Color gray = const Color(0xFF7f7f7f);
 Color graydark = const Color(0xFF787878);
 
-
-
 //TYL
 Color graytext = const Color(0xFF64748B);
 Color blacktext = const Color(0xFF0F172A);
@@ -37,6 +35,14 @@ Color spcard1 = const Color(0xFF2463EB);
 Color spcard2 = const Color(0xFF17A34A);
 Color spcard3 = const Color(0xFF9334E9);
 Color spcard4 = const Color(0xFFEA580B);
+
+Color shimmerBaseColor = const Color(0xFFC9D9FF); // Light blue (more visible)
+Color shimmerHighlightColor = const Color(
+  0xFFDDE7FF,
+); // Softer highlight (still bright)
+
+Color shimmerBaseColor2 = graylight.withAlpha(100);
+Color shimmerHighlightColor2 = lightGrayBg;
 
 Color blackmedium = const Color(0xFF404040);
 Color lightblue = const Color(0xFFEAEFFF);
@@ -55,38 +61,32 @@ Color blackcolor = const Color(0xFF000000);
 
 //white light
 Color bgccolor1 = const Color(0xFFffffff);
-Color bgccolor2 = const Color(0xFFF3F8FF); 
+Color bgccolor2 = const Color(0xFFF3F8FF);
 
-//Color bgccolor2 = const Color(0xFFf8fafd); 
+//Color bgccolor2 = const Color(0xFFf8fafd);
 // blue lightblue
-Color bgccolor3 = const Color(0xFFd3e3fd); 
-Color bgccolor4 = const Color(0xFF226dd4); 
+Color bgccolor3 = const Color(0xFFd3e3fd);
+Color bgccolor4 = const Color(0xFF226dd4);
 
 //gray gray light
-Color bgccolor5 = const Color(0xFFe8eaed); 
-Color bgccolor6 = const Color(0xFF70757a); 
-
-
+Color bgccolor5 = const Color(0xFFe8eaed);
+Color bgccolor6 = const Color(0xFF70757a);
 
 Color textcolor = const Color(0xFF000000);
 Color textcol_light = const Color(0xFF787878);
 Color textcol_medium = const Color(0xFF2E2E2E);
 Color textcol_dark = const Color(0xFF000000);
 
-
 Color violetcolor = const Color(0xFF3D42DF);
 Color goldencolor = const Color(0xFFFEC53D);
 Color greenlightcolor = const Color(0xFF00B69B);
-
-
 
 Color cardcolor1 = const Color(0xFF2ea7c4);
 Color cardcolor2 = const Color(0xFFf44879);
 Color cardcolor3 = const Color(0xFF32c1a4);
 Color cardcolor4 = const Color(0xFFfabc1c);
 
-
- Gradient homeGradient = LinearGradient(
+Gradient homeGradient = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
   colors: [
@@ -95,4 +95,73 @@ Color cardcolor4 = const Color(0xFFfabc1c);
   ],
 );
 
+final List<Gradient> gradiantList = [
+  LinearGradient(
+    colors: [Color(0xff1ed9bf), Color(0xff04a38d)], // Mint to Sky
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xff52b4f0), Color(0xff108ad3)], // Beige Sunset
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
 
+  LinearGradient(
+    colors: [Color(0xff8e98f2), Color(0xff5e68b8)], // Soft Peach
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xffff9a63), Color(0xfff87049)],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xff5C9602), Color(0xff8DC900)], // Green Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xff0B7ED7), Color(0xff069CDD)], // Blue Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+
+  LinearGradient(
+    colors: [Color(0xff9962DE), Color(0xff948DFF)], // Purple Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xff3A9F9F), Color(0xff00D5AA)], // Teal Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xffFFB75E), Color(0xffED8F03)], // Orange Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xffFF6A88), Color(0xffFF99AC)], // Pink Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+  LinearGradient(
+    colors: [Color(0xff7F7FD5), Color(0xff86A8E7)], // Soft Indigo Gradient
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  ),
+];
+
+Gradient getGradientByIndex(int index) {
+  final int mappedIndex = (index % 10) % gradiantList.length;
+
+  // Use defaultGradient if out of range or list is empty
+  if (gradiantList.isEmpty || mappedIndex >= gradiantList.length) {
+    return homeGradient;
+  }
+
+  return gradiantList[mappedIndex];
+}

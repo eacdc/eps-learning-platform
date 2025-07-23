@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/views/screen/dashboard/quiz/qnapage/chatwidget.dart';
 
+import '../../../../../theme.dart';
+import '../../../../custom_widgets/circular_back_button.dart';
+
 class QnaPage extends StatefulWidget {
   const QnaPage({Key? key}) : super(key: key);
 
@@ -37,17 +40,54 @@ class _QnaPageState extends State<QnaPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+ ;
+
+     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('QnA'),
-          foregroundColor: blacktext,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        // AppBar with custom layout
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Column(
+            children: [
+              AppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                title: Container(
+                  // color: Colors.yellow,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Back Button
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CircularBackButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      const Text(
+                        'QnA',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Gray divider
+              Spacer(),
+              Divider(color: textWhiteGrey, height: 1),
+            ],
+          ),
         ),
-        body: ChatWidget(chapterId: chapterId,chapterName:chapterName),
-      ),
+        body: ChatWidget(chapterId: chapterId,chapterName:chapterName), ),
     );
   }
 }

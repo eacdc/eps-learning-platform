@@ -30,6 +30,34 @@ class ApiManager {
     return "/api/chat/chapter-history/$chapterId";
   }
 
+  static const String userProfile = "/api/users/me";
+  static const String updateProfile = "/api/users/profile";
+  static const String updateProfilePic = "/api/users/upload-profile-picture";
+
+   static String recentActivity(String userId) {
+    return "/api/scores/recent-activity/$userId";
+  }
+
+   static String scoreBoard(String userId) {
+    return "/api/scores/scoreboard/$userId";
+  }
+   static String scoreProgressDetails(String userId) {
+    return "/api/scores/progress-details/$userId";
+  }
+   static String assesmentData(String userId) {
+    return "/api/scores/assessment-data/$userId";
+  }
+   static String performanceOverview(String userId) {
+    return "/api/scores/performance-overview/$userId";
+  }
+
+
+
+
+
+
+  
+
 
   static const String loginwithplno = "/api/loginusingplno/";
   static const String profile = "/api/employee/employeedetailsbyid";

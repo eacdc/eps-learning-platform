@@ -1,51 +1,75 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/controllers/ImageUploadController/imageupload_controller.dart';
 import 'package:test_your_learing/controllers/profile/profile_controller.dart';
+import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/profile_model/profile_model.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
-import 'package:test_your_learing/views/custom_widgets/input_field.dart';
 
-class EditProfileSheet extends StatefulWidget {
+class UpdateProfilePicSheet extends StatefulWidget {
   final String? title;
-  final Widget? content;
-  final VoidCallback? onReadMore;
+
   final UserProfile? userProfile;
   final ProfileController profileController;
 
-  const EditProfileSheet({
+  const UpdateProfilePicSheet({
     Key? key,
     required this.userProfile,
     required this.profileController,
     this.title,
-    this.content,
-    this.onReadMore,
   }) : super(key: key);
 
   @override
-  State<EditProfileSheet> createState() => _EditProfileSheetState();
+  State<UpdateProfilePicSheet> createState() => _UpdateProfilePicSheetState();
 }
 
-class _EditProfileSheetState extends State<EditProfileSheet> {
+class _UpdateProfilePicSheetState extends State<UpdateProfilePicSheet> {
   late String token;
-  final TextEditingController fullnameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phonenoController = TextEditingController();
+
+  File? selectedImageFile;
+  Uint8List? imagePreviewBytes;
+
+  ImageuploadController imageuploadController = Get.put( ImageuploadController());
+
+  Future<void> pickImageFile() async {
+    final ImagePicker picker = ImagePicker();
+
+    try {
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85, // Reduce image size if needed
+      );
+
+      if (image != null) {
+        selectedImageFile = File(image.path);
+        imagePreviewBytes =
+            await selectedImageFile!.readAsBytes(); // for preview
+      } else {
+        selectedImageFile = null;
+        imagePreviewBytes = null;
+      }
+
+      setState(() {});
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBarGetx(e.toString());
+      print(e.toString());
+    }
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
-    final userProfile = widget.userProfile;
-    final fullname = userProfile?.fullname ?? '';
-    final email = userProfile?.email ?? '';
-    final _phone = userProfile?.phone ?? '';
-    final phone = _phone.replaceAll('+91', '').replaceAll(' ', '');
-
-    fullnameController.text = fullname;
-    emailController.text = email;
-    phonenoController.text = phone;
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       token = SharedPreferencesService.getAccessToken() ?? '';
     });
@@ -96,7 +120,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                         const SizedBox(height: 15),
                         Center(
                           child: Text(
-                            "Edit Profile",
+                            "Profile Picture",
                             style: TextStyle(
                               fontSize: 18,
                               color: blacktext,
@@ -149,76 +173,90 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      InputField(
-                        title: "Full name",
-                        hintText: 'Enter your full name',
-                        suffixIcon: SizedBox.shrink(),
-                        controller: fullnameController,
-                      ),
-                      SizedBox(height: 16),
-
-                      InputField(
-                        title: "Email Address",
-                        hintText: 'Enter your Email Address',
-                        suffixIcon: SizedBox.shrink(),
-                        // mandatory: true,
-                        controller: emailController,
-                        prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: graytext,
-                          size: 16,
+                      DottedBorder(
+                        borderType: BorderType.RRect,
+                        color: bordercolor,
+                        strokeWidth: 1,
+                        dashPattern: [6, 3],
+                        radius: Radius.circular(10),
+                        child: Container(
+                          height: 200,
+                          width: double.maxFinite,
+                          padding: EdgeInsets.all(8),
+                          child: InkWell(
+                            onTap: pickImageFile,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: 8),
+                                  imagePreviewBytes != null
+                                      ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.memory(
+                                          imagePreviewBytes!,
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                      : Image.asset(
+                                        "assets/images/add_image.png",
+                                        width: 40,
+                                        height: 40,
+                                        color: bordercolor,
+                                      ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    selectedImageFile != null
+                                        /// ? selectedImageFile!.name
+                                        ? basename(selectedImageFile!.path)
+                                        : 'Select Profile Image',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: primarycolor,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: primarycolor.withOpacity(
+                                        0.5,
+                                      ),
+                                      decorationThickness: 2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        onChanged: (val) {
-                          //signupController.emailid.value = val;
-                        },
-                        onSaved: (val) => null,
-                        validator:
-                            (val) =>
-                                (val!.isEmpty || val!.length < 10)
-                                    ? "Enter valid Email Address"
-                                    : null,
                       ),
-                      SizedBox(height: 16),
 
-                      InputField(
-                        title: "Phone number",
-                        hintText: 'Enter your phone number',
-                        suffixIcon: SizedBox.shrink(),
-                        controller: phonenoController,
-                      ),
-                      SizedBox(height: 20),
-                      CustomGradiantButton(
-                        loading: widget.profileController.isLoading.value,
-                        buttonColor: primarycolor,
-                        textValue: 'Save Changes',
-                        textColor: onprimary,
-                        onPressed: () {
-                          final _fullname = fullnameController.text;
-                          final _email = emailController.text;
-                          final _phonenumber = phonenoController.text;
-
-                          if (validateCredentials(
-                            _fullname,
-                            _email,
-                            _phonenumber,
-
-                            context,
-                          )) {
-                            /*  loginController.loginUser(
-                                    _email, _password, context); */
-                            // update email to controller
-                            widget.profileController.updateUserProfile(
-                              token: token,
-                              context: context,
-                              fullname: _fullname,
-                              email: _email,
-                              phoneNumber: _phonenumber,
-                            );
-
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          }
-                        },
-                      ),
+                      SizedBox(height: 32),
+                      selectedImageFile != null
+                          ? Obx(
+                            () => CustomGradiantButton(
+                              loading: imageuploadController.isLoading.value,
+                              buttonColor: primarycolor,
+                              textValue: 'Update',
+                              textColor: onprimary,
+                              onPressed: () {
+                                if (selectedImageFile != null) {
+                                  imageuploadController.updateUserProfilePicture(
+                                    file: selectedImageFile!,
+                                    token: token,
+                                    //fileExtension: widget.userProfile!.fullname,
+                                    context: context,
+                                    profile_controller:
+                                        widget.profileController,
+                                  );
+                                }
+                              },
+                            ),
+                          )
+                          : SizedBox.shrink(),
 
                       SizedBox(height: 16),
                     ],
