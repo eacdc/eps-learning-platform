@@ -1,10 +1,23 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/constants/grade_list.dart';
+import 'package:test_your_learing/constants/master_list.dart';
 import 'package:test_your_learing/controllers/collection_controller.dart';
+import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
+import 'package:test_your_learing/models/collection_model/books_collection_list.dart';
+import 'package:test_your_learing/views/custom_widgets/primary_button.dart';
+import 'package:test_your_learing/views/custom_widgets/progressbar_widget.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
+import 'package:test_your_learing/views/custom_widgets/search_input_field.dart';
+import 'package:test_your_learing/views/custom_widgets/secondary_button.dart';
+import 'package:test_your_learing/views/dialogsheet/book_subscribe_sheet.dart';
 
+import '../../../../controllers/dashboard_controller.dart';
 import '../quiz/qnapage/qna_page.dart';
 
 class CollectionPage extends StatefulWidget {
@@ -15,256 +28,16 @@ class CollectionPage extends StatefulWidget {
 }
 
 class _CollectionPageState extends State<CollectionPage> {
-  final dashboardController = Get.put(CollectionController());
-  //final EventSubmitController eventSubmitController = Get.find();
-  //final ProfileController profileController = Get.find();
+  final collectionController = Get.put(CollectionController());
+  final dashboardController = findOrPut(() => DashboardController());
+  final searchController = TextEditingController();
+  final FocusNode searchFocus = FocusNode();
 
   ScrollController scrollController = ScrollController();
+  bool _showFilterBar = true;
+  Timer? _scrollTimer;
 
-  late int employee_id;
   late String token;
-  //String selectedFilter = "All"; // Default selected filter
-
-  /* void showDepartmentBottomSheet(BuildContext context) {
-  final TextEditingController searchController = TextEditingController();
-  final RxString searchText = ''.obs;
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    ),
-    builder: (context) {
-      return Obx(() {
-        List<Department> departmentList =
-            eventSubmitController.department_data.value?.data ?? [];
-
-        // 🔍 Filter department list based on search input
-        final filteredDepartments = departmentList
-            .where((dept) => dept.departmentName
-                .toLowerCase()
-                .contains(searchText.value.toLowerCase()))
-            .toList();
-
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          padding: const EdgeInsets.all(0),
-          child: Column(
-            children: [
-              // Title Bar with Close Icon
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                height: 50,
-                child: Stack(
-                  children: [
-                    Align(
-                      child: Text(
-                        'Department',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: primarycolor),
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: IconButton(
-                        iconSize: 16,
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Divider(
-                height: 2,
-                color: bordercolor,
-                thickness: 0.5,
-              ),
-
-              // 🔍 Search Box
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search department...',
-                    prefixIcon: Icon(Icons.search, size: 20),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onChanged: (value) => searchText.value = value,
-                ),
-              ),
-
-              Expanded(
-                child: eventSubmitController.isLoading.value
-                    ? const Center(child: CircularProgressIndicator())
-                    : filteredDepartments.isEmpty
-                        ? const Center(child: Text("No departments found."))
-                        : ListView.builder(
-                            itemCount: filteredDepartments.length,
-                            itemBuilder: (context, index) {
-                              final department = filteredDepartments[index];
-                              return Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 6),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: whitecolor,
-                                ),
-                                child: ListTile(
-                                  title: Text(department.departmentName),
-                                  leading: Radio<Department>(
-                                    activeColor: primarycolor,
-                                    value: department,
-                                    groupValue: dashboardController
-                                        .selectedDepartment.value,
-                                    onChanged: (Department? value) {
-                                      dashboardController
-                                          .selectedDepartment.value = value;
-                                      Navigator.pop(context, value);
-                                      dashboardController.allfilter.value = false;
-                                      dashboardController.getIncidentFilterSearch(
-                                          token: token, context: context);
-                                    },
-                                  ),
-                                  onTap: () {
-                                    dashboardController
-                                        .selectedDepartment.value = department;
-                                    Navigator.pop(context, department);
-                                    dashboardController.allfilter.value = false;
-                                    dashboardController.getIncidentFilterSearch(
-                                        token: token, context: context);
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-              )
-            ],
-          ),
-        );
-      });
-    },
-  );
-}
-
-  void showSeverityBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Obx(() {
-          return Container(
-            padding: EdgeInsets.all(0),
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  height: 50,
-                  child: Stack(
-                    children: [
-                      Align(
-                          child: Text(
-                        'Severity',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: primarycolor),
-                        // style: MyTextStyles.mediumSemiboldBlack(context),
-                      )),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: IconButton(
-                          iconSize: 16,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(
-                  height: 2,
-                  color: bordercolor,
-                  thickness: 0.5,
-                  indent: 0,
-                  endIndent: 0,
-                ),
-                SizedBox(
-                  height: 6,
-                ),
-                Expanded(
-                  child: eventSubmitController.isLoading.value
-                      ? Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                          itemCount: severityList.length,
-                          itemBuilder: (context, index) {
-                            var _severity = severityList[index];
-                            return Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 6),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: whitecolor,
-                              ),
-                              child: ListTile(
-                                title: Text(_severity.title),
-                                leading: Radio<Severity>(
-                                  activeColor: primarycolor,
-                                  value: _severity,
-                                  groupValue: dashboardController
-                                      .selectedSeverity.value,
-                                  onChanged: (Severity? value) {
-                                    dashboardController.selectedSeverity.value =
-                                        value;
-                                    Navigator.pop(context,
-                                        value); // Return selected value
-
-                                    dashboardController.allfilter.value = false;
-                                    dashboardController.getIncidentFilterSearch(
-                                        token: token, context: context);
-                                  },
-                                ),
-                                onTap: () {
-                                  dashboardController.selectedSeverity.value =
-                                      _severity;
-                                  Navigator.pop(context,
-                                      _severity); // Return selected department
-
-                                  dashboardController.allfilter.value = false;
-                                  dashboardController.getIncidentFilterSearch(
-                                      token: token, context: context);
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
-          );
-        });
-      },
-    );
-  }
- */
 
   Widget _buildFilterItem(
     String label,
@@ -327,17 +100,55 @@ class _CollectionPageState extends State<CollectionPage> {
     );
   }
 
+  showSubscribeDialog(BookList bookData) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SubscribeBookSheet(
+          title: bookData.title ?? "",
+          desc:
+              bookData.isSubscribed
+                  ? 'Do you want to unsubscribe this book?'
+                  : 'Do you want to subscribe this book?',
+          bookData: bookData,
+          positiveText: bookData.isSubscribed ? 'Unsubscribe' : "Subscribe",
+          negativeText: "Cancel",
+          onPositiveCallback: () {
+            bookData.isSubscribed
+                ? collectionController.unsubscribeBook(
+                  token: token,
+                  context: context,
+                  bookId: bookData.id ?? "",
+                )
+                : collectionController.subscribeBook(
+                  token: token,
+                  context: context,
+                  bookId: bookData.id ?? "",
+                );
+          },
+          onNegativeCallback: () {},
+        );
+      },
+    );
+  }
+
+  void searchUnfocus() {
+    if (searchFocus.hasFocus) {
+      searchFocus.unfocus();
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    employee_id = 0;
-    //SharedPreferencesService.getEmployeeId();
     token = SharedPreferencesService.getAccessToken();
-    //SharedPreferencesService.getAccessToken();
 
-    dashboardController.getBookListCollection(
+    collectionController.getBookListCollectionFilterSearch(
       token: token,
       context: context,
       reloadpage: true,
@@ -347,36 +158,70 @@ class _CollectionPageState extends State<CollectionPage> {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
         print("reach end");
-        dashboardController.pageNo.value = dashboardController.pageNo.value + 1;
-        dashboardController.getIncidentFilterSearch(
+        collectionController.pageNo.value = collectionController.pageNo.value + 1;
+         collectionController.getBookListCollectionFilterSearch(
           token: token,
           context: context,
-          pageNumber: dashboardController.pageNo.value,
+          pageNumber: collectionController.pageNo.value,
         );
 
         //get More Task
       }
+
+      // Scroll control for filter
+      /*  if (scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        // scrolling down
+        if (_showFilterBar) setState(() => _showFilterBar = false);
+      } else if (scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        // scrolling up
+        if (!_showFilterBar) setState(() => _showFilterBar = true);
+      } */
+
+      // Always hide filter bar while scrolling
+      if (_showFilterBar) {
+        setState(() {
+          _showFilterBar = false;
+        });
+      }
+
+      // Cancel any previous timer
+      _scrollTimer?.cancel();
+
+      // Start a timer to show the filter bar after scrolling stops
+      _scrollTimer = Timer(const Duration(milliseconds: 500), () {
+        if (!_showFilterBar) {
+          setState(() {
+            _showFilterBar = true;
+          });
+        }
+      });
     });
 
-    // profileController.getEmployeeProfile(employee_id, token, context);
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    scrollController.dispose();
+    // scrollController.dispose();
+    scrollController.removeListener(() {});
+    _scrollTimer?.cancel();
+    searchController.dispose();
+    searchFocus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("rebuild cvv");
     return Obx(
       () => Container(
         color: lightwhitetext,
         child: Stack(
           // fit: StackFit.loose,
           //  alignment: AlignmentDirectional.center,
-          fit: StackFit.expand,
+          //  fit: StackFit.expand,
           children: [
             Column(
               // mainAxisAlignment: MainAxisAlignment.start,
@@ -386,8 +231,13 @@ class _CollectionPageState extends State<CollectionPage> {
                 SizedBox(height: 1),
                 Container(
                   width: double.infinity,
-                  margin: EdgeInsets.all(8),
-                  padding: EdgeInsets.all(6),
+                  margin: EdgeInsets.only(
+                    top: 16,
+                    bottom: 8,
+                    left: 16,
+                    right: 16,
+                  ),
+                  padding: EdgeInsets.all(0),
                   decoration: BoxDecoration(
                     // color: redcolor,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -400,9 +250,24 @@ class _CollectionPageState extends State<CollectionPage> {
                           onTap: () {
                             // _showModal(context, collectionController);
                           },
-                          child: SearchField(),
+                          //  child: SearchField(),
+                          child: SearchInputField(
+                            controller: searchController,
+                            focusNode: searchFocus,
+                            onTextChanged: (text) {
+                              print("Search input: $text");
+                              collectionController.searchString.value = text;
+                              // Add search logic here
+                              collectionController
+                                  .getBookListCollectionFilterSearch(
+                                    context: context,
+                                    token: token,
+                                  );
+                            },
+                          ),
                         ),
                       ),
+
                       SizedBox(height: 12),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -415,7 +280,7 @@ class _CollectionPageState extends State<CollectionPage> {
                               "All",
                               true,
                               "assets/icons/png_all_category.png",
-                              dashboardController.allfilter.value,
+                             true,
                               () {},
                             ),
                             SizedBox(width: 8),
@@ -437,202 +302,299 @@ class _CollectionPageState extends State<CollectionPage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 4),
+
+                      //SizedBox(height: 4),
                     ],
                   ),
                 ),
 
-                /*  (dashboardController.incidentdata.value?.data ?? [])
-                              .isNotEmpty */
-                dashboardController.bookCollectionList.value.isNotEmpty
+                collectionController.bookCollectionList.value.isNotEmpty
                     ? Expanded(
                       // height: 200,
                       //   color: blackcolor,
-                      child: GridView.builder(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(16),
+                      child:
+                          dashboardController.isListStyle.value
+                              ? ListView.builder(
+                                padding: const EdgeInsets.only(
+                                  bottom: 50,
+                                ), // adjust as needed
+                                controller: scrollController,
 
-                        /*  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,                // 2 columns
-    crossAxisSpacing: 12,
-    mainAxisSpacing: 12,
-    childAspectRatio: 0.4,            // Adjust as per your design
-  ), */
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 250, // Max width of each item
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio:
-                                  0.46, // Optional: can remove or tweak
-                            ),
-                        itemCount:
-                            dashboardController.bookCollectionList.length,
-                        itemBuilder: (context, index) {
-                          final bookData =
-                              dashboardController.bookCollectionList[index];
+                              
+                                //physics: NeverScrollableScrollPhysics(),
+                                //  shrinkWrap: true,
+                                itemCount:
+                                    collectionController
+                                        .bookCollectionList
+                                        .length,
+                                itemBuilder: (context, index) {
+                                  final bookData =
+                                      collectionController
+                                          .bookCollectionList
+                                          .value[index];
+                                  return bookListItem(
+                                    imageUrl: bookData.bookCoverImgLink ?? "",
+                                    title: bookData.title ?? "",
+                                    progress: 0.0,
+                                    isSubscribed: bookData.isSubscribed,
 
-                          return bookGridItem(
-                            imageUrl: bookData.bookCoverImgLink,
-                            title:
-                                bookData
-                                    .title, // Corrected field name to `bookTitle`
-                            progress: 0.0,
-                            isSubscribed: bookData.subscribed,
-                            onViewChapter: () {
-                              _showChapterBottomsheet(
-                                context,
-                                dashboardController,
-                                bookData
-                                    .id, // Corrected field name to `bookId`
-                                token,
-                              );
-                            },
-                            onSubscribe: () {
-                              Get.defaultDialog(
-                                title: bookData.title ?? "",
-                                middleText:
-                                    bookData.subscribed
-                                        ? 'Do you want to unsubscribe?'
-                                        : 'Do you want to subscribe?',
-                                textCancel: 'Cancel',
-                                textConfirm:
-                                    bookData.subscribed
-                                        ? 'Unsubscribe'
-                                        : "Subscribe",
-                                confirmTextColor: Colors.white,
-                                buttonColor: primarycolor,
-                                onConfirm: () {
-                                  Get.back(); // Close the dialog
-                                  // TODO: Call your unsubscribe function here
-                                  print('User confirmed unsubscribe');
-
-                                  bookData.subscribed
-                                      ? dashboardController.unsubscribeBook(
-                                        token: token,
-                                        context: context,
-                                        bookId: bookData.id ?? "",
-                                      )
-                                      : dashboardController.subscribeBook(
-                                        token: token,
-                                        context: context,
-                                        bookId: bookData.id ?? "",
+                                    onViewChapter: () {
+                                      searchUnfocus();
+                                      _showChapterBottomsheet(
+                                        context,
+                                        collectionController,
+                                        bookData.bookId ?? "",
+                                        bookData,
+                                        token,
                                       );
+                                    },
+                                    onSubscribe: () {
+                                      searchUnfocus();
+                                      showSubscribeDialog(bookData);
+                                    },
+                                  );
                                 },
-                                onCancel: () {
-                                  Get.back();
-                                  // Optional: Handle cancel action
-                                  print('User canceled');
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
+                              )
+                              : GridView.builder(
+                                controller: scrollController,
+                                padding: const EdgeInsets.only(
+                                  left: 16,
+                                  right: 16,
+                                  top: 8,
+                                  bottom: 50,
+                                ),
 
-                      /* ListView.builder(
-                        controller: scrollController,
+                                /*  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,                // 2 columns
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.4,            // Adjust as per your design
+                            ), */
+                                gridDelegate:
+                                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent:
+                                          250, // Max width of each item
+                                      mainAxisSpacing: 12,
+                                      crossAxisSpacing: 12,
+                                      childAspectRatio:
+                                          0.46, // Optional: can remove or tweak
+                                    ),
+                                itemCount:
+                                    collectionController
+                                        .bookCollectionList
+                                        .length,
+                                itemBuilder: (context, index) {
+                                  final bookData =
+                                      collectionController
+                                          .bookCollectionList[index];
 
-                        /*  controller: ScrollController()
-                                  ..addListener(() {
-                                    
-                                  /*   if (dashboardController.isLoading.isFalse &&
-                                        dashboardController.hasNextPage.isTrue &&
-                                        dashboardController
-                                            .incidentDataList.isNotEmpty) {
-                                      dashboardController.getIncidentFilterSearch(
-                                        token: token, // Add your token here
-                                        context: context,
-                                        pageNumber:
-                                            dashboardController.pageNo.value,
+                                  return bookGridItem(
+                                    imageUrl: bookData.bookCoverImgLink,
+                                    title:
+                                        bookData
+                                            .title, // Corrected field name to `bookTitle`
+                                    progress: 0.0,
+                                    isSubscribed: bookData.isSubscribed,
+                                    onViewChapter: () {
+                                      searchUnfocus();
+                                      _showChapterBottomsheet(
+                                        context,
+                                        collectionController,
+                                        bookData
+                                            .id, // Corrected field name to `bookId`
+                                        bookData,
+                                        token,
                                       );
-                                    } */
-                                  }), */
-                        //physics: NeverScrollableScrollPhysics(),
-                        //  shrinkWrap: true,
-                        itemCount:
-                            dashboardController.bookCollectionList.length,
-                        itemBuilder: (context, index) {
-                          final bookData =
-                              dashboardController
-                                  .bookCollectionList
-                                  .value[index];
-                          return bookListItem(
-                            imageUrl: bookData.bookCoverImgLink,
-                            title: bookData.title,
-                            progress: 0.0,
-                            // onViewChapter: () => print("View chapter tapped"),
-                            onViewChapter: () {
-                              _showChapterBottomsheet(
-                                context,
-                                dashboardController,
-                                bookData.id,
-                                token,
-                              );
-                            },
-                            onSubscribe: () => print("Subscribe tapped"),
-                          );
-                        },
-                      ), */
-                    )
+                                    },
+                                    onSubscribe: () {
+                                      searchUnfocus();
+                                      showSubscribeDialog(bookData);
+                                    },
+                                  );
+                                },
+                              ),
+
+                   )
                     : Container(
                       margin: EdgeInsets.only(top: 30),
                       padding: EdgeInsets.all(80),
                       child: Image.asset("assets/images/png_no_collection.png"),
-                      //child:Text(dashboardController.bookCollectionList.value.length.toString()),
+                      //child:Text(collectionController.bookCollectionList.value.length.toString()),
                     ),
+
+                //   SizedBox(height: 16,)
               ],
             ),
-            Visibility(
-              visible: dashboardController.isLoading.value,
+
+            // Positioned.fill (
+            Positioned(
+              // Makes the child fill the entire stack
+              bottom: 36,
+              left: 0,
+              right: 0,
               child: Center(
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primarycolor.withOpacity(0.3),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 2), // changes position of shadow
-                      ),
-                    ],
-                    color: whitecolor,
-                  ),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4.5,
-                    color: primarycolor.withOpacity(0.8),
-                    strokeCap: StrokeCap.round,
+                /* AnimatedSlide(
+                  duration: Duration(milliseconds: 300),
+                  offset: _showFilterBar ? Offset(0, 0) : Offset(0, 1), // slide in/out vertically
+                  child: YourFilterWidget(),
+                  ) */
+                child: AnimatedOpacity(
+                  opacity: _showFilterBar ? 1.0 : 0.0,
+                  duration: Duration(milliseconds: 400),
+                  child: Container(
+                    // height: 50,
+                    //width: 150,
+                    // alignment: Alignment.bottomCenter, dont use this!!!!!!!!!!!!
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: blackmedium,
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: whitecolor.withAlpha(100),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 2), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      //mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            searchUnfocus();
+                            _showFilterBottomsheet(
+                              context,
+                              collectionController,
+                              token,
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Stack(
+                                children: [
+                                  Image.asset(
+                                    "assets/icons/png_filter.png",
+                                    height: 16,
+                                    width: 16,
+                                  ),
+                                  Visibility(
+                                    visible:
+                                        collectionController
+                                            .isFilterApplied
+                                            .value,
+                                    child: Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: Container(
+                                        height: 6,
+                                        width: 6,
+                                        decoration: BoxDecoration(
+                                          color: redcolor,
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(width: 8),
+                              Text(
+                                "Filter",
+
+                                style: TextStyle(
+                                  color: whitecolor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 14),
+                          height: 24,
+                          width: 1,
+                          color: whitecolor.withAlpha(150),
+                        ),
+                        /*   VerticalDivider(
+                          color: redcolor,
+                          thickness: 10,
+                          width: 24,
+                          //indent: 8,
+                          // endIndent: 8,
+                        ), */
+                        InkWell(
+                          onTap: () {
+                            searchUnfocus();
+                            _showSortBottomsheet(
+                              context,
+                              collectionController,
+                              token,
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Stack(
+                                children: [
+                                  Image.asset(
+                                    "assets/icons/png_sort.png",
+                                    height: 16,
+                                    width: 16,
+                                  ),
+                                  Visibility(
+                                    visible:
+                                        collectionController
+                                            .isSortApplied
+                                            .value,
+                                    child: Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: Container(
+                                        height: 6,
+                                        width: 6,
+                                        decoration: BoxDecoration(
+                                          color: redcolor,
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                "Sorting",
+                                style: TextStyle(
+                                  color: whitecolor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
+
+            ProgressBarWidget(visible: collectionController.isLoading.value),
           ],
         ),
       ),
     );
   }
-}
-
-class Report {
-  final String severity;
-  final String department;
-  final String description;
-  final String date;
-  final String time;
-  final int imageCount;
-
-  Report({
-    required this.severity,
-    required this.department,
-    required this.description,
-    required this.date,
-    required this.time,
-    required this.imageCount,
-  });
 }
 
 Widget bookGridItem({
@@ -748,6 +710,8 @@ Widget bookListItem({
   required String imageUrl,
   required String title,
   required double progress, // from 0.0 to 1.0
+  required bool isSubscribed, // from 0.0 to 1.0
+
   required VoidCallback onViewChapter,
   required VoidCallback onSubscribe,
 }) {
@@ -846,7 +810,8 @@ Widget bookListItem({
                 onTap: onSubscribe,
                 child: Center(
                   child: Text(
-                    "Subscribe",
+                    isSubscribed ? "Unsubscribe" : "Subscribe",
+
                     style: TextStyle(
                       color: primarycolor,
                       fontWeight: FontWeight.w500,
@@ -867,6 +832,7 @@ void _showChapterBottomsheet(
   context,
   CollectionController collectionController,
   String bookId,
+  BookList bookData,
   String token,
 ) {
   //final TextEditingController searchTextController = TextEditingController();
@@ -881,7 +847,7 @@ void _showChapterBottomsheet(
   showModalBottomSheet(
     isScrollControlled: true,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
     ),
     context: context,
     builder: (context) {
@@ -900,205 +866,1056 @@ void _showChapterBottomsheet(
             maxChildSize: 0.95,
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
-              return Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    height: 50,
-                    child: Stack(
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  children: [
+                    // 🔵 Fixed Header Section (non-scrollable)
+                    Stack(
                       children: [
-                        Align(
-                          child: Text(
-                            "Chapters",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: blackmedium,
-                            ),
-                            // style: MyTextStyles.mediumSemiboldBlack(context),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 12,
+                            right: 12,
+                            top: 12,
+                            bottom: 1,
+                          ),
+                          child: Column(
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 50,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: lightbluetext,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Center(
+                                child: Text(
+                                  "Book Details",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: blacktext,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Divider(thickness: 1, color: lightbluetext),
+                            ],
                           ),
                         ),
-                        /* Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: IconButton(
-                              iconSize: 18,
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(Icons.close),
+                        Positioned(
+                          right: 10,
+                          top: 10,
+                          child: Material(
+                            color: lightbluetext,
+                            elevation: 0,
+                            borderRadius: BorderRadius.circular(32),
+                            child: InkWell(
+                              onTap: () => Navigator.pop(context),
+                              borderRadius: BorderRadius.circular(32),
+                              splashColor: primarycolor.withAlpha(50),
+                              child: Container(
+                                height: 32,
+                                width: 32,
+                                decoration: BoxDecoration(
+                                  // color: lightbluetext, // insted added it in material color for ripple effect
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
-                          ), */
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  Divider(
-                    height: 2,
-                    color: bordercolor,
-                    thickness: 0.5,
-                    indent: 0,
-                    endIndent: 0,
-                  ),
-                  SizedBox(height: 8),
-                  // 🔍 Search Header
 
-                  // 📃 Result List
-                  Expanded(
-                    child: Obx(() {
-                      final results = collectionController.bookChapterList;
-
-                      if (collectionController.isLoading.value) {
-                        return Center(
-                          child: Container(
-                            height: 50,
-                            width: 50,
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: primarycolor.withOpacity(0.3),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(
-                                    0,
-                                    2,
-                                  ), // changes position of shadow
-                                ),
-                              ],
-                              color: whitecolor,
-                            ),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 4.5,
-                              color: primarycolor.withOpacity(0.8),
-                              strokeCap: StrokeCap.round,
+                    /* Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      height: 50,
+                      child: Stack(
+                        children: [
+                          Align(
+                            child: Text(
+                              "Chapters",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: blackmedium,
+                              ),
+                              // style: MyTextStyles.mediumSemiboldBlack(context),
                             ),
                           ),
-                        );
-                      }
+                          /* Positioned(
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: IconButton(
+                                iconSize: 18,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.close),
+                              ),
+                            ), */
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 2,
+                      color: bordercolor,
+                      thickness: 0.5,
+                      indent: 0,
+                      endIndent: 0,
+                    ),
+                    SizedBox(height: 8),
+                    // 🔍 Search Header */
+                    const SizedBox(height: 10),
 
-                      if (results.isEmpty) {
-                        return Center(
-                          child: Text(
-                            "No Chapters Found",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: primarycolor,
-                              fontWeight: FontWeight.w600,
+                    // book details
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Left: Book Image
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              bookData.bookCoverImgLink,
+                              width: 70,
+                              height: 90,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/logo.png', // Your local default image
+                                  width: 80,
+                                  height: 110,
+                                  fit: BoxFit.contain,
+                                );
+                              },
                             ),
                           ),
-                        );
-                      }
-
-                      return ListView.separated(
-                        controller: scrollController,
-                        itemCount: results.length,
-                        separatorBuilder: (context, _) => Divider(),
-                        itemBuilder: (context, index) {
-                          final chapterdata = results[index];
-
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 8,
-                            ),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100, //  Background color
-                              borderRadius: BorderRadius.circular(
-                                16,
-                              ), //  Curved border
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                          const SizedBox(width: 12),
+                          // Right Column
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                // Book Name
+                                Text(
+                                  bookData.title,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 5,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: primarycolor.withAlpha(30),
-                                          borderRadius: BorderRadius.circular(
-                                            50,
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Subject - ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
-                                        ),
-                                        child: Text(
-                                          '${index + 1}',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: primarycolor,
-                                            fontWeight: FontWeight.w600,
+                                          //SizedBox(width: 10),
+
+                                          //  Spacer(),
+                                          Text(
+                                            bookData.subject,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text(
-                                          chapterdata.title ?? "No Name",
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            /* height:
-                                                1.4, */
-                                            // improves readability for multi-line
+
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Publisher - ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
-                                          softWrap: true,
-                                        ),
+
+                                          // SizedBox(width: 10),
+
+                                          //  Spacer(),
+                                          Text(
+                                            bookData.publisher,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Grade - ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          //SizedBox(width: 10),
+
+                                          //  Spacer(),
+                                          Text(
+                                            bookData.grade,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
 
-                                /* 
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Get.to(
-                                      () => const QnaPage(),
-                                      arguments: {
-                                        'chapterId': chapterdata.id ?? '',
-                                        'chapterName': chapterdata.title ?? '',
-                                        'bookId': chapterdata.bookId ?? '',
-                                      },
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: primarycolor,
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: const Text(
-                                      'Start Quiz',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                                // Progress Bar
+                                /*  LinearProgressIndicator(
+                                      value: progress,
+                                      minHeight: 6,
+                                      backgroundColor: progressColorLight.withAlpha(80),
+                                      color: progressColor,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ), */
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Chapters :",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: blacktext,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 3),
+                            Container(
+                              width: 45,
+                              height: 1.5,
+                              decoration: BoxDecoration(
+                                color: lightGray,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // 📃 chapter List
+                    Expanded(
+                      child: Obx(() {
+                        final results = collectionController.bookChapterList;
+
+                        if (collectionController.isChapterLoading.value) {
+                          return Center(
+                            child: ProgressBarWidget(
+                              visible:
+                                  collectionController.isChapterLoading.value,
+                            ),
+                          );
+                        }
+
+                        if (results.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 100,
+                                  width: 100,
+                                  //margin: EdgeInsets.only(top: 30),
+                                  padding: EdgeInsets.all(5),
+                                  child: Image.asset(
+                                    "assets/images/png_no_collection.png",
+                                  ),
+                                  //  child: Center(child: Text("No Category Found")),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  "No Chapters Found",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: primarycolor,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              */
                               ],
                             ),
                           );
-                        },
-                      );
-                    }),
-                  ),
-                ],
+                        }
+
+                        return ListView.builder(
+                          controller: scrollController,
+                          itemCount: results.length,
+                          //  separatorBuilder: (context, _) => Divider(),
+                          itemBuilder: (context, index) {
+                            final chapterdata = results[index];
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 8,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: lightGrayBg.withAlpha(
+                                  150,
+                                ), //  Background color
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ), //  Curved border
+                                border: Border.all(
+                                  color: lightGrayBg.withAlpha(250),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: primarycolor.withAlpha(25),
+                                            borderRadius: BorderRadius.circular(
+                                              50,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: primarycolor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            chapterdata.title ?? "No Name",
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              /* height:
+                                                  1.4, */
+                                              // improves readability for multi-line
+                                            ),
+                                            softWrap: true,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  /* 
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Get.to(
+                                        () => const QnaPage(),
+                                        arguments: {
+                                          'chapterId': chapterdata.id ?? '',
+                                          'chapterName': chapterdata.title ?? '',
+                                          'bookId': chapterdata.bookId ?? '',
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: primarycolor,
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: const Text(
+                                        'Start Quiz',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                */
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void _showSortBottomsheet(
+  context,
+  CollectionController collectionController,
+
+  String token,
+) {
+  //final TextEditingController searchTextController = TextEditingController();
+  //collectionController.searchServices("");
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+    ),
+    context: context,
+    builder: (context) {
+      return Padding(
+        padding:
+            MediaQuery.of(
+              context,
+            ).viewInsets, // 👈 Pushes up when keyboard shows
+        child: SafeArea(
+          child: DraggableScrollableSheet(
+            expand: false,
+
+            /* .............. */
+            initialChildSize: 0.6,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            /* ............... */
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 🔵 Fixed Header Section (non-scrollable)
+                        Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 12,
+                                right: 12,
+                                top: 12,
+                                bottom: 1,
+                              ),
+                              child: Column(
+                                children: [
+                                  Center(
+                                    child: Container(
+                                      width: 50,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: lightbluetext,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Center(
+                                    child: Text(
+                                      "Sort",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: blacktext,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Divider(thickness: 1, color: lightbluetext),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              right: 10,
+                              top: 10,
+                              child: Material(
+                                color: lightbluetext,
+                                elevation: 0,
+                                borderRadius: BorderRadius.circular(32),
+                                child: InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  borderRadius: BorderRadius.circular(32),
+                                  splashColor: primarycolor.withAlpha(50),
+                                  child: Container(
+                                    height: 32,
+                                    width: 32,
+                                    decoration: BoxDecoration(
+                                      // color: lightbluetext, // insted added it in material color for ripple effect
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // 🔵 Scrollable Content Section
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Sort By
+                                Text(
+                                  "Sort By :",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: blacktext,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  children:
+                                      sortOptions.map((option) {
+                                        return Obx(() {
+                                          final isSelected =
+                                              collectionController
+                                                  .sortBy
+                                                  .value ==
+                                              option.value;
+                                          return ChoiceChip(
+                                            backgroundColor: lightGrayBg,
+                                            selectedColor: primarycolor,
+                                            label: Text(option.label),
+                                            side: BorderSide.none,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              side: BorderSide.none,
+                                              /*  side: BorderSide(
+                                                color:
+                                                    isSelected
+                                                        ? primarycolor
+                                                        : blackmedium,
+                                              ), */
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color:
+                                                  isSelected
+                                                      ? whitecolor
+                                                      : blackcolor,
+                                            ),
+                                            selected: isSelected,
+                                            onSelected: (_) {
+                                              collectionController
+                                                  .sortBy
+                                                  .value = option.value;
+                                              collectionController
+                                                  .updateIsSortApplied();
+                                              collectionController
+                                                  .getBookListCollectionFilterSearch(
+                                                    context: context,
+                                                    token: token,
+                                                  );
+                                            },
+                                            showCheckmark: false,
+                                          );
+                                        });
+                                      }).toList(),
+                                ),
+
+                                SizedBox(height: 24),
+
+                                // Sort Order
+                                Text(
+                                  "Sort Order :",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: blacktext,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  children:
+                                      sortOrderOptions.map((option) {
+                                        return Obx(() {
+                                          final isSelected =
+                                              collectionController
+                                                  .sortOrder
+                                                  .value ==
+                                              option.value;
+                                          return ChoiceChip(
+                                            backgroundColor: lightGrayBg,
+                                            selectedColor: primarycolor,
+                                            label: Text(option.label),
+                                            side: BorderSide.none,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              side: BorderSide.none,
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color:
+                                                  isSelected
+                                                      ? whitecolor
+                                                      : blackcolor,
+                                            ),
+                                            selected: isSelected,
+                                            onSelected: (_) {
+                                              collectionController
+                                                  .sortOrder
+                                                  .value = option.value;
+                                              collectionController
+                                                  .updateIsSortApplied();
+                                              collectionController
+                                                  .getBookListCollectionFilterSearch(
+                                                    context: context,
+                                                    token: token,
+                                                  );
+                                            },
+                                            showCheckmark: false,
+                                          );
+                                        });
+                                      }).toList(),
+                                ),
+                                SizedBox(height: 24),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // 🔵 Bottom Fixed Buttons
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Divider(color: lightbluetext),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SecondaryButton(
+                                      buttonColor: primarycolor,
+                                      textValue: "Clear",
+                                      textColor: primarycolor,
+                                      onPressed: () {
+                                        collectionController.clearSorts();
+                                        collectionController
+                                            .getBookListCollectionFilterSearch(
+                                              context: context,
+                                              token: token,
+                                            );
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+
+                                  Expanded(
+                                    child: PrimaryButton(
+                                      buttonColor: primarycolor,
+                                      textValue: "Apply",
+                                      textColor: whitecolor,
+                                      onPressed: () {
+                                        Navigator.of(
+                                          context,
+                                        ).pop(); // Or your sort function
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void _showFilterBottomsheet(
+  context,
+  CollectionController collectionController,
+
+  String token,
+) {
+  //final TextEditingController searchTextController = TextEditingController();
+  //collectionController.searchServices("");
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+    ),
+    context: context,
+    builder: (context) {
+      return Padding(
+        padding:
+            MediaQuery.of(
+              context,
+            ).viewInsets, // 👈 Pushes up when keyboard shows
+        child: SafeArea(
+          child: DraggableScrollableSheet(
+            expand: false,
+
+            /* .............. */
+            initialChildSize: 0.7,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            /* ............... */
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 🔵 Fixed Header Section (non-scrollable)
+                        Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 12,
+                                right: 12,
+                                top: 12,
+                                bottom: 1,
+                              ),
+                              child: Column(
+                                children: [
+                                  Center(
+                                    child: Container(
+                                      width: 50,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: lightbluetext,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Center(
+                                    child: Text(
+                                      "Sort",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: blacktext,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Divider(thickness: 1, color: lightbluetext),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              right: 10,
+                              top: 10,
+                              child: Material(
+                                color: lightbluetext,
+                                elevation: 0,
+                                borderRadius: BorderRadius.circular(32),
+                                child: InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  borderRadius: BorderRadius.circular(32),
+                                  splashColor: primarycolor.withAlpha(50),
+                                  child: Container(
+                                    height: 32,
+                                    width: 32,
+                                    decoration: BoxDecoration(
+                                      // color: lightbluetext, // insted added it in material color for ripple effect
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // 🔵 Scrollable Content Section
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Sort By
+                                Text(
+                                  "Subject :",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: blacktext,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  children:
+                                      subjectOptions.map((option) {
+                                        return Obx(() {
+                                          final isSelected =
+                                              collectionController
+                                                  .subjectFilter
+                                                  .value ==
+                                              option.value;
+                                          return ChoiceChip(
+                                            backgroundColor: lightGrayBg,
+                                            selectedColor: primarycolor,
+                                            label: Text(option.label),
+                                            side: BorderSide.none,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              side: BorderSide.none,
+                                              /*  side: BorderSide(
+                                                color:
+                                                    isSelected
+                                                        ? primarycolor
+                                                        : blackmedium,
+                                              ), */
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color:
+                                                  isSelected
+                                                      ? whitecolor
+                                                      : blackcolor,
+                                            ),
+                                            selected: isSelected,
+                                            onSelected: (_) {
+                                              collectionController
+                                                  .subjectFilter
+                                                  .value = option.value;
+
+                                              collectionController
+                                                  .updateIsFilterApplied();
+
+                                              collectionController
+                                                  .getBookListCollectionFilterSearch(
+                                                    context: context,
+                                                    token: token,
+                                                  );
+                                            },
+                                            showCheckmark: false,
+                                          );
+                                        });
+                                      }).toList(),
+                                ),
+
+                                SizedBox(height: 24),
+
+                                // Sort Order
+                                Text(
+                                  "Grade :",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: blacktext,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  children:
+                                      gradeList.map((option) {
+                                        return Obx(() {
+                                          final isSelected =
+                                              collectionController
+                                                  .gradeFilter
+                                                  .value ==
+                                              option.value.toString();
+                                          return ChoiceChip(
+                                            backgroundColor: lightGrayBg,
+                                            selectedColor: primarycolor,
+                                            label: Text(
+                                              option.value.toString(),
+                                            ),
+                                            side: BorderSide.none,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              side: BorderSide.none,
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color:
+                                                  isSelected
+                                                      ? whitecolor
+                                                      : blackcolor,
+                                            ),
+                                            selected: isSelected,
+                                            onSelected: (_) {
+                                              collectionController
+                                                      .gradeFilter
+                                                      .value =
+                                                  option.value.toString();
+                                              collectionController
+                                                  .updateIsFilterApplied();
+
+                                              collectionController
+                                                  .getBookListCollectionFilterSearch(
+                                                    context: context,
+                                                    token: token,
+                                                  );
+                                            },
+                                            showCheckmark: false,
+                                          );
+                                        });
+                                      }).toList(),
+                                ),
+                                SizedBox(height: 24),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // 🔵 Bottom Fixed Buttons
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Divider(color: lightbluetext),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SecondaryButton(
+                                      buttonColor: primarycolor,
+                                      textValue: "Clear",
+                                      textColor: primarycolor,
+                                      onPressed: () {
+                                        collectionController.clearFilters();
+                                        collectionController
+                                            .getBookListCollectionFilterSearch(
+                                              context: context,
+                                              token: token,
+                                            );
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+
+                                  Expanded(
+                                    child: PrimaryButton(
+                                      buttonColor: primarycolor,
+                                      textValue: "Apply",
+                                      textColor: whitecolor,
+                                      onPressed: () {
+                                        Navigator.of(
+                                          context,
+                                        ).pop(); // Or your sort function
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
               );
             },
           ),

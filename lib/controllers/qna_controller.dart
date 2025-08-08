@@ -1,5 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/chapter_model/chapter_model.dart';
 import 'package:test_your_learing/models/collection_model/books_collection_list.dart';
@@ -12,7 +21,6 @@ class QnaController extends GetxController
   var isLoading = false.obs;
   var aiThinking = false.obs;
 
-  var incidentdata = Rxn<IncidentFormResponse>(); // Holds LoginResponse object
 
   var allfilter = true.obs;
   var departmentfilter = "".obs;
@@ -183,6 +191,18 @@ class QnaController extends GetxController
   }) async {
     aiThinking.value = true;
 
+    final aiLoadingModel = ChatMessageModel(
+      role: 'assistant',
+      content: "Ai Thinking...",
+      isAudio: false,
+      audioFileId: null,
+      messageId: null,
+      timestamp: DateTime.now().toIso8601String(),
+      id: DateTime.now().toIso8601String(),
+      aiLoading: true, // Set aiLoading to true for the new message
+    );
+
+    chatMessageList.add(aiLoadingModel);
     /*   print(
       "xreq ${{
         "page": pageNumber,
@@ -252,9 +272,7 @@ class QnaController extends GetxController
       } else {
         print("Request failed: ${response.statusCode}");
 
-          if (response.data.containsKey('error')
-           ) {
-
+        if (response.data.containsKey('error')) {
           SnackBarHelper.showFailureSnackBar(
             context,
             response.data['error'] ?? "Something Went Wrong!",
@@ -268,6 +286,123 @@ class QnaController extends GetxController
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
       aiThinking.value = false;
+      chatMessageList.remove(aiLoadingModel);
+    }
+  }
+
+  Future<File> loadAssetFileToTemp(String assetPath, String filename) async {
+    final byteData = await rootBundle.load(assetPath);
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/$filename');
+    await file.writeAsBytes(byteData.buffer.asUint8List());
+    return file;
+  }
+
+  void sendAudioFile({
+    required String token,
+    required BuildContext context,
+    required File file,
+    required String userId,
+    required String chapterId,
+  }) async {
+    isLoading.value = true;
+
+    final uri = Uri.parse(ApiManager.baseUrl + ApiManager.sendAudio);
+
+    final request = http.MultipartRequest("POST", uri);
+
+    // Add headers
+    // request.headers['Authorization'] = 'Bearer $token';
+    request.headers.addAll({'Authorization': 'Bearer $token'});
+
+    // Add form fields
+    request.fields['userId'] = userId;
+    request.fields['chapterId'] = chapterId;
+
+    // Get file extension
+    String extension = path.extension(file.path).replaceFirst('.', '');
+
+    // Add image file
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'audio', // <-- field name used in backend
+        file.path,
+        filename: basename(file.path),
+        contentType: MediaType(
+          'audio',
+          extension ?? "mp3",
+        ), // Optional if required by backend
+      ),
+    );
+
+    /* // Usage:
+    final file = await loadAssetFileToTemp(
+      'assets/audio/hello.mp3',
+      'hello.mp3',
+    );
+    print('File exists: ${file.existsSync()}');
+    print('File size: ${file.lengthSync()} bytes');
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'audio',
+        file.path,
+        filename: 'hello.mp3',
+        contentType: MediaType('audio', 'mp3'),
+      ),
+    );
+
+    print("jkl" + request.files.toString()); */
+    // Send request
+    final response = await request.send();
+
+    try {
+      if (response.statusCode == 200) {
+        final responseData = await http.Response.fromStream(response);
+        final Map<String, dynamic> data = json.decode(responseData.body);
+
+        if (data is Map) {
+          if (data.containsKey('transcription') &&
+              data.containsKey('redirect')) {
+            //SnackBarHelper.showSuccessSnackBarGetx(data['transcription']);
+              chatMessageList.add(
+              ChatMessageModel(
+                id: DateTime.now().toIso8601String(),
+                role: 'user',
+                content: data['transcription'] ?? "",
+                isAudio: true,
+                audioFileId: null,
+                messageId: null,
+                timestamp: DateTime.now().toIso8601String(),
+              ),
+            );
+
+            sendChatMessage(
+              token: token,
+              context: context,
+              chapterId: chapterId,
+              userId: userId,
+              message: data['transcription'] ?? "",
+            );
+          }
+        } else {
+          print("Unhandled response format");
+          SnackBarHelper.showFailureSnackBarGetx(
+            "Something went wrong: ${response.toString()}",
+          );
+        }
+      } else {
+        SnackBarHelper.showFailureSnackBarGetx(
+          "Something went wrong: ${response.toString()}",
+        );
+      }
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBarGetx(e.toString());
+
+      /*       isMoreDataAvailable.value = false; // No more pages to load
+      SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
+    } finally {
+      isLoading.value = false;
+      // Close BottomSheet only if it's still open
     }
   }
 

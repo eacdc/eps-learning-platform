@@ -39,7 +39,7 @@ Widget build(BuildContext context) {
           borderRadius: BorderRadius.circular(32),
         ),
         child: Container(
-          height: 48,
+          height: 45,
           alignment: Alignment.center,
           child: loading
               ? const SizedBox(

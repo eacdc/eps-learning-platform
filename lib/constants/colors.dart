@@ -18,6 +18,7 @@ Color redcolor = const Color(0xFFFF0000);
 Color graylight = const Color(0xFFbfbfbf);
 Color gray = const Color(0xFF7f7f7f);
 Color graydark = const Color(0xFF787878);
+Color graychatbg = const Color(0xFFF0F0F0);
 
 //TYL
 Color graytext = const Color(0xFF64748B);
@@ -155,7 +156,7 @@ final List<Gradient> gradiantList = [
   ),
 ];
 
-Gradient getGradientByIndex(int index) {
+Gradient getGradientByIndex(int index) {  
   final int mappedIndex = (index % 10) % gradiantList.length;
 
   // Use defaultGradient if out of range or list is empty

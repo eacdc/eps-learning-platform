@@ -38,14 +38,14 @@ class _TypingIndicatorState extends State<TypingIndicator> {
       children: [
         Text(
           //'AI Thinking$dots',
-          'AI Thinking',
-          style: const TextStyle(
+          'AI Thinking...',
+          style:  TextStyle(
             fontSize: 16,
-            color: Colors.black87,
+            color: primarycolor,
             fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 4),
         Image.asset(
           "assets/icons/aigif.gif",
           height: 24.0,

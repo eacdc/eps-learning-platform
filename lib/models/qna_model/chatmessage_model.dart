@@ -6,6 +6,7 @@ class ChatMessageModel {
   final String? messageId;
   final String id;
   final String timestamp;
+  final bool aiLoading ; // Default value, can be set later if needed
 
   ChatMessageModel({
     required this.role,
@@ -13,6 +14,7 @@ class ChatMessageModel {
     required this.isAudio,
     this.audioFileId,
     this.messageId,
+    this.aiLoading = false, // Default value
     required this.id,
     required this.timestamp,
   });

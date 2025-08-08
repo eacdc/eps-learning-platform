@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/collection_controller.dart';
 import 'package:test_your_learing/controllers/my_subscription_controller.dart';
+import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
 
@@ -16,7 +17,8 @@ class QuizPage extends StatefulWidget {
 }
 
 class _MySubscriptionPageState extends State<QuizPage> {
-  final mysubscriptionController = Get.put(MysubscriptionController());
+  //final mysubscriptionController = Get.put(MysubscriptionController());
+  late MysubscriptionController mysubscriptionController;
   //final EventSubmitController eventSubmitController = Get.find();
   //final ProfileController profileController = Get.find();
 
@@ -91,16 +93,19 @@ class _MySubscriptionPageState extends State<QuizPage> {
     // TODO: implement initState
     super.initState();
 
-    employee_id = 0;
     //SharedPreferencesService.getEmployeeId();
-    token = SharedPreferencesService.getAccessToken();
-    //SharedPreferencesService.getAccessToken();
+    mysubscriptionController = findOrPut(() => MysubscriptionController());
 
-    mysubscriptionController.getSubscriptionList(
-      token: token,
-      context: context,
-      reloadpage: true,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      token = SharedPreferencesService.getAccessToken();
+      //SharedPreferencesService.getAccessToken();
+
+      mysubscriptionController.getSubscriptionList(
+        token: token,
+        context: context,
+        reloadpage: true,
+      );
+    });
 
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
@@ -144,7 +149,7 @@ class _MySubscriptionPageState extends State<QuizPage> {
               //  mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 1),
-              /*   Container(
+                /*   Container(
                   width: double.infinity,
                   margin: EdgeInsets.all(8),
                   padding: EdgeInsets.all(6),
@@ -202,8 +207,7 @@ class _MySubscriptionPageState extends State<QuizPage> {
                   ),
                 ),
  */
-                
-                
+
                 /*  (dashboardController.incidentdata.value?.data ?? [])
                               .isNotEmpty */
                 mysubscriptionController.mySubscriptionList.value.isNotEmpty

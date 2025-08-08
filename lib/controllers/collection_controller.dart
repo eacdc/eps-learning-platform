@@ -6,32 +6,32 @@ import 'package:test_your_learing/models/collection_model/books_collection_list.
 import 'package:test_your_learing/models/my_subscription_model/my_subscription_model.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
 
+import '../models/collection_model/books_collection_filter..dart';
+
 class CollectionController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var isLoading = false.obs;
+  var isChapterLoading = false.obs;
 
-  var incidentdata = Rxn<IncidentFormResponse>(); // Holds LoginResponse object
-
-  var allfilter = true.obs;
-  var departmentfilter = "".obs;
-  var severityFIlter = "".obs;
-  var datefromFilter = "".obs;
-  var dateToFilter = "".obs;
   var pageNo = 1.obs;
+  var limit = 20.obs;
   var searchString = "".obs;
+  var sortBy = "".obs;
+  var sortOrder = "".obs;
+  var gradeFilter = "".obs;
+  var subjectFilter = "".obs;
+  var gridStyle = true.obs;
+  var isFilterApplied = false.obs;
+  var isSortApplied = false.obs;
 
   //var selectedDepartment = Rxn<Department>(); // Holds the selected department
-  //var selectedSeverity = Rxn<Severity>(); // Holds the selected department
 
-  // for pagination
 
   ScrollController scrollController = ScrollController();
 
   //var incidentDataList = <Incident>[].obs; // List to store paginated data
   // var hasNextPage = true.obs; // Tracks if more pages are available
 
-  var incidentDataList =
-      List<Incident>.empty(growable: true).obs; // List to store paginated data
   var isMoreDataAvailable = true.obs; // Tracks if more pages are available
 
   var bookCollectionList = List<BookList>.empty().obs;
@@ -39,7 +39,7 @@ class CollectionController extends GetxController
 
   var mySubscriptionList = List<SubscribedBookModel>.empty().obs;
 
-  DashboardController() {}
+  CollectionController() {}
 
   @override
   onInit() async {
@@ -52,6 +52,149 @@ class CollectionController extends GetxController
     // paginateTask();
   }
 
+  void clearFilters() {
+    gradeFilter.value = "";
+    subjectFilter.value = "";
+
+    updateIsFilterApplied(); // Update the status of applied filters
+  }
+
+  void updateIsFilterApplied() {
+    isFilterApplied.value = gradeFilter.isNotEmpty || subjectFilter.isNotEmpty;
+  }
+
+  void clearSorts() {
+    sortBy.value = "";
+    sortOrder.value = "";
+
+    updateIsSortApplied(); // Update the status of applied filters
+  }
+
+  void updateIsSortApplied() {
+    isSortApplied.value = sortBy.isNotEmpty || sortOrder.isNotEmpty;
+  }
+
+  String buildFilterUrl() {
+    final baseUrl = ApiManager.bookCollectionFilterSearch;
+    final queryParams = <String>[];
+
+    queryParams.add("limit=${limit.value}");
+    queryParams.add("page=${pageNo.value}");
+
+    if (searchString.value.isNotEmpty) {
+      queryParams.add("q=${searchString.value}");
+    }
+    if (sortOrder.value.isNotEmpty) {
+      queryParams.add("sortOrder=${sortOrder.value}");
+    }
+    if (sortBy.value.isNotEmpty) {
+      queryParams.add("sortBy=${sortBy.value}");
+    }
+    if (subjectFilter.value.isNotEmpty) {
+      queryParams.add("subject=${subjectFilter.value}");
+    }
+    if (gradeFilter.value.isNotEmpty) {
+      queryParams.add("grade=${gradeFilter.value}");
+    }
+
+    // Combine all params with '&'
+    final queryString = queryParams.join("&");
+
+    return "$baseUrl?$queryString";
+  }
+
+  void getBookListCollectionFilterSearch({
+    required String token,
+    required BuildContext context,
+    int pageSize = 20, // Default page size is 10
+    int pageNumber = 1, // Default page number is 1
+    bool reloadpage =
+        false, // Default to false , Clear all data and filter value
+  }) async {
+    if (pageNumber == 1) {
+      bookCollectionList.value = [];
+      //clear
+      pageNo.value = 1;
+      isMoreDataAvailable.value = true;
+    }
+    if (
+    // isLoading.value ||
+    !isMoreDataAvailable.value) {
+      SnackBarHelper.showNormalSnackBar(context, "No More Books...");
+
+      return;
+    } // Prevent multiple calls
+
+    isLoading.value = true;
+
+    print(
+      "qqqqqqqqqqqqq " +
+          "${ApiManager.bookCollectionFilterSearch}?q=${searchString.value}&sortOrder=${sortOrder.value}&sortBy=${sortBy.value}&subject=${subjectFilter.value}&grade=${gradeFilter.value}",
+    );
+
+    /* if (reloadpage) {
+      pageNumber = 1;
+      //  selectedDepartment.value = null;
+      //  selectedSeverity.value = null;
+      /* ********* refresh page no*/
+      pageNo.value = 1;
+    } */
+
+    final url = buildFilterUrl();
+
+    var response = await ApiManager.requestNew(
+      endpoint: url,
+      method: "GET",
+      /* body: {
+          "search": searchString.value,
+          // "page": 1,
+          "page_size": pageSize,
+        }, */
+      token: token,
+    );
+
+    try {
+      if (response.isSuccess) {
+        if (response.data is Map) {
+          BookResponseModel bookData = BookResponseModel.fromJson(
+            response.data,
+          );
+
+          final newData = bookData.data?.books ?? [];
+          if (newData.isNotEmpty) {
+            bookCollectionList.addAll(newData);
+          } else {
+            isMoreDataAvailable.value = false;
+            if(pageNumber>1){
+                SnackBarHelper.showFailureSnackBar(context, "No more books...");
+            }
+            /// isMoreDataAvailable.value = false; // No more pages to load
+            ///  SnackBarHelper.showNormalSnackBar(context, "No more items...");
+          }
+
+          ///  bookCollectionList.value = bookData.data?.books ?? [];
+        } else {
+          print("Unhandled response format");
+        }
+      } else {
+        print("Request failed: ${response.statusCode}");
+        SnackBarHelper.showFailureSnackBar(
+          context,
+          response.data['error'] ??
+              response.data['message'] ??
+              "Something Went Wrong",
+        );
+      }
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBar(context, e.toString());
+
+      /*       isMoreDataAvailable.value = false; // No more pages to load
+      SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   void getBookListCollection({
     required String token,
     required BuildContext context,
@@ -61,7 +204,7 @@ class CollectionController extends GetxController
         false, // Default to false , Clear all data and filter value
   }) async {
     if (pageNumber == 1) {
-    ///  bookCollectionList.value = [];
+      ///  bookCollectionList.value = [];
       //clear
       pageNo.value = 1;
       isMoreDataAvailable.value = true;
@@ -76,27 +219,9 @@ class CollectionController extends GetxController
 
     isLoading.value = true;
 
-    print(
-      "xreq ${{
-        "page": pageNumber,
-        // "department_id": selectedDepartment?.value?.id ?? "",
-        // "severity": selectedSeverity.value?.title ?? "",
-        "start_date": datefromFilter.value,
-        "end_date": dateToFilter.value,
-        "search": searchString.value,
-        // "page": 1,
-        "page_size": pageSize,
-      }}",
-    );
-
     if (reloadpage) {
       pageNumber = 1;
 
-      allfilter.value = true;
-      departmentfilter.value = "";
-      severityFIlter.value = "";
-      datefromFilter.value = "";
-      dateToFilter.value = "";
       searchString.value = "";
       //  selectedDepartment.value = null;
       //  selectedSeverity.value = null;
@@ -171,7 +296,7 @@ class CollectionController extends GetxController
   }) async {
     bookChapterList.clear();
 
-    isLoading.value = true;
+    isChapterLoading.value = true;
 
     var response = await ApiManager.requestNew(
       endpoint: ApiManager.bookChapterList(bookId),
@@ -220,7 +345,7 @@ class CollectionController extends GetxController
       /*       isMoreDataAvailable.value = false; // No more pages to load
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
-      isLoading.value = false;
+      isChapterLoading.value = false;
     }
   }
 
@@ -248,27 +373,10 @@ class CollectionController extends GetxController
 
     isLoading.value = true;
 
-    print(
-      "xreq ${{
-        "page": pageNumber,
-        // "department_id": selectedDepartment?.value?.id ?? "",
-        // "severity": selectedSeverity.value?.title ?? "",
-        "start_date": datefromFilter.value,
-        "end_date": dateToFilter.value,
-        "search": searchString.value,
-        // "page": 1,
-        "page_size": pageSize,
-      }}",
-    );
-
     if (reloadpage) {
       pageNumber = 1;
 
-      allfilter.value = true;
-      departmentfilter.value = "";
-      severityFIlter.value = "";
-      datefromFilter.value = "";
-      dateToFilter.value = "";
+      // dateToFilter.value = "";
       searchString.value = "";
       //  selectedDepartment.value = null;
       //  selectedSeverity.value = null;
@@ -308,7 +416,7 @@ class CollectionController extends GetxController
           List<String> subscribedIds =
               subscribebooks.map((e) => e.bookId.toString()).toList();
 
-          updateSubscribedStatus(allBooks, subscribedIds);
+          ///  updateSubscribedStatus(allBooks, subscribedIds);
         } else if (response.data is Map) {
           if (response.data.containsKey('error') ||
               response.data.containsKey('message')) {
@@ -368,7 +476,7 @@ class CollectionController extends GetxController
 
     try {
       if (response.isSuccess) {
-        getBookListCollection(context: context, token: token);
+        getBookListCollectionFilterSearch(context: context, token: token);
         if (response.data is List) {
           List<SubscribedBookModel> books =
               (response.data as List)
@@ -383,8 +491,7 @@ class CollectionController extends GetxController
               "Error: ${response.data['error'] ?? response.data['message']}",
             );
 
-            SnackBarHelper.showSuccessSnackBar(
-              context,
+            SnackBarHelper.showSuccessSnackBarGetx(
               response.data['error'] ?? response.data['message'],
             );
           } else {
@@ -393,8 +500,7 @@ class CollectionController extends GetxController
           }
         } else {
           print("Unhandled response format");
-          SnackBarHelper.showFailureSnackBar(
-            context,
+          SnackBarHelper.showFailureSnackBarGetx(
             response.data['error'] ??
                 response.data['message'] ??
                 "Something Went Wrong",
@@ -404,12 +510,16 @@ class CollectionController extends GetxController
         print("Request failed: ${response.statusCode}");
       }
     } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, e.toString());
+      SnackBarHelper.showFailureSnackBarGetx(e.toString());
 
       /*       isMoreDataAvailable.value = false; // No more pages to load
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
       isLoading.value = false;
+      // Close BottomSheet only if it's still open
+      if (context != null && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -431,7 +541,7 @@ class CollectionController extends GetxController
 
     try {
       if (response.isSuccess) {
-        getBookListCollection(context: context, token: token);
+        getBookListCollectionFilterSearch(context: context, token: token);
 
         if (response.data is List) {
           List<SubscribedBookModel> books =
@@ -447,8 +557,7 @@ class CollectionController extends GetxController
               "Error: ${response.data['error'] ?? response.data['message']}",
             );
 
-            SnackBarHelper.showSuccessSnackBar(
-              context,
+            SnackBarHelper.showSuccessSnackBarGetx(
               response.data['error'] ?? response.data['message'],
             );
           } else {
@@ -457,8 +566,7 @@ class CollectionController extends GetxController
           }
         } else {
           print("Unhandled response format");
-          SnackBarHelper.showFailureSnackBar(
-            context,
+          SnackBarHelper.showFailureSnackBarGetx(
             response.data['error'] ??
                 response.data['message'] ??
                 "Something Went Wrong",
@@ -468,16 +576,20 @@ class CollectionController extends GetxController
         print("Request failed: ${response.statusCode}");
       }
     } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, e.toString());
+      SnackBarHelper.showFailureSnackBarGetx(e.toString());
 
       /*       isMoreDataAvailable.value = false; // No more pages to load
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
       isLoading.value = false;
+      // Close BottomSheet only if it's still open
+      if (context != null && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     }
   }
 
-  void getIncidentFilterSearch({
+  /*   void getIncidentFilterSearch({
     required String token,
     required BuildContext context,
     int pageSize = 10, // Default page size is 10
@@ -594,8 +706,9 @@ class CollectionController extends GetxController
       }
     });
   }
+ */
 
-  void updateSubscribedStatus(
+  /* void updateSubscribedStatus(
     List<BookList> allBooks,
     List<String> subscribedBookIds,
   ) {
@@ -606,5 +719,5 @@ class CollectionController extends GetxController
       }
     }
     bookCollectionList.refresh();
-  }
+  } */
 }

@@ -14,19 +14,23 @@ class ApiManager {
   static const String resendSignupOTP = "/api/users/resend-otp";
   static const String checkUsername = "/api/users/check-username";
   static const String bookCollectionList = "/api/books";
+  static const String bookCollectionFilterSearch = "/api/books/search-with-status";
   static const String sendChat = "/api/chat/send";
-  static const String mySubscriptionList = "/api/subscriptions/my-subscriptions";
+  static const String sendAudio = "/api/chat/transcribe";
+  static const String mySubscriptionList =
+      "/api/subscriptions/my-subscriptions";
   static const String subscribe = "/api/subscriptions";
-  static  String unsubscribe(String bookId) {
+  static String unsubscribe(String bookId) {
     return "/api/subscriptions/$bookId";
   }
+
   //static const String bookChapterList = "/api/books/$bookId/chapters";
-   // Function to get chapters list endpoint by bookId
+  // Function to get chapters list endpoint by bookId
   static String bookChapterList(String bookId) {
     return "/api/books/$bookId/chapters";
   }
 
-   static String chatHistoryList(String chapterId) {
+  static String chatHistoryList(String chapterId) {
     return "/api/chat/chapter-history/$chapterId";
   }
 
@@ -34,30 +38,25 @@ class ApiManager {
   static const String updateProfile = "/api/users/profile";
   static const String updateProfilePic = "/api/users/upload-profile-picture";
 
-   static String recentActivity(String userId) {
+  static String recentActivity(String userId) {
     return "/api/scores/recent-activity/$userId";
   }
 
-   static String scoreBoard(String userId) {
+  static String scoreBoard(String userId) {
     return "/api/scores/scoreboard/$userId";
   }
-   static String scoreProgressDetails(String userId) {
+
+  static String scoreProgressDetails(String userId) {
     return "/api/scores/progress-details/$userId";
   }
-   static String assesmentData(String userId) {
+
+  static String assesmentData(String userId) {
     return "/api/scores/assessment-data/$userId";
   }
-   static String performanceOverview(String userId) {
+
+  static String performanceOverview(String userId) {
     return "/api/scores/performance-overview/$userId";
   }
-
-
-
-
-
-
-  
-
 
   static const String loginwithplno = "/api/loginusingplno/";
   static const String profile = "/api/employee/employeedetailsbyid";
@@ -67,14 +66,13 @@ class ApiManager {
   static const String getAllIncident = "/api/incident/getallincident/";
   static const String getAllDepartment = "/api/department/getalldepartment/";
   static const String getAllDesignation = "/api/designation/getalldesignation/";
-  static const String getAllNearmisscause = "/api/nearmisscause/getallnearmisscause/";
+  static const String getAllNearmisscause =
+      "/api/nearmisscause/getallnearmisscause/";
   static const String s3Upload = "/api/s3/upload/";
   static const String getAllShift = "/api/shift/getallshift/";
   static const String submitEvents = "/api/incident/createincident/";
-  static const String getIncidentFilter = "/api/incident/filters/";
-    static const String getIncidentFilterSearch = "/api/incident/filtersSearch/";
+  static const String getIncidentFilterSearch = "/api/incident/filtersSearch/";
 
-  
   static const String getIncidentDetails = "/api/incident/incidentdetailsbyid/";
   static const String deleteAccount = "/api/employee/checkdeleteemployee/";
 
@@ -89,107 +87,103 @@ class ApiManager {
   // Generic API Call Method
 
   static Future<ApiResponse> request({
-  required String endpoint,
-  String method = "GET",
-  Map<String, dynamic>? body,
-  String? token,
-}) async {
-  try {
-    final Uri url = Uri.parse(baseUrl + endpoint);
-    final headersMap = headers(token: token);
+    required String endpoint,
+    String method = "GET",
+    Map<String, dynamic>? body,
+    String? token,
+  }) async {
+    try {
+      final Uri url = Uri.parse(baseUrl + endpoint);
+      final headersMap = headers(token: token);
 
-    http.Response response;
+      http.Response response;
 
-    switch (method) {
-      case "POST":
-        response = await http.post(
-          url,
-          headers: headersMap,
-          body: jsonEncode(body),
-        );
-        break;
-      case "PUT":
-        response = await http.put(
-          url,
-          headers: headersMap,
-          body: jsonEncode(body),
-        );
-        break;
-      case "DELETE":
-        response = await http.delete(url, headers: headersMap);
-        break;
-      default:
-        response = await http.get(url, headers: headersMap);
+      switch (method) {
+        case "POST":
+          response = await http.post(
+            url,
+            headers: headersMap,
+            body: jsonEncode(body),
+          );
+          break;
+        case "PUT":
+          response = await http.put(
+            url,
+            headers: headersMap,
+            body: jsonEncode(body),
+          );
+          break;
+        case "DELETE":
+          response = await http.delete(url, headers: headersMap);
+          break;
+        default:
+          response = await http.get(url, headers: headersMap);
+      }
+
+      final decoded = jsonDecode(response.body);
+
+      return ApiResponse(
+        statusCode: response.statusCode,
+        data: Map<String, dynamic>.from(decoded),
+      );
+    } catch (e) {
+      return ApiResponse(
+        statusCode: 500,
+        data: {"message": "Something went wrong: $e"},
+      );
     }
-
-    final decoded = jsonDecode(response.body);
-
-    return ApiResponse(
-      statusCode: response.statusCode,
-      data: Map<String, dynamic>.from(decoded),
-    );
-  } catch (e) {
-    return ApiResponse(
-      statusCode: 500,
-      data: {"message": "Something went wrong: $e"},
-    );
   }
-}
 
+  //new Generic API CALL
 
-//new Generic API CALL
+  static Future<ApiResponseNew> requestNew({
+    required String endpoint,
+    String method = "GET",
+    Map<String, dynamic>? body,
+    String? token,
+  }) async {
+    try {
+      final Uri url = Uri.parse(baseUrl + endpoint);
+      final headersMap = headers(token: token);
 
-static Future<ApiResponseNew> requestNew({
-  required String endpoint,
-  String method = "GET",
-  Map<String, dynamic>? body,
-  String? token,
-}) async {
-  try {
-    final Uri url = Uri.parse(baseUrl + endpoint);
-    final headersMap = headers(token: token);
+      http.Response response;
 
-    http.Response response;
+      switch (method) {
+        case "POST":
+          response = await http.post(
+            url,
+            headers: headersMap,
+            body: jsonEncode(body),
+          );
+          break;
+        case "PUT":
+          response = await http.put(
+            url,
+            headers: headersMap,
+            body: jsonEncode(body),
+          );
+          break;
+        case "DELETE":
+          response = await http.delete(url, headers: headersMap);
+          break;
+        default:
+          response = await http.get(url, headers: headersMap);
+      }
 
-    switch (method) {
-      case "POST":
-        response = await http.post(
-          url,
-          headers: headersMap,
-          body: jsonEncode(body),
-        );
-        break;
-      case "PUT":
-        response = await http.put(
-          url,
-          headers: headersMap,
-          body: jsonEncode(body),
-        );
-        break;
-      case "DELETE":
-        response = await http.delete(url, headers: headersMap);
-        break;
-      default:
-        response = await http.get(url, headers: headersMap);
+      final dynamic decoded = jsonDecode(response.body);
+
+      return ApiResponseNew(statusCode: response.statusCode, data: decoded);
+    } catch (e) {
+      print("XCV " + endpoint + " " + e.toString());
+      return ApiResponseNew(
+        statusCode: 500,
+        data: {"message": "Something went wrong: $e"},
+      );
     }
-
-    final dynamic decoded = jsonDecode(response.body);
-
-    return ApiResponseNew(
-      statusCode: response.statusCode,
-      data: decoded,
-    );
-  } catch (e) {
-    return ApiResponseNew(
-      statusCode: 500,
-      data: {"message": "Something went wrong: $e"},
-    );
   }
-}
 
 
-
-/*   static Future<dynamic> request({
+  /*   static Future<dynamic> request({
     required String endpoint,
     String method = "GET",
     Map<String, dynamic>? body,

@@ -31,7 +31,7 @@ class SecondaryButton extends StatelessWidget {
         customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
         splashColor: primarycolor.withAlpha(30),
         child: Container(
-          height: 48,
+          height: 45,
           decoration: BoxDecoration(
             border: Border.all(color: primarycolor),
            /*  gradient: LinearGradient(

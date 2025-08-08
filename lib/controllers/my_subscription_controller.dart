@@ -9,9 +9,6 @@ import 'package:test_your_learing/networks/api_manager.dart';
 class MysubscriptionController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var isLoading = false.obs;
-
-  var incidentdata = Rxn<IncidentFormResponse>(); // Holds LoginResponse object
-
   var allfilter = true.obs;
   var departmentfilter = "".obs;
   var severityFIlter = "".obs;
@@ -30,8 +27,7 @@ class MysubscriptionController extends GetxController
   //var incidentDataList = <Incident>[].obs; // List to store paginated data
   // var hasNextPage = true.obs; // Tracks if more pages are available
 
-  var incidentDataList =
-      List<Incident>.empty(growable: true).obs; // List to store paginated data
+  
   var isMoreDataAvailable = true.obs; // Tracks if more pages are available
 
   var mySubscriptionList = List<SubscribedBookModel>.empty().obs;

@@ -18,7 +18,7 @@ class UserData {
   final List<Book>? recentBooks;
   final int? totalChaptersCompleted;
   final int? totalChaptersInProgress;
-  final int? overallProgressPercentage;
+  final double? overallProgressPercentage;
   final int? totalQuestionsAnswered;
   final List<RecentActivity>? recentActivities;
   final QuizData? quizData;
@@ -46,7 +46,7 @@ class UserData {
           .toList(),
       totalChaptersCompleted: json['totalChaptersCompleted'],
       totalChaptersInProgress: json['totalChaptersInProgress'],
-      overallProgressPercentage: json['overallProgressPercentage'],
+      overallProgressPercentage: (json['overallProgressPercentage'] as num?)?.toDouble(),
       totalQuestionsAnswered: json['totalQuestionsAnswered'],
       recentActivities: (json['recentActivities'] as List?)
           ?.map((e) => RecentActivity.fromJson(e))

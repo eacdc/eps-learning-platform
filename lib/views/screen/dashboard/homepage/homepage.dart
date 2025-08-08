@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/homeController/home_controller.dart';
 import 'package:test_your_learing/utils/app_colors.dart';
@@ -11,6 +12,7 @@ import 'package:test_your_learing/views/custom_widgets/progressbar_widget.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
 import 'package:test_your_learing/views/screen/dashboard/homepage/notificationpage.dart';
 
+import '../../../../controllers/dashboard_controller.dart';
 import '../../../../helper/getx_helper.dart';
 import '../../../../helper/sharedpreference_helper.dart'
     show SharedPreferencesService;
@@ -25,6 +27,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeController homeController;
+  final dashboardController = findOrPut(() => DashboardController());
 
   @override
   void initState() {
@@ -70,57 +73,39 @@ class _HomePageState extends State<HomePage> {
           children: [
             ListView(
               children: [
-                Stack(
-                  alignment: AlignmentDirectional.bottomEnd,
-                  children: [
-                    Container(
-                      // height: 200,
-                      decoration: BoxDecoration(
-                        gradient: homeGradient,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(16),
-                        ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: homeGradient,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                  ),
+
+                  child: Stack(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    children: [
+                      Image.asset(
+                        "assets/images/png_vector_wave.png",
+                        //width: 120,
+                        height: 120,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width:
-                                      50, // Adjust the width to accommodate the border
-                                  height:
-                                      50, // Adjust the height to accommodate the border
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: lightwhite1, // Border color
-                                      width: 1.0, // Border width
-                                    ),
-                                  ),
-                                  child: const CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: AssetImage(
-                                      "assets/images/logo.png",
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(NotificationPage());
-                                  },
-                                  child: Container(
+                      Container(
+                        // height: 200,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
                                     width:
-                                        45, // Adjust the width to accommodate the border
+                                        50, // Adjust the width to accommodate the border
                                     height:
-                                        45, // Adjust the height to accommodate the border
-                                    padding: EdgeInsets.all(10),
+                                        50, // Adjust the height to accommodate the border
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
@@ -128,74 +113,103 @@ class _HomePageState extends State<HomePage> {
                                         width: 1.0, // Border width
                                       ),
                                     ),
-                                    child: Image.asset(
-                                      "assets/icons/png_notification.png",
+                                    child: const CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: AssetImage(
+                                        "assets/images/logo.png",
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 24),
-                            Row(
-                              children: [
-                                Container(
-                                  width:
-                                      32, // Adjust the width to accommodate the border
-                                  height:
-                                      32, // Adjust the height to accommodate the border
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: whitecolor.withAlpha(40),
+                                  const Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(NotificationPage());
+                                    },
+                                    child: Container(
+                                      width:
+                                          45, // Adjust the width to accommodate the border
+                                      height:
+                                          45, // Adjust the height to accommodate the border
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: lightwhite1, // Border color
+                                          width: 1.0, // Border width
+                                        ),
+                                      ),
+                                      child: Image.asset(
+                                        "assets/icons/png_notification.png",
+                                      ),
+                                    ),
                                   ),
-                                  child: Image.asset(
-                                    "assets/icons/png_user.png",
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Hello, user!",
-                                  style: TextStyle(
-                                    color: lightwhite1,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Let’s learn something new today!",
-                              style: TextStyle(
-                                color: lightwhite1,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                ],
                               ),
-                            ),
-
-                            SizedBox(height: 24),
-
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 2),
-                              child: InkWell(
-                                onTap: () {
-                                  // _showModal(context, serviceController);
-                                },
-                                child: SearchField(),
+                              SizedBox(height: 24),
+                              Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        32, // Adjust the width to accommodate the border
+                                    height:
+                                        32, // Adjust the height to accommodate the border
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: whitecolor.withAlpha(40),
+                                    ),
+                                    child: Image.asset(
+                                      "assets/icons/png_user.png",
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Shimmer.fromColors(
+                                    baseColor: whitecolor,
+                                    highlightColor: shimmerHighlightColor2,
+                                    loop: 1,
+                                    period: Duration(seconds: 3),
+                                    child: Text(
+                                      "Hello, user!",
+                                      style: TextStyle(
+                                        color: lightwhite1,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
+                              SizedBox(height: 8),
+                              Text(
+                                "Let’s learn something new today!",
+                                style: TextStyle(
+                                  color: lightwhite1,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
 
-                            SizedBox(height: 10),
-                          ],
+                              SizedBox(height: 24),
+
+                              Container(
+                                // color: redcolor,
+                                padding: EdgeInsets.symmetric(horizontal: 2),
+                                child: InkWell(
+                                  onTap: () {
+                                    //   print("Search Field Tapped");
+                                    dashboardController.changeIndex(3);
+                                  },
+                                  child: SearchField(),
+                                ),
+                              ),
+
+                              SizedBox(height: 10),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Image.asset(
-                      "assets/images/png_vector_wave.png",
-                      //width: 120,
-                      height: 120,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
 
                 /*   GridView.count(
@@ -498,7 +512,10 @@ class _HomePageState extends State<HomePage> {
                             child: Container(
                               //margin: EdgeInsets.only(top: 30),
                               padding: EdgeInsets.all(5),
-                              child: Center(child: Text("No Category Found")),
+                              child: Image.asset(
+                                "assets/images/png_no_recentactivity.png",
+                              ),
+                              //  child: Center(child: Text("No Category Found")),
                             ),
                           ),
                 ),

@@ -3,7 +3,7 @@ class BookChapterModel {
   final String bookId;
   final String title;
   final String prompt; // raw prompt string, could be parsed if needed
-  final List<double> embedding;
+  //final List<double> embedding;
   final List<QuestionPrompt> questionPrompt;
   final String createdAt;
   final String updatedAt;
@@ -15,7 +15,7 @@ class BookChapterModel {
     required this.bookId,
     required this.title,
     required this.prompt,
-    required this.embedding,
+   // required this.embedding,
     required this.questionPrompt,
     required this.createdAt,
     required this.updatedAt,
@@ -29,7 +29,7 @@ class BookChapterModel {
       bookId: json['bookId'],
       title: json['title'],
       prompt: json['prompt'],
-      embedding: List<double>.from(json['embedding'].map((e) => e.toDouble())),
+      //embedding: List<double>.from(json['embedding'].map((e) => e.toDouble())),
       questionPrompt: List<QuestionPrompt>.from(
         json['questionPrompt'].map((e) => QuestionPrompt.fromJson(e)),
       ),
@@ -46,7 +46,7 @@ class BookChapterModel {
       'bookId': bookId,
       'title': title,
       'prompt': prompt,
-      'embedding': embedding,
+      //'embedding': embedding,
       'questionPrompt': questionPrompt.map((e) => e.toJson()).toList(),
       'createdAt': createdAt,
       'updatedAt': updatedAt,

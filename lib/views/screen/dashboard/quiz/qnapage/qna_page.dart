@@ -69,12 +69,12 @@ class _QnaPageState extends State<QnaPage> {
                           },
                         ),
                       ),
-                      const Text(
-                        'QnA',
+                       Text(
+                        "Chapter ($chapterName)" ,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
