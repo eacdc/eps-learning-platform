@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/controllers/faq_controller.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/circular_back_button.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
+
+import '../../../../../helper/getx_helper.dart';
+import '../../../../../helper/sharedpreference_helper.dart';
+import '../../../../custom_widgets/progressbar_widget.dart';
 
 class HelpCenterPage extends StatefulWidget {
   const HelpCenterPage({super.key});
@@ -14,6 +20,19 @@ class HelpCenterPage extends StatefulWidget {
 
 class _HelpCenterPageState extends State<HelpCenterPage> {
   bool showFaq = true;
+
+  late final FaqController faqController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    faqController = findOrPut(() => FaqController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final token = SharedPreferencesService.getAccessToken() ?? '';
+      faqController.getFaq(token: token, context: context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,28 +72,36 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
             ],
           ),
         ),
-        body: Column(
-          children: [
-            const SizedBox(height: 10),
-            // Toggle Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                toggleButton("FAQ's", showFaq, () {
-                  setState(() => showFaq = true);
-                }),
-                const SizedBox(width: 16),
-                toggleButton("Help Center", !showFaq, () {
-                  setState(() => showFaq = false);
-                }),
-              ],
-            ),
-            const SizedBox(height: 20),
+        body: Obx(() {
+          return Stack(
+            children: [
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  // Toggle Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      toggleButton("FAQ's", showFaq, () {
+                        setState(() => showFaq = true);
+                      }),
+                      const SizedBox(width: 16),
+                      toggleButton("Help Center", !showFaq, () {
+                        setState(() => showFaq = false);
+                      }),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-            // Toggle Content
-            Expanded(child: showFaq ? FaqWidget() : HelpCenterWidget()),
-          ],
-        ),
+                  // Toggle Content
+                  Expanded(child: showFaq ? FaqWidget() : HelpCenterWidget()),
+                ],
+              ),
+
+              ProgressBarWidget(visible: faqController.isLoading.value),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -88,9 +115,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
         decoration: BoxDecoration(
           color: isSelected ? primarycolor : whitecolor,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: isSelected ? primarycolor : graylight,
-          ),
+          border: Border.all(color: isSelected ? primarycolor : graylight),
         ),
         child: Text(
           label,
@@ -105,121 +130,165 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
 }
 
 class FaqWidget extends StatelessWidget {
-  final List<Map<String, String>> faqList = [
-    {
-      "question": "What are course apps?",
-      "answer":
-          "Course apps connect users to educational resources and content tailored to their learning goals.",
-    },
-    {
-      "question": "What features do course apps have?",
-      "answer":
-          "They include quizzes, video tutorials, tracking progress, certification, and discussion forums.",
-    },
-    {
-      "question": "What are the benefits of using course apps?",
-      "answer":
-          "They provide flexible learning, progress tracking, and personalized content anytime, anywhere.",
-    },
-    {
-      "question": "Are course apps effective for learning?",
-      "answer":
-          "Yes, when used consistently, they enhance knowledge retention and encourage self-paced learning.",
-    },
-  ];
+  final fcontroller = findOrPut(() => FaqController());
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                textAlign: TextAlign.start,
+      child: Obx(() {
+        final faqdata = fcontroller.faqResponse.value?.data;
+        final faq_category = faqdata?.categories;
 
-                "Frequently Asked\nQuestion",
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: textBlack,
-                  fontSize: 22,
+        final faqcategorylist =
+            [
+              faq_category?['general'],
+              faq_category?['account'],
+              faq_category?['features'],
+              faq_category?['technical'],
+              faq_category?['privacy'],
+              faq_category?['subscription'],
+            ].where((element) => element != null).toList();
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  textAlign: TextAlign.start,
+
+                  "Frequently Asked\nQuestion",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: textBlack,
+                    fontSize: 22,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: SearchField(),
-          ),
-          Divider(
-            color: lightGrayBg,
-            height: 48,
-            thickness: 8,
-            indent: 0,
-            endIndent: 0,
-          ),
-          Container(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(0),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: faqList.length,
-              itemBuilder: (context, index) {
-                return ExpansionTile(
-                  // collapsedBackgroundColor: Colors.grey[100],
-                  backgroundColor: Colors.white,
-                  collapsedIconColor: graydark,
-                  shape: Border.all(color: Colors.transparent),
-
-                  iconColor: graydark,
-                  title: Text(
-                    faqList[index]["question"] ?? '',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: textBlack,
-                      fontSize: 15,
-                    ),
-                  ),
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        faqList[index]["answer"] ?? '',
-                        style: TextStyle(color: graytext),
-                      ),
-                    ),
-                  ],
-                );
-              },
-              separatorBuilder: (context, index) => SizedBox.shrink(),
+            SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SearchField(),
             ),
-          ),
-          SizedBox(height: 16),
-        ],
-      ),
+            Divider(
+              color: lightGrayBg,
+              height: 48,
+              thickness: 8,
+              indent: 0,
+              endIndent: 0,
+            ),
+            Container(
+              child: ListView.separated(
+                padding: const EdgeInsets.all(0),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: faqcategorylist.length,
+                itemBuilder: (context, index) {
+                  final category = faqcategorylist[index];
+                  return ExpansionTile(
+                    // collapsedBackgroundColor: Colors.grey[100],
+                    backgroundColor: Colors.white,
+                    collapsedIconColor: graydark,
+                    shape: Border.all(color: Colors.transparent),
+
+                    iconColor: graydark,
+                    title: Text(
+                      category?.title ?? '',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: textBlack,
+                        fontSize: 15,
+                      ),
+                    ),
+                    children: [
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: lightGrayBg,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 5,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(0),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: category?.questions?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final item = category?.questions?[index];
+                            return ExpansionTile(
+                              // collapsedBackgroundColor: Colors.grey[100],
+                              // backgroundColor: Colors.white,
+                              collapsedIconColor: graydark,
+                              shape: Border.all(color: Colors.transparent),
+
+                              iconColor: graydark,
+                              title: Text(
+                                item?.question ?? '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: textBlack.withAlpha(210),
+                                  fontSize: 14.5,
+                                ),
+                              ),
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: whitecolor,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    item?.answer ?? '',
+                                    style: TextStyle(
+                                      color: graytext,
+                                      fontSize: 13.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder:
+                              (context, index) => SizedBox.shrink(),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                separatorBuilder: (context, index) => SizedBox.shrink(),
+              ),
+            ),
+            SizedBox(height: 16),
+          ],
+        );
+      }),
     );
   }
 }
 
 class HelpCenterWidget extends StatelessWidget {
-   final List<Widget> itemWidgets = [
+  final List<Widget> itemWidgets = [
     HelpCenterItem(
       iconPath: 'assets/icons/score_progress/png_hc_customer.png',
       title: 'Customer Service',
       description: '1274-555 666 (Toll-free)',
       onTap: () {
         print('User Profile clicked');
-        
-       
       },
     ),
     HelpCenterItem(
@@ -264,7 +333,6 @@ class HelpCenterWidget extends StatelessWidget {
       description: '@eps_learning',
       onTap: () {
         print('Settings clicked');
-         
       },
     ),
     // Add more InfoItem widgets here...
@@ -283,15 +351,13 @@ class HelpCenterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-              itemCount: itemWidgets.length,
-              itemBuilder: (context, index) {
-                return itemWidgets[index];
-              },
-            );
-          
+      itemCount: itemWidgets.length,
+      itemBuilder: (context, index) {
+        return itemWidgets[index];
+      },
+    );
   }
 }
-
 
 class HelpCenterItem extends StatelessWidget {
   final String iconPath;
@@ -364,7 +430,6 @@ class HelpCenterItem extends StatelessWidget {
                   ],
                 ),
               ),
-              
             ],
           ),
         ),
@@ -372,4 +437,3 @@ class HelpCenterItem extends StatelessWidget {
     );
   }
 }
-

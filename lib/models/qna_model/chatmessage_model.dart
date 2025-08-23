@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class ChatMessageModel {
   final String role;
   final String content;
@@ -7,6 +9,8 @@ class ChatMessageModel {
   final String id;
   final String timestamp;
   final bool aiLoading ; // Default value, can be set later if needed
+   final GlobalKey key = GlobalKey();
+
 
   ChatMessageModel({
     required this.role,

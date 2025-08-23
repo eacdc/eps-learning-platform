@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 
 import '../../constants/colors.dart';
 import '../../models/collection_model/books_collection_list.dart';
@@ -10,26 +11,31 @@ class SubscribeBookSheet extends StatelessWidget {
   final String title;
   //final Widget content;
   final String desc;
-  final BookList bookData;
+  final String bookImage;
   final String positiveText;
   final String negativeText;
   final VoidCallback onPositiveCallback;
   final VoidCallback onNegativeCallback;
+  final RxBool isLoading; // Pass from controller
+
 
   const SubscribeBookSheet({
     Key? key,
     required this.title,
     required this.desc,
-    required this.bookData,
+    required this.bookImage,
     required this.positiveText,
     required this.negativeText,
     required this.onPositiveCallback,
     required this.onNegativeCallback,
+        required this.isLoading,
+
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Obx((){
+      return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -119,7 +125,7 @@ class SubscribeBookSheet extends StatelessWidget {
                       bottom: Radius.circular(12),
                     ),
                     child: Image.network(
-                      bookData.bookCoverImgLink,
+                      bookImage,
                       height: 120,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
@@ -164,6 +170,7 @@ class SubscribeBookSheet extends StatelessWidget {
                           textValue: positiveText,
                           textColor: whitecolor,
                           onPressed: onPositiveCallback,
+                          loading: isLoading.value,
                         ),
                       ),
                       SizedBox(width: 16),
@@ -215,5 +222,9 @@ class SubscribeBookSheet extends StatelessWidget {
         ],
       ),
     );
-  }
+ 
+    });
+    
+    
+     }
 }

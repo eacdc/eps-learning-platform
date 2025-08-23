@@ -14,11 +14,14 @@ class ApiManager {
   static const String resendSignupOTP = "/api/users/resend-otp";
   static const String checkUsername = "/api/users/check-username";
   static const String bookCollectionList = "/api/books";
-  static const String bookCollectionFilterSearch = "/api/books/search-with-status";
+  static const String bookCollectionFilterSearch =
+      "/api/books/search-with-status";
   static const String sendChat = "/api/chat/send";
   static const String sendAudio = "/api/chat/transcribe";
   static const String mySubscriptionList =
-      "/api/subscriptions/my-subscriptions";
+      "/api/subscriptions/my-subscriptions"; // not Used
+  static const String myBooksCollection =
+      "/api/subscriptions/collection"; // new
   static const String subscribe = "/api/subscriptions";
   static String unsubscribe(String bookId) {
     return "/api/subscriptions/$bookId";
@@ -38,6 +41,11 @@ class ApiManager {
   static const String updateProfile = "/api/users/profile";
   static const String updateProfilePic = "/api/users/upload-profile-picture";
 
+    static const String privacyPolicy = "/api/static/privacy-policy";
+    static const String faq = "/api/static/faq";
+    static const String termsService = "/api/static/terms-of-service";
+
+
   static String recentActivity(String userId) {
     return "/api/scores/recent-activity/$userId";
   }
@@ -56,6 +64,10 @@ class ApiManager {
 
   static String performanceOverview(String userId) {
     return "/api/scores/performance-overview/$userId";
+  }
+
+  static String chapterStats(String userId) {
+    return "/api/scores/chapter-stats/$userId";
   }
 
   static const String loginwithplno = "/api/loginusingplno/";
@@ -181,7 +193,6 @@ class ApiManager {
       );
     }
   }
-
 
   /*   static Future<dynamic> request({
     required String endpoint,

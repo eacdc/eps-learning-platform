@@ -7,16 +7,20 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/homeController/home_controller.dart';
+import 'package:test_your_learing/models/home_model/recent_activity_model.dart';
 import 'package:test_your_learing/utils/app_colors.dart';
 import 'package:test_your_learing/views/custom_widgets/progressbar_widget.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
 import 'package:test_your_learing/views/screen/dashboard/homepage/notificationpage.dart';
 
 import '../../../../controllers/dashboard_controller.dart';
+import '../../../../controllers/my_subscription_controller.dart';
 import '../../../../helper/getx_helper.dart';
 import '../../../../helper/sharedpreference_helper.dart'
     show SharedPreferencesService;
+import '../../../../models/my_subscription_model/my_subscription_model.dart';
 import '../../../custom_widgets/performance_overview_card.dart';
+import '../quiz/qnapage/qna_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,7 +31,506 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeController homeController;
+  late final String token;
+  late final String userId;
   final dashboardController = findOrPut(() => DashboardController());
+  final mysubscriptionController = findOrPut(() => MysubscriptionController());
+
+
+
+void _showChapterBottomsheet(
+  context,
+  MysubscriptionController mysubscriptionController,
+  String bookId,
+  Book bookData,
+  String token,
+) {
+  //final TextEditingController searchTextController = TextEditingController();
+  //mysubscriptionController.searchServices("");
+
+  mysubscriptionController.getBookChapter(
+    context: context,
+    token: token,
+    bookId: bookId,
+  );
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+    ),
+    context: context,
+    builder: (context) {
+      return Padding(
+        padding:
+            MediaQuery.of(
+              context,
+            ).viewInsets, // 👈 Pushes up when keyboard shows
+        child: SafeArea(
+          child: DraggableScrollableSheet(
+            expand: false,
+
+            /* .............. */
+            initialChildSize: 0.7,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            /* ............... */
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  children: [
+                    // 🔵 Fixed Header Section (non-scrollable)
+                    Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 12,
+                            right: 12,
+                            top: 12,
+                            bottom: 1,
+                          ),
+                          child: Column(
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 50,
+                                  height: 4,        
+                                  decoration: BoxDecoration(
+                                    color: lightbluetext,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Center(
+                                child: Text(
+                                  "Book Details",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: blacktext,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Divider(thickness: 1, color: lightbluetext),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          right: 10,
+                          top: 10,
+                          child: Material(
+                            color: lightbluetext,
+                            elevation: 0,
+                            borderRadius: BorderRadius.circular(32),
+                            child: InkWell(
+                              onTap: () => Navigator.pop(context),
+                              borderRadius: BorderRadius.circular(32),
+                              splashColor: primarycolor.withAlpha(50),
+                              child: Container(
+                                height: 32,
+                                width: 32,
+                                decoration: BoxDecoration(
+                                  // color: lightbluetext, // insted added it in material color for ripple effect
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    /* Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      height: 50,
+                      child: Stack(
+                        children: [
+                          Align(
+                            child: Text(
+                              "Chapters",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: blackmedium,
+                              ),
+                              // style: MyTextStyles.mediumSemiboldBlack(context),
+                            ),
+                          ),
+                          /* Positioned(
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: IconButton(
+                                iconSize: 18,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.close),
+                              ),
+                            ), */
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 2,
+                      color: bordercolor,
+                      thickness: 0.5,
+                      indent: 0,
+                      endIndent: 0,
+                    ),
+                    SizedBox(height: 8),
+                    // 🔍 Search Header */
+                    const SizedBox(height: 10),
+
+                    // book details
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Left: Book Image
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              bookData.bookCoverImgLink ?? "",
+                              width: 70,
+                              height: 90,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/logo.png', // Your local default image
+                                  width: 80,
+                                  height: 110,
+                                  fit: BoxFit.contain,
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Right Column
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Book Name
+                                Text(
+                                  bookData.title ?? "",
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Subject - ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          //SizedBox(width: 10),
+
+                                          //  Spacer(),
+                                          Text(
+                                            bookData.subject ?? "",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 2),
+                                      /* Row(
+                                        children: [
+                                          Text(
+                                            "Publisher - ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+
+                                          // SizedBox(width: 10),
+
+                                          //  Spacer(),
+                                          Text(
+                                            bookData.publisher ?? "",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2), */
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Grade - ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          //SizedBox(width: 10),
+
+                                          //  Spacer(),
+                                          Text(
+                                            bookData.grade ?? "",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: graytext,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Progress Bar
+                                /*  LinearProgressIndicator(
+                                      value: progress,
+                                      minHeight: 6,
+                                      backgroundColor: progressColorLight.withAlpha(80),
+                                      color: progressColor,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ), */
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Chapters :",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: blacktext,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 3),
+                            Container(
+                              width: 45,
+                              height: 1.5,
+                              decoration: BoxDecoration(
+                                color: lightGray,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // 📃 chapter List
+                    Expanded(
+                      child: Obx(() {
+                        final results =
+                            mysubscriptionController.bookChapterList;
+
+                        if (mysubscriptionController.isChapterLoading.value) {
+                          return Center(
+                            child: ProgressBarWidget(
+                              visible:
+                                  mysubscriptionController
+                                      .isChapterLoading
+                                      .value,
+                            ),
+                          );
+                        }
+
+                        if (results.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 100,
+                                  width: 100,
+                                  //margin: EdgeInsets.only(top: 30),
+                                  padding: EdgeInsets.all(5),
+                                  child: Image.asset(
+                                    "assets/images/png_no_collection.png",
+                                  ),
+                                  //  child: Center(child: Text("No Category Found")),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  "No Chapters Found",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: primarycolor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          controller: scrollController,
+                          itemCount: results.length,
+                          //  separatorBuilder: (context, _) => Divider(),
+                          itemBuilder: (context, index) {
+                            final chapterdata = results[index];
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 8,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: lightGrayBg.withAlpha(
+                                  150,
+                                ), //  Background color
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ), //  Curved border
+                                border: Border.all(
+                                  color: lightGrayBg.withAlpha(250),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: primarycolor.withAlpha(25),
+                                            borderRadius: BorderRadius.circular(
+                                              50,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: primarycolor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            chapterdata.title ?? "No Name",
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              /* height:
+                                                  1.4, */
+                                              // improves readability for multi-line
+                                            ),
+                                            softWrap: true,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Get.to(
+                                        () => const QnaPage(),
+                                        arguments: {
+                                          'chapterId': chapterdata.id ?? '',
+                                          'chapterName':
+                                              chapterdata.title ?? '',
+                                          'bookId': chapterdata.bookId ?? '',
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: primarycolor,
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: const Text(
+                                        'Start Quiz',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   @override
   void initState() {
@@ -35,8 +538,8 @@ class _HomePageState extends State<HomePage> {
 
     homeController = findOrPut(() => HomeController());
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final token = SharedPreferencesService.getAccessToken() ?? '';
-      final userId = SharedPreferencesService.getUserId() ?? '';
+       token = SharedPreferencesService.getAccessToken() ?? '';
+       userId = SharedPreferencesService.getUserId() ?? '';
       homeController.getRecentActivity(
         token: token,
         userid: userId,
@@ -48,7 +551,11 @@ class _HomePageState extends State<HomePage> {
         userid: userId,
         context: context,
       );
+
+      homeController.getChapterStats(token: token, context: context, userid: userId);
     });
+
+
   }
 
   @override
@@ -57,6 +564,8 @@ class _HomePageState extends State<HomePage> {
       final recentBooks =
           homeController.recent_activity.value?.data?.recentBooks ?? [];
       final scoreboard = homeController.scoreboard.value?.data?.summary;
+    
+
 
       final String quizInProgress =
           (scoreboard?.totalQuizzesInProgress?.toString() ?? 'N/A');
@@ -480,24 +989,32 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         Spacer(),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: whitecolor.withAlpha(50),
-                                            borderRadius: BorderRadius.circular(
-                                              50,
+                                        InkWell(
+                                          onTap: (){
+
+
+_showChapterBottomsheet(context,mysubscriptionController,books.bookId??"",books,token);
+
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
                                             ),
-                                          ),
-                                          child: Text(
-                                            //"${books.chaptersCompleted ?? 0}/${books.chaptersAttempted ?? 0} Chapters",
-                                            "Continue Quiz",
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: whitecolor,
+                                            decoration: BoxDecoration(
+                                              color: whitecolor.withAlpha(50),
+                                              borderRadius: BorderRadius.circular(
+                                                50,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              //"${books.chaptersCompleted ?? 0}/${books.chaptersAttempted ?? 0} Chapters",
+                                              "Continue Quiz",
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: whitecolor,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -521,7 +1038,10 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 SizedBox(height: 16),
-                PerformanceOverviewCard(),
+                PerformanceOverviewCard(chapterStats: homeController.chapterStates.value?.data?.overall,onChanged: (value){
+                  homeController.getChapterStats(token:token , context: context, userid: userId,filter: value);
+
+                },),
                 SizedBox(height: 36),
               ],
             ),

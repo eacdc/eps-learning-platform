@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/circular_back_button.dart';
@@ -34,65 +35,71 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        // AppBar with custom layout
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Column(
-            children: [
-              AppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                surfaceTintColor: Colors.transparent,
-                title: Container(
-                  // color: Colors.yellow,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Back Button
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: CircularBackButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      const Text(
-                        'Notification',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Gray divider
-              Divider(color: textWhiteGrey, height: 1),
-            ],
-          ),
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: whitecolor, // Your desired status bar color
+          statusBarIconBrightness: Brightness.dark, // Icons: light or dark
         ),
-        body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [],
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          // AppBar with custom layout
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: Column(
+              children: [
+                AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  title: Container(
+                    // color: Colors.yellow,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Back Button
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: CircularBackButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                        const Text(
+                          'Notification',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 10),
-         
-            ],
+                // Gray divider
+                Divider(color: textWhiteGrey, height: 1),
+              ],
+            ),
+          ),
+          body: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+           
+              ],
+            ),
           ),
         ),
       ),

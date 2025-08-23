@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:glow_container/glow_container.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +10,7 @@ import 'package:markdown_widget/config/all.dart';
 import 'package:markdown_widget/widget/all.dart';
 import 'package:markdown_widget/widget/markdown.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
@@ -138,12 +140,13 @@ class _ChatWidgetState extends State<ChatWidget>
     super.dispose();
   }
 
-  void sendMessage() {
-    String text = messageController.text.trim();
+  void sendMessage(String text) {
+    // String text = messageController.text.trim();
     if (text.isEmpty) return;
 
     // 1 Add user message immediately to the chat list
-    qnaController.chatMessageList.add(
+
+    qnaController.addMessageToList(
       ChatMessageModel(
         role: 'user',
         content: text.trim(),
@@ -154,6 +157,17 @@ class _ChatWidgetState extends State<ChatWidget>
         id: DateTime.now().toIso8601String(),
       ),
     );
+    /* qnaController.chatMessageList.add(
+      ChatMessageModel(
+        role: 'user',
+        content: text.trim(),
+        isAudio: false,
+        audioFileId: null,
+        messageId: null,
+        timestamp: DateTime.now().toIso8601String(),
+        id: DateTime.now().toIso8601String(),
+      ),
+    ); */
 
     //  Call API to send the message and wait for response
     qnaController.sendChatMessage(
@@ -188,15 +202,15 @@ class _ChatWidgetState extends State<ChatWidget>
         return Stack(
           children: [
             Container(
-             color: lightwhite4,
-           /*    decoration: BoxDecoration(
+              color: lightwhite4,
+
+              /*    decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/images/chat_background.jpg"),
                   opacity: 1,
                   fit: BoxFit.cover, 
                 ),
               ), */
-
               child: Column(
                 children: [
                   /*  InkWell(
@@ -254,53 +268,107 @@ class _ChatWidgetState extends State<ChatWidget>
  */
                   Expanded(
                     child: Obx(
-                      () => ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        shrinkWrap: true,
-                        reverse: true,
+                      () =>
+                          qnaController.chatMessageList.isEmpty
+                              ? Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      height: 150,
+                                      width: 150,
+                                      //margin: EdgeInsets.only(top: 30),
+                                      padding: EdgeInsets.all(5),
+                                      child: Image.asset(
+                                        "assets/images/png_no_collection.png",
+                                      ),
+                                      //  child: Center(child: Text("No Category Found")),
+                                    ),
+                                    SizedBox(height: 2),
+                                    (qnaController.isLoading.value)
+                                        ? SizedBox.shrink()
+                                        : InkWell(
+                                          onTap: () {
+                                            sendMessage("Let's Start");
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 7,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              color: primarycolor.withAlpha(20),
+                                            ),
+                                            child: Text(
+                                              "Start Test",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: primarycolor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  ],
+                                ),
+                              )
+                              : ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                reverse: true,
 
-                        // controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        itemCount: qnaController.chatMessageList.length,
-                        /* +(qnaController.aiThinking.value ? 1 : 0) */
-                        itemBuilder: (context, index) {
-                          final reversedIndex =
-                              qnaController.chatMessageList.length - 1 - index;
+                                controller: qnaController.scrollController,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                itemCount: qnaController.chatMessageList.length,
+                                /* +(qnaController.aiThinking.value ? 1 : 0) */
+                                itemBuilder: (context, index) {
+                                  final reversedIndex =
+                                      qnaController.chatMessageList.length -
+                                      1 -
+                                      index;
 
-                          final message =
-                              qnaController.chatMessageList[reversedIndex];
-                          bool isUser = message.role == 'user';
+                                  final message =
+                                      qnaController
+                                          .chatMessageList[reversedIndex];
+                                  bool isUser = message.role == 'user';
 
-                          if (message.aiLoading
-                          /*  qnaController.aiThinking.value &&
+                                  if (message.aiLoading
+                                  /*  qnaController.aiThinking.value &&
                               reversedIndex ==
                                   qnaController.chatMessageList.length */
-                          ) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 6,
-                                ),
-                                child: _AiThink(
-                                  avatar: "assets/icons/png_ai_avtar.png",
-                                  message: "Ai Thinking...",
-                                ),
-                              ),
-                            );
-                          }
+                                  ) {
+                                    return Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        key: message.key,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 6,
+                                        ),
+                                        child: _AiThink(
+                                          avatar:
+                                              "assets/icons/png_ai_avtar.png",
+                                          message: "Ai Thinking...",
+                                        ),
+                                      ),
+                                    );
+                                  }
 
-                          return _itemChat(
-                            isUser: isUser,
-                            avatar:
-                                isUser
-                                    ? 'assets/images/user_avatar.png'
-                                    : 'assets/icons/png_ai_avtar.png',
-                            message: message.content,
-                            time: message.timestamp,
-                          );
-                        },
-                      ),
+                                  return _itemChat(
+                                    isUser: isUser,
+                                    avatar:
+                                        isUser
+                                            ? 'assets/images/user_avatar.png'
+                                            : 'assets/icons/png_ai_avtar.png',
+                                    message: message.content,
+                                    time: message.timestamp,
+                                    globalkey: message.key,
+                                  );
+                                },
+                              ),
                     ),
                   ),
 
@@ -373,6 +441,98 @@ class _ChatWidgetState extends State<ChatWidget>
               ),
             ),
 
+            Positioned(
+              bottom: 90,
+              right: 20,
+              child:
+                  qnaController.scoreCardOpacity != 0.0
+                      ? SizedBox.shrink()
+                      : AnimatedOpacity(
+                        opacity: 1.0,
+                        //  opacity: qnaController.scoreCardOpacity.value,
+                        duration: const Duration(milliseconds: 300),
+
+                        child: Center(
+                          child: GlowContainer(
+                            glowRadius: 16,
+                            gradientColors: [
+                              Colors.blue,
+                              Colors.purple,
+                              Colors.pink,
+                            ],
+                            rotationDuration: Duration(seconds: 2),
+                            glowLocation: GlowLocation.both,
+                            containerOptions: ContainerOptions(
+                              width: 120,
+                              height: 100,
+                              borderRadius: 16,
+                              backgroundColor: lightGrayBg,
+                              borderSide: BorderSide(
+                                width: 1.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                            transitionDuration: Duration(milliseconds: 200),
+                            showAnimatedBorder: true,
+                            child: Container(
+                              margin: EdgeInsets.all(2),
+                              // width: 50,
+                              // height: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: whitecolor,
+                              ),
+
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(height: 8),
+                                  Text(
+                                    "Curent Score",
+
+                                    style: TextStyle(
+                                      color: primarycolor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 6),
+
+                                  Shimmer.fromColors(
+                                    baseColor: primarycolor,
+                                    highlightColor: primarycolor.withAlpha(50),
+                                    loop: 0,
+                                    period: Duration(seconds: 2),
+                                    child: Text(
+                                      " 0/00",
+                                      // qnaController.scoreValue.value
+                                      style: TextStyle(
+                                        color: primarycolor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    "Total Question",
+
+                                    style: TextStyle(
+                                      color: primarycolor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+            ),
+
             Visibility(
               visible: qnaController.isLoading.value,
               child: Center(
@@ -406,7 +566,13 @@ class _ChatWidgetState extends State<ChatWidget>
     );
   }
 
-  _itemChat({required bool isUser, String? avatar, message, String? time}) {
+  _itemChat({
+    required bool isUser,
+    required GlobalKey globalkey,
+    String? avatar,
+    message,
+    String? time,
+  }) {
     return Row(
       mainAxisAlignment:
           isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -437,11 +603,12 @@ class _ChatWidgetState extends State<ChatWidget>
 
         Flexible(
           child: Container(
+            key: globalkey,
             margin: EdgeInsets.only(left: 0, right: 0, top: 16),
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isUser ? primarycolor : whitecolor,
-              
+
               borderRadius:
                   isUser
                       ? BorderRadius.only(
@@ -480,7 +647,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                           ? Colors.white
                                           : Colors
                                               .black87, // 🔑 Your required color
-                                  fontSize: 15,
+                                  fontSize: 16,
                                 ),
                               ),
                               LinkConfig(
@@ -722,7 +889,7 @@ class _ChatWidgetState extends State<ChatWidget>
               width: 20,
               // colorFilter: ColorFilter.mode(primarycolor, BlendMode.srcIn)
             ),
-            onPressed: sendMessage,
+            onPressed: () => sendMessage(messageController.text.trim()),
             style: IconButton.styleFrom(
               backgroundColor: lightGrayBg,
               foregroundColor: primarycolor,

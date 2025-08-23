@@ -93,8 +93,8 @@ class FullQuestion {
 
 
 class Score {
-  final int? marksAwarded;
-  final int? maxMarks;
+  final num? marksAwarded;
+  final num? maxMarks;
   final String? previousQuestion;
 
   Score({

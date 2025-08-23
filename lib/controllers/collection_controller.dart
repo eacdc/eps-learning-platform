@@ -12,6 +12,7 @@ class CollectionController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var isLoading = false.obs;
   var isChapterLoading = false.obs;
+  var isSubscribeLoading = false.obs;
 
   var pageNo = 1.obs;
   var limit = 20.obs;
@@ -25,7 +26,6 @@ class CollectionController extends GetxController
   var isSortApplied = false.obs;
 
   //var selectedDepartment = Rxn<Department>(); // Holds the selected department
-
 
   ScrollController scrollController = ScrollController();
 
@@ -112,7 +112,7 @@ class CollectionController extends GetxController
         false, // Default to false , Clear all data and filter value
   }) async {
     if (pageNumber == 1) {
-      bookCollectionList.value = [];
+    //  bookCollectionList.value = [];
       //clear
       pageNo.value = 1;
       isMoreDataAvailable.value = true;
@@ -162,14 +162,18 @@ class CollectionController extends GetxController
 
           final newData = bookData.data?.books ?? [];
           if (newData.isNotEmpty) {
-            bookCollectionList.addAll(newData);
+            (pageNumber == 1)
+                ? (bookCollectionList
+                  ..clear()
+                  ..addAll(newData))
+                : bookCollectionList.addAll(newData);
           } else {
             isMoreDataAvailable.value = false;
-            if(pageNumber>1){
-                SnackBarHelper.showFailureSnackBar(context, "No more books...");
+            if (pageNumber > 1) {
+              SnackBarHelper.showFailureSnackBar(context, "No more books...");
+            } else {
+              bookCollectionList.clear();
             }
-            /// isMoreDataAvailable.value = false; // No more pages to load
-            ///  SnackBarHelper.showNormalSnackBar(context, "No more items...");
           }
 
           ///  bookCollectionList.value = bookData.data?.books ?? [];
@@ -188,6 +192,7 @@ class CollectionController extends GetxController
     } catch (e) {
       SnackBarHelper.showFailureSnackBar(context, e.toString());
 
+      print(e.toString());
       /*       isMoreDataAvailable.value = false; // No more pages to load
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
@@ -456,7 +461,7 @@ class CollectionController extends GetxController
 
     // Default to false , Clear all data and filter value
   }) async {
-    isLoading.value = true;
+    isSubscribeLoading.value = true;
 
     var response = await ApiManager.requestNew(
       endpoint: ApiManager.unsubscribe(bookId),
@@ -515,7 +520,7 @@ class CollectionController extends GetxController
       /*       isMoreDataAvailable.value = false; // No more pages to load
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
-      isLoading.value = false;
+      isSubscribeLoading.value = false;
       // Close BottomSheet only if it's still open
       if (context != null && Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -530,7 +535,7 @@ class CollectionController extends GetxController
 
     // Default to false , Clear all data and filter value
   }) async {
-    isLoading.value = true;
+    isSubscribeLoading.value = true;
 
     var response = await ApiManager.requestNew(
       endpoint: ApiManager.subscribe,
@@ -581,7 +586,7 @@ class CollectionController extends GetxController
       /*       isMoreDataAvailable.value = false; // No more pages to load
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
-      isLoading.value = false;
+      isSubscribeLoading.value = false;
       // Close BottomSheet only if it's still open
       if (context != null && Navigator.canPop(context)) {
         Navigator.pop(context);

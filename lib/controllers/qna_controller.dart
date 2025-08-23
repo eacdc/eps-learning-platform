@@ -20,20 +20,13 @@ class QnaController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var isLoading = false.obs;
   var aiThinking = false.obs;
+  var scoreCardOpacity = 0.0.obs;
+  var scoreValue = "".obs;
 
-
-  var allfilter = true.obs;
-  var departmentfilter = "".obs;
-  var severityFIlter = "".obs;
-  var datefromFilter = "".obs;
-  var dateToFilter = "".obs;
   var pageNo = 1.obs;
-  var searchString = "".obs;
 
   //var selectedDepartment = Rxn<Department>(); // Holds the selected department
   //var selectedSeverity = Rxn<Severity>(); // Holds the selected department
-
-  // for pagination
 
   ScrollController scrollController = ScrollController();
 
@@ -43,6 +36,45 @@ class QnaController extends GetxController
   var isMoreDataAvailable = true.obs; // Tracks if more pages are available
 
   var chatMessageList = List<ChatMessageModel>.empty().obs;
+
+  void _handleScrollForReverseList(ChatMessageModel message) {
+    if (!scrollController.hasClients) return;
+
+    final context = message.key.currentContext;
+    if (context == null) return;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final messageHeight = renderBox.size.height;
+    final viewportHeight = scrollController.position.viewportDimension;
+
+    if (messageHeight <= viewportHeight) {
+      // Short message → show bottom (default behavior)
+
+      print("lesss");
+      scrollController.jumpTo(scrollController.position.minScrollExtent);
+    } else {
+      // Tall message → show top of message
+      // In reverse mode, top means scrolling down by messageHeight - viewportHeight
+      final offset = (messageHeight - viewportHeight).clamp(0, double.infinity);
+      scrollController.jumpTo(offset.toDouble());
+      /*  scrollController.animateTo(
+        offset.toDouble(),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      ); */
+    }
+  }
+
+  void addMessageToList(ChatMessageModel newChatModel) {
+    chatMessageList.add(newChatModel);
+
+    // Wait for the UI to build so we can measure
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _handleScrollForReverseList(newChatModel);
+    });
+  }
 
   DashboardController() {}
 
@@ -55,6 +87,12 @@ class QnaController extends GetxController
 
     //paginate task
     // paginateTask();
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
   }
 
   void getChatHistoryCollection({
@@ -100,12 +138,6 @@ class QnaController extends GetxController
     if (reloadpage) {
       pageNumber = 1;
 
-      allfilter.value = true;
-      departmentfilter.value = "";
-      severityFIlter.value = "";
-      datefromFilter.value = "";
-      dateToFilter.value = "";
-      searchString.value = "";
       //  selectedDepartment.value = null;
       //  selectedSeverity.value = null;
 
@@ -139,6 +171,15 @@ class QnaController extends GetxController
                   .toList();
           // use books
           chatMessageList.value = chatList;
+
+          /*   // Scroll to top of the new message if needed
+          Future.delayed(const Duration(milliseconds: 50), () {
+            if (scrollController.hasClients) {
+              scrollController.jumpTo(
+                scrollController.position.maxScrollExtent,
+              );
+            }
+          }); */
         } else if (response.data is Map) {
           if (response.data.containsKey('error') ||
               response.data.containsKey('message')) {
@@ -202,7 +243,8 @@ class QnaController extends GetxController
       aiLoading: true, // Set aiLoading to true for the new message
     );
 
-    chatMessageList.add(aiLoadingModel);
+    addMessageToList(aiLoadingModel);
+
     /*   print(
       "xreq ${{
         "page": pageNumber,
@@ -252,19 +294,34 @@ class QnaController extends GetxController
             print("xxx3");
             // use single book
 
-            chatMessageList.add(
-              ChatMessageModel(
-                id: DateTime.now().toIso8601String(),
-                role: 'assistant',
-                content: chatResponseModel.message ?? "Something Went Wrong",
-                isAudio: false,
-                audioFileId: null,
-                messageId: null,
-                timestamp: DateTime.now().toIso8601String(),
-              ),
+            final chatModel = ChatMessageModel(
+              id: DateTime.now().toIso8601String(),
+              role: 'assistant',
+              content: chatResponseModel.message ?? "Something Went Wrong",
+              isAudio: false,
+              audioFileId: null,
+              messageId: null,
+              timestamp: DateTime.now().toIso8601String(),
             );
 
-            print("xxx4");
+            addMessageToList(chatModel);
+
+            // visible Score Graphics
+
+            final num? markAwarded =
+                chatResponseModel.score?.marksAwarded;
+            final num? markMax =
+                chatResponseModel.score?.maxMarks;
+
+            if (markAwarded != null && markMax != null) {
+              scoreCardOpacity.value = 1.0;
+              scoreValue.value = " $markAwarded / $markMax";
+              Future.delayed(const Duration(seconds: 5), () {
+                scoreCardOpacity.value = 0.0;
+                scoreValue.value ="";
+              });
+            }
+
           }
         } else {
           print("Unhandled response format");
@@ -273,6 +330,20 @@ class QnaController extends GetxController
         print("Request failed: ${response.statusCode}");
 
         if (response.data.containsKey('error')) {
+          /*   final chatXModel = ChatMessageModel(
+            id: DateTime.now().toIso8601String(),
+            role: 'assistant',
+            content:
+                //"ttttttttttttttttttt",
+                "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum(The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from de Finibus Bonorum et Malorum by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham",
+            isAudio: false,
+            audioFileId: null,
+            messageId: null,
+            timestamp: DateTime.now().toIso8601String(),
+          );
+
+          addMessageToList(chatXModel); */
+
           SnackBarHelper.showFailureSnackBar(
             context,
             response.data['error'] ?? "Something Went Wrong!",
@@ -364,7 +435,7 @@ class QnaController extends GetxController
           if (data.containsKey('transcription') &&
               data.containsKey('redirect')) {
             //SnackBarHelper.showSuccessSnackBarGetx(data['transcription']);
-              chatMessageList.add(
+            chatMessageList.add(
               ChatMessageModel(
                 id: DateTime.now().toIso8601String(),
                 role: 'user',

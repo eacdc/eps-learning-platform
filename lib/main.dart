@@ -20,6 +20,10 @@ void main() async {
       statusBarColor: whitecolor,
       statusBarIconBrightness: Brightness.dark, // For Android
       statusBarBrightness: Brightness.light, // For iOS
+
+      // 👇 Bottom navigation bar
+    systemNavigationBarColor: whitecolor, // Background color
+    systemNavigationBarIconBrightness: Brightness.dark, // Icon color
     ),
   );
 

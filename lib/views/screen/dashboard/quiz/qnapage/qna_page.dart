@@ -30,7 +30,7 @@ class _QnaPageState extends State<QnaPage> {
     bookId = arguments?['bookId'] ?? "";
     chapterName = arguments?['chapterName'] ?? "";
 
- /*    // Set status bar style
+    /*    // Set status bar style
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.white,
       statusBarIconBrightness: Brightness.dark,
@@ -40,54 +40,59 @@ class _QnaPageState extends State<QnaPage> {
 
   @override
   Widget build(BuildContext context) {
- ;
-
-     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        // AppBar with custom layout
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Column(
-            children: [
-              AppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                surfaceTintColor: Colors.transparent,
-                title: Container(
-                  // color: Colors.yellow,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Back Button
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: CircularBackButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+    return SafeArea(
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: whitecolor, // Your desired status bar color
+          statusBarIconBrightness: Brightness.dark, // Icons: light or dark
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          // AppBar with custom layout
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: Column(
+              children: [
+                AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  title: Container(
+                    // color: Colors.yellow,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Back Button
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: CircularBackButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
                         ),
-                      ),
-                       Text(
-                        "Chapter ($chapterName)" ,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                        Text(
+                          "Chapter ($chapterName)",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              // Gray divider
-              Spacer(),
-              Divider(color: textWhiteGrey, height: 1),
-            ],
+                // Gray divider
+                Spacer(),
+                Divider(color: textWhiteGrey, height: 1),
+              ],
+            ),
           ),
+          body: ChatWidget(chapterId: chapterId, chapterName: chapterName),
         ),
-        body: ChatWidget(chapterId: chapterId,chapterName:chapterName), ),
+      ),
     );
   }
 }

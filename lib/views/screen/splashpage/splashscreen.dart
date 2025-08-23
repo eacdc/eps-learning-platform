@@ -43,8 +43,6 @@ class _SplashScreenPageState extends State<SplashScreenPage>
     //SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     //SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-
-
     _circleController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 2500),
@@ -136,13 +134,19 @@ class _SplashScreenPageState extends State<SplashScreenPage>
     final size = MediaQuery.of(context).size;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarColor:
-              false
-                  ? whitecolor
-                  : Color(0xff6DC2C6), // Your desired status bar color
-          statusBarIconBrightness: Brightness.dark, // Icons: light or dark
-        ),
+      value: SystemUiOverlayStyle(
+        statusBarColor:
+            false
+                ? whitecolor
+                : Color(0xff6DC2C6), // Your desired status bar color
+        statusBarIconBrightness: Brightness.dark, // Icons: light or dark
+        statusBarBrightness: Brightness.light, // iOS
+        // Bottom navigation bar
+        systemNavigationBarColor: Colors.white, // Background
+        systemNavigationBarIconBrightness: Brightness.dark, // Icons
+        systemNavigationBarDividerColor:
+            Colors.white, // Optional, removes divider line
+      ),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Center(
@@ -173,7 +177,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                       );
                     },
                   ),
-      
+
                   Center(
                     child: Image.asset(
                       'assets/images/logo.png',
@@ -183,13 +187,13 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                   ),
                 ],
               ),
-      
+
               Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(height: 8),
-      
+
                     /* // Image.asset('assets/images/logo.png', height: 95, width: 95),
                     const SizedBox(height: 20),
                     AnimatedBuilder(
@@ -241,17 +245,26 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                     ), */
                     _buildAnimatedText(
                       Constants.appname,
-                      const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     _buildAnimatedText(
                       Constants.appdesc,
-                      const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                      const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     _buildAnimatedText(
                       Constants.copyright,
-                      const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+                      const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ],
                 ),

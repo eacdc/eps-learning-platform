@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/state_manager.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/controllers/homeController/home_controller.dart';
 import 'package:test_your_learing/views/custom_widgets/multisegment_circulsr_indicator.dart';
 
+import '../../models/home_model/chapter_states_model.dart';
+import 'multisegment_painter.dart';
+
 class PerformanceOverviewCard extends StatefulWidget {
-  const PerformanceOverviewCard({super.key});
+  final OverallStats? chapterStats;
+    final ValueChanged<String> onChanged;
+
+  const PerformanceOverviewCard({super.key, required this.chapterStats,required this.onChanged,});
 
   @override
   State<PerformanceOverviewCard> createState() =>
@@ -17,6 +25,16 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
 
   @override
   Widget build(BuildContext context) {
+    final chapterStats = widget.chapterStats;
+
+    final totalbooks = chapterStats?.totalBooks ?? '-';
+    final totalchapters = chapterStats?.totalChapters ?? '-';
+    final completed = chapterStats?.completed?.count ??'-' ;
+    final completed_percentage = (chapterStats?.completed?.percentage ?? 0)/100;
+    final inProgress = chapterStats?.inProgress ?.count?? '-';
+    final inProgress_percent =(chapterStats?.inProgress?.percentage??0)/100;
+    final notStatrted = chapterStats?.notStarted?.count ?? '-';
+    final notStatrted_perentag = (chapterStats?.notStarted?.percentage??0)/100;
     return Card(
       elevation: 0.5,
       color: Colors.white,
@@ -53,6 +71,9 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
                     setState(() {
                       selectedPeriod = newValue!;
                     });
+
+                    widget.onChanged(newValue??"");
+                    // recall the Api with new Date Format
                   },
                 ),
               ],
@@ -61,11 +82,11 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
             const SizedBox(height: 16),
 
             /// Circular Progress Indicator
-            CircularPercentIndicator(
+            /* CircularPercentIndicator(
               radius: 60.0,
               lineWidth: 12.0,
               percent: 0.75, // 75% complete
-              
+
               center: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -83,6 +104,25 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
               backgroundColor: Colors.grey.shade200,
               circularStrokeCap: CircularStrokeCap.round,
             ),
+ */
+           
+           
+           Container(
+            height: 120,
+            width: 120,
+             child: MultiSegmentCircle(
+               completedPercent:completed_percentage,
+               inProgressPercent: inProgress_percent,
+               notStartedPercent: notStatrted_perentag,
+               completedColor:Colors.green,
+                  inProgressColor:Colors.orange,
+               notStartedColor: Colors.red,
+               
+               ),
+            
+
+             
+           ),
 
             const SizedBox(height: 16),
 
@@ -90,9 +130,17 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('48/60', 'Completed', Colors.green),
-                _buildStat('30/60', 'In Progress', Colors.orange),
-                _buildStat('3/60', 'Not Started', Colors.red),
+                _buildStat("$completed/$totalchapters", 'Completed', Colors.green),
+                _buildStat(
+                  "$inProgress/$totalchapters",
+                  'In Progress',
+                  Colors.orange,
+                ),
+                _buildStat(
+                  "$notStatrted/$totalchapters",
+                  'Not Started',
+                  Colors.red,
+                ),
               ],
             ),
 

@@ -36,6 +36,7 @@ class _CollectionPageState extends State<CollectionPage> {
   ScrollController scrollController = ScrollController();
   bool _showFilterBar = true;
   Timer? _scrollTimer;
+  Timer? _debounce;
 
   late String token;
 
@@ -114,7 +115,7 @@ class _CollectionPageState extends State<CollectionPage> {
               bookData.isSubscribed
                   ? 'Do you want to unsubscribe this book?'
                   : 'Do you want to subscribe this book?',
-          bookData: bookData,
+          bookImage: bookData.bookCoverImgLink,
           positiveText: bookData.isSubscribed ? 'Unsubscribe' : "Subscribe",
           negativeText: "Cancel",
           onPositiveCallback: () {
@@ -131,6 +132,7 @@ class _CollectionPageState extends State<CollectionPage> {
                 );
           },
           onNegativeCallback: () {},
+          isLoading: collectionController.isSubscribeLoading,
         );
       },
     );
@@ -148,6 +150,9 @@ class _CollectionPageState extends State<CollectionPage> {
 
     token = SharedPreferencesService.getAccessToken();
 
+    // searchController.text= collectionController.searchString.value;
+    collectionController.searchString.value = "";
+
     collectionController.getBookListCollectionFilterSearch(
       token: token,
       context: context,
@@ -158,8 +163,9 @@ class _CollectionPageState extends State<CollectionPage> {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
         print("reach end");
-        collectionController.pageNo.value = collectionController.pageNo.value + 1;
-         collectionController.getBookListCollectionFilterSearch(
+        collectionController.pageNo.value =
+            collectionController.pageNo.value + 1;
+        collectionController.getBookListCollectionFilterSearch(
           token: token,
           context: context,
           pageNumber: collectionController.pageNo.value,
@@ -198,7 +204,6 @@ class _CollectionPageState extends State<CollectionPage> {
         }
       });
     });
-
   }
 
   @override
@@ -255,14 +260,24 @@ class _CollectionPageState extends State<CollectionPage> {
                             controller: searchController,
                             focusNode: searchFocus,
                             onTextChanged: (text) {
-                              print("Search input: $text");
-                              collectionController.searchString.value = text;
-                              // Add search logic here
-                              collectionController
-                                  .getBookListCollectionFilterSearch(
-                                    context: context,
-                                    token: token,
-                                  );
+                              // Cancel previous timer if still running
+                              if (_debounce?.isActive ?? false)
+                                _debounce!.cancel();
+
+                              _debounce = Timer(
+                                const Duration(milliseconds: 300),
+                                () {
+                                  print("Search input: $text");
+                                  collectionController.searchString.value =
+                                      text;
+
+                                  collectionController
+                                      .getBookListCollectionFilterSearch(
+                                        context: context,
+                                        token: token,
+                                      );
+                                },
+                              );
                             },
                           ),
                         ),
@@ -280,7 +295,7 @@ class _CollectionPageState extends State<CollectionPage> {
                               "All",
                               true,
                               "assets/icons/png_all_category.png",
-                             true,
+                              true,
                               () {},
                             ),
                             SizedBox(width: 8),
@@ -320,7 +335,6 @@ class _CollectionPageState extends State<CollectionPage> {
                                 ), // adjust as needed
                                 controller: scrollController,
 
-                              
                                 //physics: NeverScrollableScrollPhysics(),
                                 //  shrinkWrap: true,
                                 itemCount:
@@ -413,8 +427,7 @@ class _CollectionPageState extends State<CollectionPage> {
                                   );
                                 },
                               ),
-
-                   )
+                    )
                     : Container(
                       margin: EdgeInsets.only(top: 30),
                       padding: EdgeInsets.all(80),
