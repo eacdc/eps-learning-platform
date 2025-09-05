@@ -70,8 +70,8 @@ class Book {
   final int? chaptersAttempted;
   final int? chaptersCompleted;
   final int? questionsAnswered;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final double? progressPercentage;
   final String? lastActivity;
 
@@ -118,11 +118,11 @@ class RecentActivity {
   final String? grade;
   final int? questionsAnswered;
   final int? totalQuestions;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final double? scorePercentage;
   final String? timestamp;
-  final int? pointsEarned;
+  final num? pointsEarned;
 
   RecentActivity({
     this.type,
@@ -162,7 +162,7 @@ class RecentActivity {
 class QuizData {
   final int? totalQuizzesTaken;
   final double? avgQuizScore;
-  final int? totalPointsEarned;
+  final num? totalPointsEarned;
 
   QuizData({
     this.totalQuizzesTaken,

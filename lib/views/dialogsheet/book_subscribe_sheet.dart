@@ -36,8 +36,8 @@ class SubscribeBookSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx((){
       return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration:  BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -71,7 +71,7 @@ class SubscribeBookSheet extends StatelessWidget {
                         "${positiveText} Book",
                         style: TextStyle(
                           fontSize: 15,
-                          color: blacktext,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -145,7 +145,7 @@ class SubscribeBookSheet extends StatelessWidget {
                       title,
                       style: TextStyle(
                         fontSize: 14,
-                        color: blacktext,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -156,7 +156,7 @@ class SubscribeBookSheet extends StatelessWidget {
                     desc,
                     style: TextStyle(
                       fontSize: 16,
-                      color: lightGraytext,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

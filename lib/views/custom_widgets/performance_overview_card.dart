@@ -37,7 +37,7 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
     final notStatrted_perentag = (chapterStats?.notStarted?.percentage??0)/100;
     return Card(
       elevation: 0.5,
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.secondaryContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.all(10),
       shadowColor: Colors.grey.shade200,

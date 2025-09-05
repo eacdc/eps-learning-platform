@@ -9,11 +9,14 @@ import 'package:test_your_learing/controllers/dashboard_controller.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_dashboard_switch.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_switch.dart';
+import 'package:test_your_learing/views/custom_widgets/darkmode_switch_flutter.dart';
 import 'package:test_your_learing/views/screen/dashboard/collection/collectionpage.dart';
 import 'package:test_your_learing/views/screen/dashboard/homepage/homepage.dart';
 import 'package:test_your_learing/views/screen/dashboard/my_library/mysubscription.dart';
 import 'package:test_your_learing/views/screen/dashboard/profile/profilepage.dart';
 import 'package:test_your_learing/views/screen/dashboard/quiz/quizpage.dart';
+
+import '../../../utils/getxtheme/theme_controller.dart';
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -22,6 +25,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final dashboardController = Get.put(DashboardController());
+  final themeController = Get.find<ThemeController>();
 
   //int _selectedIndex = 0;
 
@@ -198,7 +202,11 @@ List<Widget> get _actionWidget => [
           // dashboardController.changeListStyle(value);
         },
       ),
-      SizedBox.shrink(),
+      DarkModeSwitch(
+        onChanged: (value) {
+          /// themeController.toggleTheme();
+        },
+      ),
     ];
   }
 
@@ -210,9 +218,24 @@ List<Widget> get _actionWidget => [
         value: SystemUiOverlayStyle(
           statusBarColor:
               _selectedIndex != 0
-                  ? whitecolor
+                  ? Theme.of(context).colorScheme.surface
                   : Color(0xff6DC2C6), // Your desired status bar color
-          statusBarIconBrightness: Brightness.dark, // Icons: light or dark
+          statusBarIconBrightness:
+              Theme.of(context).brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+
+          // Bottom navigation bar
+          systemNavigationBarColor:
+              Theme.of(context).colorScheme.surface, // Background
+          systemNavigationBarIconBrightness:
+              Theme.of(context).brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark, // Icons
+          systemNavigationBarDividerColor:
+              Theme.of(
+                context,
+              ).colorScheme.surface, // Optional, removes divider line
         ),
         child: PopScope(
           canPop: dashboardController.selectedIndex.value == 0,
@@ -248,10 +271,11 @@ List<Widget> get _actionWidget => [
                             bottom: Radius.circular(0),
                           ),
                         ),
-                        elevation: 20,
-                        backgroundColor: whitecolor,
+
+                        ///elevation: 20,
+                        ///backgroundColor: whitecolor,
                         surfaceTintColor: Colors.transparent,
-                        //  title: const Text(Constants.appname),
+                        // title: const Text(Constants.appname),
                         automaticallyImplyLeading: false, //remove back button
                         flexibleSpace: Stack(
                           children: [
@@ -293,7 +317,10 @@ List<Widget> get _actionWidget => [
                                         _pagesname[_selectedIndex] ?? "",
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: blacktext,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
                                           fontWeight: FontWeight.w700,
                                           fontSize: 19,
                                         ),
@@ -306,7 +333,10 @@ List<Widget> get _actionWidget => [
                                   ),
                                 ),
                                 Spacer(),
-                                Divider(height: 1, color: textWhiteGrey),
+                                Divider(
+                                  height: 1,
+                                  color: Theme.of(context).dividerColor,
+                                ),
                               ],
                             ),
                           ],
@@ -341,7 +371,7 @@ List<Widget> get _actionWidget => [
               bottomNavigationBar: BottomAppBar(
                 height: 65,
                 //shape: const CircularNotchedRectangle(),
-                color: textWhiteGrey,
+                //color: textWhiteGrey,
                 padding: EdgeInsets.all(4),
                 notchMargin: 0.0,
                 child: Container(
@@ -419,7 +449,10 @@ List<Widget> get _actionWidget => [
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: primarycolor,
-                          border: Border.all(color: Colors.white, width: 3),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.surface,
+                            width: 3,
+                          ),
                           boxShadow:
                               _selectedIndex == 2
                                   ? [

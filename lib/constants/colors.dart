@@ -1,36 +1,42 @@
 import 'package:flutter/material.dart';
 
-Color light = const Color(0xFFF7F8FC);
-Color lightGray = const Color(0xFFA4A6B3);
-Color dark = const Color(0xFF363740);
-Color active = const Color(0xFF0b57d0);
+const Color light = const Color(0xFFF7F8FC);
+const Color lightGray = const Color(0xFFA4A6B3);
+const Color dark = const Color(0xFF363740);
+const Color active = const Color(0xFF0b57d0);
 
-Color primarycolor = const Color(0xFF0056D2);
+const Color primarycolor = const Color(0xFF0056D2);
 //Color primarycolor = const Color(0xFF572ac8);
 //Color primarycolor = const Color(0xFF2253E6);
-Color primarylightcolor = const Color(0xFF1e4ce0);
-Color secondarycolor = const Color(0xFFfed636);
-Color onprimary = const Color(0xFFF7F7FF);
-Color tertiarycolor = const Color(0xFFffe54a);
+const Color primarylightcolor = const Color(0xFF1e4ce0);
+const Color secondarycolor = const Color(0xFFfed636);
+const Color onprimary = const Color(0xFFF7F7FF);
+const Color tertiarycolor = const Color(0xFFffe54a);
 
-Color redcolor = const Color(0xFFFF0000);
+const Color redcolor = const Color(0xFFFF0000);
 
-Color graylight = const Color(0xFFbfbfbf);
-Color gray = const Color(0xFF7f7f7f);
-Color graydark = const Color(0xFF787878);
-Color graychatbg = const Color(0xFFF0F0F0);
+const Color graylight = const Color(0xFFbfbfbf);
+const Color gray = const Color(0xFF7f7f7f);
+const Color graydark = const Color(0xFF787878);
+const Color graychatbg = const Color(0xFFF0F0F0);
 
 //TYL
-Color graytext = const Color(0xFF64748B);
-Color blacktext = const Color(0xFF0F172A);
-Color lightwhitetext = const Color(0xFFFCFCFD);
-Color lightbluetext = const Color(0xFFE2EBFF);
-Color lightgreytext = const Color(0xFFE2E8F0);
-Color lightgreytext2 = const Color(0xFFCBD5E1);
-Color progressColor = const Color(0xFFFAB44C);
-Color progressColorLight = const Color(0xFFFDC573);
-Color lightGrayBg = const Color(0xFFF4F4F4);
-Color lightGraytext = const Color(0xFF797979);
+const Color graytext = const Color(0xFF64748B);
+const Color blacktext = const Color(0xFF0F172A);
+const Color lightwhitetext = const Color(0xFFFCFCFD);
+const Color lightbluetext = const Color(0xFFE2EBFF);
+const Color lightgreytext = const Color(0xFFE2E8F0);
+const Color lightgreytext2 = const Color(0xFFCBD5E1);
+const Color progressColor = const Color(0xFFFAB44C);
+const Color progressColorLight = const Color(0xFFFDC573);
+const Color lightGrayBg = const Color(0xFFF4F4F4);
+const Color lightGraytext = const Color(0xFF797979);
+
+const Color primaryBlue = Color(0xff2972ff);
+const Color textBlack = Color(0xff222222);
+const Color textGrey = Color(0xff94959b);
+const Color textWhiteGrey = Color(0xfff1f1f5);
+const Color textWhite = Color(0xffffffff);
 
 Color spcard1 = const Color(0xFF2463EB);
 Color spcard2 = const Color(0xFF17A34A);
@@ -57,7 +63,7 @@ Color lightwhite1 = const Color(0xFFFFFFFF7);
 Color lightwhite2 = const Color(0xFFF7F7FF);
 Color lightwhite3 = const Color(0xFFFFFAEF);
 Color lightwhite4 = const Color(0xFFf3f2ed);
-Color whitecolor = const Color(0xFFFFFFFF);
+const Color whitecolor = const Color(0xFFFFFFFF);
 Color blackcolor = const Color(0xFF000000);
 
 //white light
@@ -95,6 +101,9 @@ Gradient homeGradient = LinearGradient(
     Color(0xff0069AC), // Bottom color
   ],
 );
+
+
+
 
 final List<Gradient> gradiantList = [
   LinearGradient(

@@ -20,9 +20,9 @@ class SearchInputField extends StatelessWidget {
     return Container(
       height: 50,
       decoration: BoxDecoration(
-        border: Border.all(color: lightgreytext),
+        border: Border.all(color:  Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(80)),
         borderRadius: BorderRadius.circular(10.0),
-        color: whitecolor,
+        color: Theme.of(context).colorScheme.surface,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       child: Row(
@@ -34,7 +34,7 @@ class SearchInputField extends StatelessWidget {
               focusNode: focusNode, // ✅ Use the passed focusNode
               onChanged: onTextChanged,
               style: TextStyle(
-                color: blackmedium,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
                 fontSize: 17.0,
                 fontWeight: FontWeight.w400,
               ),

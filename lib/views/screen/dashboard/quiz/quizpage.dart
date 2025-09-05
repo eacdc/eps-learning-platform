@@ -28,7 +28,6 @@ class _MySubscriptionPageState extends State<QuizPage> {
 
   ScrollController scrollController = ScrollController();
 
-  late int employee_id;
   late String token;
 
   Widget _buildFilterItem(
@@ -148,7 +147,8 @@ class _MySubscriptionPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     return Obx(
       () => Container(
-        color: lightwhitetext,
+            color: Theme.of(context).colorScheme.surface
+,
         child: Stack(
           // fit: StackFit.loose,
           //  alignment: AlignmentDirectional.center,
@@ -160,67 +160,7 @@ class _MySubscriptionPageState extends State<QuizPage> {
               //  mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 1),
-                /*   Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.all(8),
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    // color: redcolor,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 0),
-                        child: InkWell(
-                          onTap: () {
-                            // _showModal(context, collectionController);
-                          },
-                          child: SearchField(),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween, // Evenly distribute items
-                          children: [
-                            _buildFilterItem(
-                              "All",
-                              true,
-                              "assets/icons/png_all_category.png",
-                              mysubscriptionController.allfilter.value,
-                              () {},
-                            ),
-                            SizedBox(width: 8),
-                            _buildFilterItem(
-                              "Science",
-                              true,
-                              "assets/icons/png_science_category.png",
-                              false,
-                              () {},
-                            ),
-                            SizedBox(width: 8),
-                            _buildFilterItem(
-                              "Mathematics",
-                              true,
-                              "assets/icons/png_math_category.png",
-                              false,
-                              () {},
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                    ],
-                  ),
-                ),
- */
-
-                /*  (dashboardController.incidentdata.value?.data ?? [])
-                              .isNotEmpty */
+        
                 mysubscriptionController.bookCollectionList.value.isNotEmpty
                     ? Expanded(
                       // height: 200,
@@ -228,23 +168,6 @@ class _MySubscriptionPageState extends State<QuizPage> {
                       child: ListView.builder(
                         controller: scrollController,
 
-                        /*  controller: ScrollController()
-                                  ..addListener(() {
-                                    
-                                  /*   if (dashboardController.isLoading.isFalse &&
-                                        dashboardController.hasNextPage.isTrue &&
-                                        dashboardController
-                                            .incidentDataList.isNotEmpty) {
-                                      dashboardController.getIncidentFilterSearch(
-                                        token: token, // Add your token here
-                                        context: context,
-                                        pageNumber:
-                                            dashboardController.pageNo.value,
-                                      );
-                                    } */
-                                  }), */
-                        //physics: NeverScrollableScrollPhysics(),
-                        //  shrinkWrap: true,
                         itemCount:
                             mysubscriptionController.bookCollectionList.length,
                         itemBuilder: (context, index) {
@@ -289,8 +212,12 @@ class _MySubscriptionPageState extends State<QuizPage> {
                                   // Optional: Handle cancel action
                                   print('User canceled');
                                 },
+                                
+                                
                               );
                             },
+                         context: context
+                         
                           );
                         },
                       ),
@@ -303,57 +230,16 @@ class _MySubscriptionPageState extends State<QuizPage> {
                     ),
               ],
             ),
-            Visibility(
-              visible: mysubscriptionController.isLoading.value,
-              child: Center(
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primarycolor.withOpacity(0.3),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 2), // changes position of shadow
-                      ),
-                    ],
-                    color: whitecolor,
-                  ),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4.5,
-                    color: primarycolor.withOpacity(0.8),
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          
+          ProgressBarWidget(visible: mysubscriptionController.isLoading.value)
+          
+             ],
         ),
       ),
     );
   }
 }
 
-class Report {
-  final String severity;
-  final String department;
-  final String description;
-  final String date;
-  final String time;
-  final int imageCount;
-
-  Report({
-    required this.severity,
-    required this.department,
-    required this.description,
-    required this.date,
-    required this.time,
-    required this.imageCount,
-  });
-}
 
 Widget bookListItem({
   required String imageUrl,
@@ -361,15 +247,17 @@ Widget bookListItem({
   required double progress, // from 0.0 to 1.0
   required VoidCallback onViewChapter,
   required VoidCallback onSubscribe,
+  required BuildContext context,
+
 }) {
   return Container(
     margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: Colors.white,
+    decoration:BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
-        BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+        BoxShadow(color:Theme.of(context).colorScheme.onSurface.withAlpha(40), blurRadius: 6, offset: Offset(0, 2)),
       ],
     ),
     child: Row(
@@ -513,8 +401,8 @@ void _showChapterBottomsheet(
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration:  BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 child: Column(
@@ -547,7 +435,7 @@ void _showChapterBottomsheet(
                                   "Book Details",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: blacktext,
+                                    color:  Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -679,7 +567,7 @@ void _showChapterBottomsheet(
                                             "Subject - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -690,7 +578,7 @@ void _showChapterBottomsheet(
                                             bookData.subject ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -704,7 +592,7 @@ void _showChapterBottomsheet(
                                             "Publisher - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -716,7 +604,7 @@ void _showChapterBottomsheet(
                                             bookData.author ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -729,7 +617,7 @@ void _showChapterBottomsheet(
                                             "Grade - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -740,7 +628,7 @@ void _showChapterBottomsheet(
                                              bookData.grade ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -777,7 +665,7 @@ void _showChapterBottomsheet(
                               "Chapters :",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: blacktext,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -859,14 +747,14 @@ void _showChapterBottomsheet(
                                 vertical: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: lightGrayBg.withAlpha(
+                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(
                                   150,
                                 ), //  Background color
                                 borderRadius: BorderRadius.circular(
                                   10,
                                 ), //  Curved border
                                 border: Border.all(
-                                  color: lightGrayBg.withAlpha(250),
+                                  color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(20),
                                 ),
                               ),
                               child: Row(

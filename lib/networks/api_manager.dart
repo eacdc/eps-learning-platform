@@ -13,6 +13,10 @@ class ApiManager {
   static const String verifySignupOTP = "/api/users/verify-otp";
   static const String resendSignupOTP = "/api/users/resend-otp";
   static const String checkUsername = "/api/users/check-username";
+  static const String forgotPasswordOtp = "/api/users/forgot-password";
+  static const String verifyOtpResetPassword = "/api/users/reset-password";
+  static const String verifyGoogleLogin = "/api/social-auth/google-login";
+  static const String changePassword = "/api/users/change-password";
   static const String bookCollectionList = "/api/books";
   static const String bookCollectionFilterSearch =
       "/api/books/search-with-status";
@@ -37,14 +41,23 @@ class ApiManager {
     return "/api/chat/chapter-history/$chapterId";
   }
 
+
+   static String getChatStats(String chapterId) {
+    return "/api/chat/chapter-stats/$chapterId";
+  }
+  
+
   static const String userProfile = "/api/users/me";
   static const String updateProfile = "/api/users/profile";
   static const String updateProfilePic = "/api/users/upload-profile-picture";
 
-    static const String privacyPolicy = "/api/static/privacy-policy";
-    static const String faq = "/api/static/faq";
-    static const String termsService = "/api/static/terms-of-service";
-
+  static const String privacyPolicy = "/api/static/privacy-policy";
+  static const String faq = "/api/static/faq";
+  static const String termsService = "/api/static/terms-of-service";
+  static const String allNotification = "/api/notifications";
+  static String notificationSeen(String notificationId) {
+    return "/api/notifications/$notificationId/mark-seen";
+  }
 
   static String recentActivity(String userId) {
     return "/api/scores/recent-activity/$userId";
@@ -70,11 +83,16 @@ class ApiManager {
     return "/api/scores/chapter-stats/$userId";
   }
 
+
+
+
+
+  //-----------------------------------------\\
+
   static const String loginwithplno = "/api/loginusingplno/";
   static const String profile = "/api/employee/employeedetailsbyid";
   static const String sendOTP = "/api/send-otp/";
   static const String verifyOTP = "/api/verify-otp/";
-  static const String resetPassword = "/api/reset-password/";
   static const String getAllIncident = "/api/incident/getallincident/";
   static const String getAllDepartment = "/api/department/getalldepartment/";
   static const String getAllDesignation = "/api/designation/getalldesignation/";
@@ -172,7 +190,10 @@ class ApiManager {
           response = await http.put(
             url,
             headers: headersMap,
-            body: jsonEncode(body),
+            body:
+                body != null
+                    ? jsonEncode(body)
+                    : null, // don’t send "null",//create problem  during PUT
           );
           break;
         case "DELETE":

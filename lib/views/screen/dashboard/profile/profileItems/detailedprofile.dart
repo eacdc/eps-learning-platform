@@ -39,7 +39,7 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         // AppBar with custom layout
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -47,7 +47,7 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
             children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
                 title: Container(
@@ -64,10 +64,10 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
                           },
                         ),
                       ),
-                      const Text(
+                       Text(
                         'Detailed Profile',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -77,7 +77,8 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
                 ),
               ),
               // Gray divider
-              Divider(color: textWhiteGrey, height: 1),
+                             Divider(color: Theme.of(context).dividerColor, height: 1),
+
             ],
           ),
         ),
@@ -268,7 +269,7 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
                                     '$phone',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: graytext,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                         ),

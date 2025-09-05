@@ -16,6 +16,7 @@ import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/qna_model/chatmessage_model.dart';
 import 'package:test_your_learing/utils/selector.dart';
+import 'package:test_your_learing/views/custom_widgets/progressbar_widget.dart';
 import 'package:test_your_learing/views/custom_widgets/typing_indicator.dart';
 
 import '../../../../../controllers/qna_controller.dart';
@@ -202,7 +203,8 @@ class _ChatWidgetState extends State<ChatWidget>
         return Stack(
           children: [
             Container(
-              color: lightwhite4,
+              //  color: lightwhite4,
+              color: Theme.of(context).colorScheme.secondaryContainer,
 
               /*    decoration: BoxDecoration(
                 image: DecorationImage(
@@ -445,11 +447,11 @@ class _ChatWidgetState extends State<ChatWidget>
               bottom: 90,
               right: 20,
               child:
-                  qnaController.scoreCardOpacity != 0.0
+                  qnaController.scoreCardOpacity == 0.0
                       ? SizedBox.shrink()
                       : AnimatedOpacity(
-                        opacity: 1.0,
-                        //  opacity: qnaController.scoreCardOpacity.value,
+                        //opacity: 1.0,
+                        opacity: qnaController.scoreCardOpacity.value,
                         duration: const Duration(milliseconds: 300),
 
                         child: Center(
@@ -463,8 +465,8 @@ class _ChatWidgetState extends State<ChatWidget>
                             rotationDuration: Duration(seconds: 2),
                             glowLocation: GlowLocation.both,
                             containerOptions: ContainerOptions(
-                              width: 120,
-                              height: 100,
+                              width: 130,
+                              height: 122,
                               borderRadius: 16,
                               backgroundColor: lightGrayBg,
                               borderSide: BorderSide(
@@ -486,7 +488,7 @@ class _ChatWidgetState extends State<ChatWidget>
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  SizedBox(height: 8),
+                                  SizedBox(height: 6),
                                   Text(
                                     "Curent Score",
 
@@ -496,7 +498,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  SizedBox(height: 6),
+                                  SizedBox(height: 5),
 
                                   Shimmer.fromColors(
                                     baseColor: primarycolor,
@@ -504,8 +506,9 @@ class _ChatWidgetState extends State<ChatWidget>
                                     loop: 0,
                                     period: Duration(seconds: 2),
                                     child: Text(
-                                      " 0/00",
-                                      // qnaController.scoreValue.value
+                                      //" -/--",
+                                      
+                                       qnaController.scoreValue.value,
                                       style: TextStyle(
                                         color: primarycolor,
                                         fontSize: 18,
@@ -515,7 +518,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                   ),
                                   SizedBox(height: 6),
                                   Text(
-                                    "Total Question",
+                                    "Question Answered ",
 
                                     style: TextStyle(
                                       color: primarycolor,
@@ -523,8 +526,17 @@ class _ChatWidgetState extends State<ChatWidget>
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  SizedBox(height: 6),
-                                  
+                                   SizedBox(height: 5),
+                                  Text(
+                                    qnaController.answerQuestion.value,
+
+                                    style: TextStyle(
+                                      color: primarycolor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
                                 ],
                               ),
                             ),
@@ -533,33 +545,7 @@ class _ChatWidgetState extends State<ChatWidget>
                       ),
             ),
 
-            Visibility(
-              visible: qnaController.isLoading.value,
-              child: Center(
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primarycolor.withOpacity(0.3),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 2), // changes position of shadow
-                      ),
-                    ],
-                    color: whitecolor,
-                  ),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4.5,
-                    color: primarycolor.withOpacity(0.8),
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-              ),
-            ),
+            ProgressBarWidget(visible: qnaController.isLoading.value),
           ],
         );
       }),
@@ -597,7 +583,9 @@ class _ChatWidgetState extends State<ChatWidget>
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(width: 5),
-                CustomPaint(painter: Triangle(whitecolor)),
+                CustomPaint(
+                  painter: Triangle(Theme.of(context).colorScheme.surface),
+                ),
               ],
             ),
 
@@ -607,7 +595,8 @@ class _ChatWidgetState extends State<ChatWidget>
             margin: EdgeInsets.only(left: 0, right: 0, top: 16),
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isUser ? primarycolor : whitecolor,
+              color:
+                  isUser ? primarycolor : Theme.of(context).colorScheme.surface,
 
               borderRadius:
                   isUser
@@ -645,14 +634,20 @@ class _ChatWidgetState extends State<ChatWidget>
                                   color:
                                       isUser
                                           ? Colors.white
-                                          : Colors
-                                              .black87, // 🔑 Your required color
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer, // 🔑 Your required color
                                   fontSize: 16,
                                 ),
                               ),
                               LinkConfig(
                                 style: TextStyle(
-                                  color: isUser ? Colors.white : Colors.black87,
+                                  color:
+                                      isUser
+                                          ? Colors.white
+                                          : Theme.of(
+                                            context,
+                                          ).colorScheme.onSecondaryContainer,
                                   decoration: TextDecoration.underline,
                                 ),
                                 onTap: (url) {
@@ -671,7 +666,9 @@ class _ChatWidgetState extends State<ChatWidget>
                                 color:
                                     isUser
                                         ? Colors.white.withAlpha(50)
-                                        : Colors.black87.withAlpha(50),
+                                        : Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -710,13 +707,13 @@ class _ChatWidgetState extends State<ChatWidget>
       children: [
         Avatar(image: avatar, size: 20),
         SizedBox(width: 5),
-        CustomPaint(painter: Triangle(whitecolor)),
+        CustomPaint(painter: Triangle(Theme.of(context).colorScheme.surface)),
         Flexible(
           child: Container(
             margin: EdgeInsets.only(left: 0, right: 12, top: 12),
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: whitecolor,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -735,12 +732,14 @@ class _ChatWidgetState extends State<ChatWidget>
     return Container(
       padding: const EdgeInsets.only(left: 12, right: 3, top: 2, bottom: 2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
 
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: gray.withAlpha(50),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSecondaryContainer.withAlpha(50),
             spreadRadius: 2,
             blurRadius: 5,
             offset: Offset(1, 3), // changes position of shadow
@@ -861,7 +860,7 @@ class _ChatWidgetState extends State<ChatWidget>
 
               decoration: InputDecoration(
                 hintText: 'Type your message...',
-                hintStyle: TextStyle(color: gray, fontSize: 14),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
                 /* border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         
@@ -887,11 +886,11 @@ class _ChatWidgetState extends State<ChatWidget>
               "assets/icons/svg_send_message.svg",
               height: 20,
               width: 20,
-              // colorFilter: ColorFilter.mode(primarycolor, BlendMode.srcIn)
+              colorFilter: ColorFilter.mode( Theme.of(context).colorScheme.onSurface, BlendMode.srcIn)
             ),
             onPressed: () => sendMessage(messageController.text.trim()),
             style: IconButton.styleFrom(
-              backgroundColor: lightGrayBg,
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
               foregroundColor: primarycolor,
               shape: CircleBorder(),
             ),
@@ -905,12 +904,14 @@ class _ChatWidgetState extends State<ChatWidget>
     return Container(
       padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
 
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: gray.withAlpha(50),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSecondaryContainer.withAlpha(50),
             spreadRadius: 2,
             blurRadius: 5,
             offset: Offset(1, 3), // changes position of shadow
@@ -930,7 +931,10 @@ class _ChatWidgetState extends State<ChatWidget>
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             // border: Border.all(color: Colors.grey),
-                            color: lightGrayBg,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).colorScheme.secondaryContainer,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child:

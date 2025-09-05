@@ -11,7 +11,7 @@ class SearchField extends StatelessWidget {
     return Container(
       height: 50,
       decoration: BoxDecoration(
-        border: Border.all(color: lightgreytext),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(80)),
         borderRadius: const BorderRadius.all(
           Radius.circular(
             10.0,
@@ -19,7 +19,7 @@ class SearchField extends StatelessWidget {
           
           
         ),
-        color: whitecolor,
+        color: Theme.of(context).colorScheme.secondaryContainer,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12,
         vertical: 8

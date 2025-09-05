@@ -25,7 +25,7 @@ class TitleDescWidget extends StatelessWidget {
       width: double.maxFinite,
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: lightGrayBg.withAlpha(200),
+        color: Theme.of(context).colorScheme.secondaryContainer,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -35,7 +35,7 @@ class TitleDescWidget extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: graytext,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -57,7 +57,7 @@ class TitleDescWidget extends StatelessWidget {
                 desc,
                 style: TextStyle(
                   fontSize: 14,
-                  color: blacktext,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),

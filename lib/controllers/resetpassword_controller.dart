@@ -24,7 +24,7 @@ class ResetPasswordController extends GetxController
 
   try {
     final ApiResponse response = await ApiManager.request(
-      endpoint: ApiManager.resetPassword,
+      endpoint:" ApiManager.resetPassword",
       method: "POST",
       body: {"email": email, "new_password": newPassword},
     );

@@ -6,6 +6,7 @@ import 'package:test_your_learing/constants/constant.dart';
 
 import 'package:test_your_learing/controllers/auth_controller.dart';
 import 'package:test_your_learing/controllers/login_controller.dart';
+import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
@@ -21,7 +22,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final authController = Get.put(AuthController());
-  final loginController = Get.put(LoginController());
+  final loginController = findOrPut(() => LoginController());
 
   final _formKey5 = GlobalKey<FormState>();
 
@@ -42,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
           _buildGetOtpForm(context),
@@ -67,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 60),
                 InkWell(
                   onTap: () {
-                   // Get.to(() => DashboardPage());
+                    // Get.to(() => DashboardPage());
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -99,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       "Welcome Back!",
                       style: TextStyle(
-                        color: blacktext,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                       ),
@@ -111,13 +112,16 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   "Please login first to start your journey!!",
                   textAlign: TextAlign.start,
-                  style: TextStyle(fontSize: 14, color: graytext),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 SizedBox(height: 24),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -199,28 +203,49 @@ class _LoginPageState extends State<LoginPage> {
                                   });
                                 },
                                 activeColor: primarycolor,
+                               
                                 side: BorderSide(),
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
                                 visualDensity: VisualDensity.compact,
+                                
 
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
+                                  side: BorderSide(
+                                    color: gray,
+                                  ),
                                 ),
                               ),
-                              Text('Remember Me'),
+                              Text(
+                                'Remember Me',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                ),
+                                //
+                              ),
                             ],
                           ),
                           InkWell(
                             onTap: () {
                               Get.to(() => ForgotPasswordPage());
+
+                              //  Get.to(() => SignupPage());
                             },
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: Text(
                                 "Forgot Password? ",
                                 style: TextStyle(
-                                  color: graytext,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -277,7 +302,9 @@ class _LoginPageState extends State<LoginPage> {
                               text: TextSpan(
                                 text: 'New to EPS?  ',
                                 style: TextStyle(
-                                  color: graytext,
+                                  color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                   fontFamily: Constants.fontFamily,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,

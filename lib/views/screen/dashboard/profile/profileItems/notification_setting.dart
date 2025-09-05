@@ -18,7 +18,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:  Theme.of(context).colorScheme.surface,
         // AppBar with custom layout
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -26,7 +26,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
             children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
+                backgroundColor:  Theme.of(context).colorScheme.surface,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
                 title: Container(
@@ -43,10 +43,10 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                           },
                         ),
                       ),
-                      const Text(
+                       Text(
                         'Notifications Settings',
                         style: TextStyle(
-                          color: Colors.black,
+                          color:  Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -56,7 +56,8 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                 ),
               ),
               // Gray divider
-              Divider(color: textWhiteGrey, height: 1),
+                Divider(color: Theme.of(context).dividerColor, height: 1),
+
             ],
           ),
         ),
@@ -80,7 +81,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                             "General",
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
-                              color: textBlack,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 18,
                             ),
                           ),
@@ -106,7 +107,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                         },
                       ),
                       Divider(
-                        color: lightGrayBg,
+                        color:   Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(50),
                         height: 48,
                         thickness: 8,
                         indent: 0,
@@ -123,7 +124,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                             "Badge Counter",
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
-                              color: textBlack,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 18,
                             ),
                           ),
@@ -159,7 +160,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                         },
                       ),
                       Divider(
-                        color: lightGrayBg,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(50),
                         height: 48,
                         thickness: 8,
                         indent: 0,
@@ -175,7 +176,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                             "Notification",
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
-                              color: textBlack,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 18,
                             ),
                           ),

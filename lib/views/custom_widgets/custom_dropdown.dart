@@ -36,7 +36,7 @@ class CommonDropdownButton<T> extends StatelessWidget {
               title ?? "",
               style:TextStyle(
                     fontSize: 12.5,
-                    color: textBlack,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w600),
             ),
           ),
@@ -49,11 +49,11 @@ class CommonDropdownButton<T> extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               fillColor: Colors.transparent,
-              hintStyle: heading6.copyWith(color: textGrey),
+              hintStyle: heading6.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(150)),
               focusColor: Colors.transparent,
               filled: true,
-              border: customBorder(color: bordercolor),
-              enabledBorder: customBorder(color: bordercolor),
+              border: customBorder(color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(80)),
+              enabledBorder: customBorder(color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(80)),
               focusedBorder: customBorder(color: primarycolor),
               errorBorder: customBorder(color: Colors.red),
               disabledBorder: customBorder(color: bordercolor),
@@ -65,8 +65,8 @@ class CommonDropdownButton<T> extends StatelessWidget {
             validator: validator,
             //icon: SvgPicture.asset("assets/icons/svg_dropdown.svg",height: 10,width: 10,),
 
-            icon: const Icon(Icons.arrow_drop_down,
-                size: 11, color: Colors.black),
+            icon:  Icon(Icons.arrow_drop_down,
+                size: 11, color: Theme.of(context).colorScheme.onSurfaceVariant),
             // iconSize: 10,
             value: chosenValue,
             items: itemsList?.map<DropdownMenuItem<T>>((T item) {

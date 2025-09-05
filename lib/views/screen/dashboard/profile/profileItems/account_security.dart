@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/circular_back_button.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
 import 'package:test_your_learing/views/custom_widgets/input_field.dart';
+
+import '../../../../../controllers/forgotpassword_controller.dart';
+import '../../../../../helper/getx_helper.dart';
+import '../../../../../helper/sharedpreference_helper.dart';
+import '../../../../../helper/snackbar_helper.dart';
 
 class AccountSecurityPage extends StatefulWidget {
   const AccountSecurityPage({super.key});
@@ -13,6 +19,11 @@ class AccountSecurityPage extends StatefulWidget {
 }
 
 class _AccountSecurityPageState extends State<AccountSecurityPage> {
+
+  late ForgotPasswordController forgotPasswordController;
+  late String token;
+
+
   final TextEditingController passwordController = TextEditingController(
     text: '',
   );
@@ -31,11 +42,41 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
     });
   }
 
+  bool _isValidPassword(String password) {
+    /*  // special charecer compulsory
+   return RegExp(
+      r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>?/\\[\]{}|~`]).{8,}$',
+    ).hasMatch(password); */
+    // special charecer optional
+    return RegExp(
+      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$',
+    ).hasMatch(password);
+
+    // return RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(password); // no special charecer
+
+    //   ^(?=.*[A-Za-z])       # must contain at least one letter
+    // (?=.*\d)              # must contain at least one digit
+    // [A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$   # allowed characters, min length 8
+  }
+
+
+   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    forgotPasswordController = findOrPut(() => ForgotPasswordController());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       token = SharedPreferencesService.getAccessToken() ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         // AppBar with custom layout
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -43,7 +84,7 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
             children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
                 title: Container(
@@ -60,10 +101,10 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                           },
                         ),
                       ),
-                      const Text(
+                      Text(
                         'Account Security',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -73,11 +114,11 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                 ),
               ),
               // Gray divider
-              Divider(color: textWhiteGrey, height: 1),
+              Divider(color: Theme.of(context).dividerColor, height: 1),
             ],
           ),
         ),
-        body: Container(
+        body: Obx((){return    Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +184,8 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
-                            color: graytext,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -177,17 +219,53 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
               ),
               SizedBox(height: 10),
               CustomGradiantButton(
-                loading: false,
+                loading: forgotPasswordController.isLoading.value,
                 buttonColor: primarycolor,
                 textValue: 'Change Password',
                 textColor: onprimary,
-                onPressed: () {},
+                onPressed: () {
+                  final String _currentPasssword =
+                      currentPasswordController.text;
+                  final String _newpassword = passwordController.text;
+                  final String _confirmPassword = conPasswordController.text;
+
+                  if (_currentPasssword.length < 4) {
+                    SnackBarHelper.showFailureSnackBar(
+                      context,
+                      "Please Enter Valid Current Password",
+                    );
+                  } else if (_newpassword.isEmpty ||
+                      !_isValidPassword(_newpassword)) {
+                    SnackBarHelper.showFailureSnackBar(
+                      context,
+                      "Please enter a valid Password ",
+                    );
+                  } else if (_confirmPassword.isEmpty ||
+                      _newpassword != _confirmPassword) {
+                    SnackBarHelper.showFailureSnackBar(
+                      context,
+                      "Password and Confirm Password do not match",
+                    );
+                  } else {
+                    forgotPasswordController.changePassword(
+                      token,
+                      _currentPasssword,
+                      _newpassword,
+                      _confirmPassword,
+                      context,
+                    );
+                  }
+                },
               ),
 
               SizedBox(height: 10),
             ],
           ),
-        ),
+        );
+     })
+        
+        
+        
       ),
     );
   }

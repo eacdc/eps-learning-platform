@@ -24,7 +24,7 @@ class ProgressBarWidget extends StatelessWidget {
                 offset: const Offset(0, 2),
               ),
             ],
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.secondaryContainer,
           ),
           child: const CircularProgressIndicator(
             strokeWidth: 4.5,

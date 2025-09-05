@@ -64,8 +64,8 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               ).viewInsets.bottom, // Pushes content up when keyboard appears
         ),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration:  BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -99,7 +99,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                             "Edit Profile",
                             style: TextStyle(
                               fontSize: 18,
-                              color: blacktext,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

@@ -9,6 +9,9 @@ import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
 import 'package:test_your_learing/views/custom_widgets/input_field.dart';
 
+import '../../../custom_widgets/circular_back_button.dart';
+import '../../../custom_widgets/dotted_line.dart';
+
 class ForgotPasswordPage extends StatefulWidget {
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
@@ -21,11 +24,38 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   final TextEditingController emailController = TextEditingController(text: '');
 
+  final TextEditingController passwordController = TextEditingController(
+    text: '',
+  );
+  final TextEditingController conPasswordController = TextEditingController(
+    text: '',
+  );
+
+  List<TextEditingController> otpFieldsControler = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+  ];
+
+  void togglePassword() {
+    forgotPasswordController.hidePassword.value =
+        !forgotPasswordController.hidePassword.value;
+  }
+
+  /*   void setOtpToControllers(String otpValue) {
+    for (int i = 0; i < otpFieldsControler.length; i++) {
+      otpFieldsControler[i].text = otpValue.length > i ? otpValue[i] : "";
+    }
+  } */
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
           // _buildEmailForm(context)
@@ -54,28 +84,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () {
+                  child: CircularBackButton(
+                    onPressed: () {
                       Get.back();
                     },
-                    child: Container(
-                      height: 38,
-                      width: 38,
-                      padding: EdgeInsets.all(11),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(
-                          color: graylight.withOpacity(0.8),
-                          width: 1,
-                        ),
-                      ),
-                      child: SvgPicture.asset(
-                        "assets/icons/svg_back_arrow.svg",
-                         colorFilter:  ColorFilter.mode(textBlack, BlendMode.srcIn),
-                        width: 15,
-                        height: 15,
-                      ),
-                    ),
                   ),
                 ),
                 SizedBox(height: 100),
@@ -84,7 +96,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Text(
                     "Forgot password?",
                     style: TextStyle(
-                      color: blackcolor,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
@@ -104,18 +116,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Text(
                     "Don’t worry! It happens. Please enter the email associated with your account.",
                     style: TextStyle(
-                      color: textGrey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
-               
-               
+
                 SizedBox(height: 32),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -162,7 +173,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               "Please enter a valid email address",
                             );
                           } else {
-                            forgotPasswordController.sendOTP(
+                            forgotPasswordController.sendFPOTP(
                               forgotPasswordController.emailid.value,
                               context,
                             );
@@ -183,15 +194,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   Widget _buildVerifyOtpForm(BuildContext context) {
-    List<TextEditingController> otpFieldsControler = [
-      TextEditingController(),
-      TextEditingController(),
-      TextEditingController(),
-      TextEditingController(),
-      // TextEditingController(),
-      //  TextEditingController()
-    ];
-
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -199,73 +201,48 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: Column(
             children: [
               SizedBox(height: 10),
+
               Align(
                 alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () {
+                child: CircularBackButton(
+                  onPressed: () {
                     forgotPasswordController.isOtpSent.value = false;
                     Get.back();
                   },
-                  child: Container(
-                    height: 38,
-                    width: 38,
-                    padding: EdgeInsets.all(11),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: graylight.withOpacity(0.8),
-                        width: 1,
-                      ),
-                    ),
-                    child: SvgPicture.asset(
-                      "assets/icons/svg_back_arrow.svg",
-                      width: 15,
-                      height: 15,
-                    ),
-                  ),
                 ),
               ),
-              SizedBox(height: 120),
+
+              SizedBox(height: 30),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Please check your email",
+                  "Enter Verification Code",
                   style: TextStyle(
-                    color: blackcolor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 8),
+
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "We’ve sent a code to",
+                  "Sent To ${emailController.text}",
                   style: TextStyle(
-                    color: textGrey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              SizedBox(height: 1),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  emailController.text,
-                  style: TextStyle(
-                    color: blackcolor,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              SizedBox(height: 36),
+
+              SizedBox(height: 16),
               Container(
                 padding: EdgeInsets.all(0),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -293,14 +270,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           last: false,
                           controller: otpFieldsControler[3],
                         ),
-                        /*  _textFieldOTP(
-                            first: false,
-                            last: false,
-                            controller: otpFieldsControler[4]),
                         _textFieldOTP(
-                            first: false,
-                            last: true,
-                            controller: otpFieldsControler[5]), */
+                          first: false,
+                          last: false,
+                          controller: otpFieldsControler[4],
+                        ),
+                        _textFieldOTP(
+                          first: false,
+                          last: true,
+                          controller: otpFieldsControler[5],
+                        ),
                       ],
                     ),
                     /*   Text(
@@ -310,11 +289,98 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               forgotPasswordController.statusMessageColor.value,
                           fontWeight: FontWeight.bold),
                     ), */
+                    SizedBox(height: 24),
+                    Divider(color: Theme.of(context).dividerColor, height: 1),
+                    SizedBox(height: 24),
+
+                    /*   CustomPaint(
+                      painter: DottedLinePainter(),
+                      child: Container(
+                        height:
+                            1.0, // Or whatever height is appropriate for your line
+                        width: double.infinity,
+                      ),
+                    ),
+                    SizedBox(height: 32), */
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Create New Password",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    InputField(
+                      title: "Password",
+                      hintText: 'Create a strong password',
+                      controller: passwordController,
+                      obscureText: forgotPasswordController.hidePassword.value,
+                      suffixIcon: IconButton(
+                        color: textGrey,
+                        splashRadius: 1,
+                        icon: Icon(
+                          forgotPasswordController.hidePassword.value
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 20,
+                        ),
+                        onPressed: togglePassword,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.lock_outline,
+                        color: graytext,
+                        size: 16,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "At least 8 characters with a combination of letters and numbers",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 16),
+                    InputField(
+                      title: "Confirm Password",
+                      hintText: 'Confirm your password',
+                      controller: conPasswordController,
+                      obscureText: forgotPasswordController.hidePassword.value,
+                      suffixIcon: IconButton(
+                        color: textGrey,
+                        splashRadius: 1,
+                        icon: Icon(
+                          forgotPasswordController.hidePassword.value
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 20,
+                        ),
+                        onPressed: togglePassword,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.lock_outline,
+                        color: graytext,
+                        size: 16,
+                      ),
+                    ),
+
                     SizedBox(height: 32),
+
                     CustomGradiantButton(
                       loading: forgotPasswordController.isLoading.value,
                       buttonColor: primarycolor,
-                      textValue: 'Verify',
+                      textValue: 'Verify OTP & Reset Password',
                       textColor: onprimary,
                       onPressed: () {
                         /*     final form = _formKey.currentState;
@@ -329,16 +395,33 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           forgotPasswordController.otp.value += controller.text;
                         });
 
-                        if (forgotPasswordController.otp.value.length == 4) {
-                          forgotPasswordController.verifyOTP(
-                            emailController.text,
-                            forgotPasswordController.otp.value,
-                            context,
-                          );
-                        } else {
+                        final String _password = passwordController.text;
+                        final String _confirmPassword =
+                            conPasswordController.text;
+
+                        if (forgotPasswordController.otp.value.length != 6) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
-                            "Please Enter 4 Digit OTP Sent To Your Email",
+                            "Please Enter 6 Digit OTP Sent To Your Email",
+                          );
+                        } else if (_password.isEmpty ||
+                            !_isValidPassword(_password)) {
+                          SnackBarHelper.showFailureSnackBar(
+                            context,
+                            "Please enter a valid Password ",
+                          );
+                        } else if (_confirmPassword.isEmpty ||
+                            _password != _confirmPassword) {
+                          SnackBarHelper.showFailureSnackBar(
+                            context,
+                            "Password and Confirm Password do not match",
+                          );
+                        } else {
+                          forgotPasswordController.verifyOTPResetPassword(
+                            emailController.text,
+                            forgotPasswordController.otp.value,
+                            passwordController.text,
+                            context,
                           );
                         }
                       },
@@ -346,6 +429,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ],
                 ),
               ),
+
               /* SizedBox(
                 height: 18,
               ),
@@ -375,9 +459,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ? "Resend new code"
                         : "Send Code again in ${forgotPasswordController.resendAfter} seconds",
                     style: TextStyle(
-                      fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: blackcolor.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -407,9 +490,26 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     ).hasMatch(email);
   }
 
+  bool _isValidPassword(String password) {
+    /*  // special charecer compulsory
+   return RegExp(
+      r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>?/\\[\]{}|~`]).{8,}$',
+    ).hasMatch(password); */
+    // special charecer optional
+    return RegExp(
+      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$',
+    ).hasMatch(password);
+
+    // return RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(password); // no special charecer
+
+    //   ^(?=.*[A-Za-z])       # must contain at least one letter
+    // (?=.*\d)              # must contain at least one digit
+    // [A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$   # allowed characters, min length 8
+  }
+
   Widget _textFieldOTP({bool first = true, last, controller}) {
-    //var height = (Get.width - 82) / 6;
-    var height = (Get.width - 82) / 5.5;
+    var height = (Get.width - 82) / 6;
+    //  var height = (Get.width - 82) / 5.5;
     return Container(
       height: height,
       child: AspectRatio(
@@ -430,9 +530,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           textAlign: TextAlign.center,
           // style: TextStyle(fontSize: height / 2, fontWeight: FontWeight.w500),
           style: TextStyle(
-            fontSize: 22,
+            fontSize: height / 2.5,
             fontWeight: FontWeight.w600,
-            color: blackcolor,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           keyboardType: TextInputType.number,
           maxLength: 1,
@@ -446,12 +546,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
             counter: Offstage(),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(width: 1.2, color: Colors.black12),
-              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                width: 1.2,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              borderRadius: BorderRadius.circular(32),
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(width: 1.2, color: primarycolor),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(32),
             ),
           ),
         ),

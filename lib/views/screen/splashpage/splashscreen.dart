@@ -72,10 +72,10 @@ class _SplashScreenPageState extends State<SplashScreenPage>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
 
-    _textColorAnimation = ColorTween(
-      begin: Colors.white,
-      end: Colors.white,
-    ).animate(_textController);
+    /*   _textColorAnimation = ColorTween(
+      begin: Theme.of(context).colorScheme.onSurface,
+      end: Theme.of(context).colorScheme.onSurface,
+    ).animate(_textController); */
 
     //Future.delayed(Duration(milliseconds: 2000), () => _textController.forward());
 
@@ -84,6 +84,20 @@ class _SplashScreenPageState extends State<SplashScreenPage>
       // _textController.forward();
       Future.delayed(Duration(seconds: 1), () => navigateUser(context));
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _textColorAnimation = ColorTween(
+      begin: Theme.of(context).colorScheme.surface,
+      end: Theme.of(context).colorScheme.surface,
+    ).animate(_textController);
+
+    /*   Theme.of(context) (and similar things like MediaQuery.of(context)) depends on the widget tree.
+At the time initState() runs, your widget is not yet fully inserted into the tree, so the inherited widget (Theme) can’t be accessed.
+That’s why Flutter tells you to use build() or didChangeDependencies() instead.*/
   }
 
   @override
@@ -142,13 +156,19 @@ class _SplashScreenPageState extends State<SplashScreenPage>
         statusBarIconBrightness: Brightness.dark, // Icons: light or dark
         statusBarBrightness: Brightness.light, // iOS
         // Bottom navigation bar
-        systemNavigationBarColor: Colors.white, // Background
-        systemNavigationBarIconBrightness: Brightness.dark, // Icons
+        systemNavigationBarColor:
+            Theme.of(context).colorScheme.surface, // Background
+        systemNavigationBarIconBrightness:
+            Theme.of(context).brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark, // Icons
         systemNavigationBarDividerColor:
-            Colors.white, // Optional, removes divider line
+            Theme.of(
+              context,
+            ).colorScheme.surface, // Optional, removes divider line
       ),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

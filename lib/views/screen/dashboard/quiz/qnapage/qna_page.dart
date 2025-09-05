@@ -43,11 +43,17 @@ class _QnaPageState extends State<QnaPage> {
     return SafeArea(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
-          statusBarColor: whitecolor, // Your desired status bar color
-          statusBarIconBrightness: Brightness.dark, // Icons: light or dark
+         statusBarColor:
+              Theme.of(
+                context,
+              ).colorScheme.surface, // Your desired status bar color
+          statusBarIconBrightness:
+              Theme.of(context).brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark, // Icons: light or dark
         ),
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor:  Theme.of(context).colorScheme.surface,
           // AppBar with custom layout
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(60),
@@ -55,7 +61,7 @@ class _QnaPageState extends State<QnaPage> {
               children: [
                 AppBar(
                   automaticallyImplyLeading: false,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   elevation: 0,
                   surfaceTintColor: Colors.transparent,
                   title: Container(
@@ -75,7 +81,7 @@ class _QnaPageState extends State<QnaPage> {
                         Text(
                           "Chapter ($chapterName)",
                           style: TextStyle(
-                            color: Colors.black,
+                            color:  Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -86,7 +92,7 @@ class _QnaPageState extends State<QnaPage> {
                 ),
                 // Gray divider
                 Spacer(),
-                Divider(color: textWhiteGrey, height: 1),
+                Divider(color: Theme.of(context).dividerColor, height: 1),
               ],
             ),
           ),

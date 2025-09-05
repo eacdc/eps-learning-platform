@@ -9,6 +9,7 @@ import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/homeController/home_controller.dart';
 import 'package:test_your_learing/models/home_model/recent_activity_model.dart';
 import 'package:test_your_learing/utils/app_colors.dart';
+import 'package:test_your_learing/utils/getxtheme/theme_controller.dart';
 import 'package:test_your_learing/views/custom_widgets/progressbar_widget.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
 import 'package:test_your_learing/views/screen/dashboard/homepage/notificationpage.dart';
@@ -77,8 +78,8 @@ void _showChapterBottomsheet(
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration:  BoxDecoration(
+                  color:  Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 child: Column(
@@ -111,7 +112,7 @@ void _showChapterBottomsheet(
                                   "Book Details",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: blacktext,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -243,7 +244,7 @@ void _showChapterBottomsheet(
                                             "Subject - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -254,7 +255,7 @@ void _showChapterBottomsheet(
                                             bookData.subject ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -293,7 +294,7 @@ void _showChapterBottomsheet(
                                             "Grade - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -304,7 +305,7 @@ void _showChapterBottomsheet(
                                             bookData.grade ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: graytext,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -341,7 +342,7 @@ void _showChapterBottomsheet(
                               "Chapters :",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: blacktext,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -423,14 +424,14 @@ void _showChapterBottomsheet(
                                 vertical: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: lightGrayBg.withAlpha(
+                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(
                                   150,
                                 ), //  Background color
                                 borderRadius: BorderRadius.circular(
                                   10,
                                 ), //  Curved border
                                 border: Border.all(
-                                  color: lightGrayBg.withAlpha(250),
+                                  color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(20),
                                 ),
                               ),
                               child: Row(
@@ -560,6 +561,8 @@ void _showChapterBottomsheet(
 
   @override
   Widget build(BuildContext context) {
+      final themeColors = Theme.of(context).colorScheme;
+
     return Obx(() {
       final recentBooks =
           homeController.recent_activity.value?.data?.recentBooks ?? [];
@@ -577,6 +580,8 @@ void _showChapterBottomsheet(
           (scoreboard?.totalPointsEarned?.toString() ?? 'N/A');
 
       return Container(
+       // color: Theme.of(context).colorScheme.surface,
+        color: themeColors.surface,
         child: Stack(
           fit: StackFit.expand,
           children: [

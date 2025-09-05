@@ -18,6 +18,8 @@ import 'package:test_your_learing/views/custom_widgets/input_field.dart';
 import 'package:test_your_learing/views/screen/authentication/forgotpasswordpage/forgotpassword_page.dart';
 import 'package:test_your_learing/views/screen/authentication/login.dart';
 
+import '../../custom_widgets/circular_back_button.dart';
+
 class SignupPage extends StatefulWidget {
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -73,7 +75,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
           // _buildGetOtpForm(context),
@@ -105,31 +107,10 @@ class _SignupPageState extends State<SignupPage> {
 
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: InkWell(
-                      onTap: () {
-                        Get.back();
+                    child: CircularBackButton(
+                      onPressed: () {
+                        Navigator.pop(context);
                       },
-                      child: Container(
-                        height: 38,
-                        width: 38,
-                        padding: EdgeInsets.all(11),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
-                          border: Border.all(
-                            color: graylight.withOpacity(0.8),
-                            width: 1,
-                          ),
-                        ),
-                        child: SvgPicture.asset(
-                          "assets/icons/svg_back_arrow.svg",
-                          colorFilter: ColorFilter.mode(
-                            textBlack,
-                            BlendMode.srcIn,
-                          ),
-                          width: 15,
-                          height: 15,
-                        ),
-                      ),
                     ),
                   ),
 
@@ -139,7 +120,7 @@ class _SignupPageState extends State<SignupPage> {
                     child: Text(
                       "Welcome to EPS Learning",
                       style: TextStyle(
-                        color: blackcolor,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                       ),
@@ -152,7 +133,7 @@ class _SignupPageState extends State<SignupPage> {
                     child: Text(
                       "Let’s join to Test Your Learning ecosystem & experience smart learning. It’s Free!",
                       style: TextStyle(
-                        color: textGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -164,7 +145,7 @@ class _SignupPageState extends State<SignupPage> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 0),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -322,7 +303,10 @@ class _SignupPageState extends State<SignupPage> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: graytext,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -470,7 +454,10 @@ class _SignupPageState extends State<SignupPage> {
                                 text: TextSpan(
                                   text: 'Already have an account?  ',
                                   style: TextStyle(
-                                    color: graytext,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                     fontFamily: Constants.fontFamily,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
@@ -502,7 +489,9 @@ class _SignupPageState extends State<SignupPage> {
                             textAlign: TextAlign.center,
                             "By signing up to create an account I accept Eduline’s Terms of Service & Privacy Policy",
                             style: TextStyle(
-                              color: textGrey,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant.withAlpha(200),
 
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
@@ -541,42 +530,20 @@ class _SignupPageState extends State<SignupPage> {
               children: [
                 SizedBox(height: 16),
 
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Container(
-                      height: 38,
-                      width: 38,
-                      padding: EdgeInsets.all(11),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(
-                          color: graylight.withOpacity(0.8),
-                          width: 1,
-                        ),
-                      ),
-                      child: SvgPicture.asset(
-                        "assets/icons/svg_back_arrow.svg",
-                        colorFilter: ColorFilter.mode(
-                          textBlack,
-                          BlendMode.srcIn,
-                        ),
-                        width: 15,
-                        height: 15,
-                      ),
+               Align(
+                    alignment: Alignment.centerLeft,
+                    child: CircularBackButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
-                  ),
-                ),
-                SizedBox(height: 50),
+                  ),SizedBox(height: 50),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "OTP Verification",
                     style: TextStyle(
-                      color: textBlack,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                     ),
@@ -589,7 +556,7 @@ class _SignupPageState extends State<SignupPage> {
                   child: RichText(
                     text: TextSpan(
                       style: TextStyle(
-                        color: textGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         fontFamily: Constants.fontFamily,
@@ -601,7 +568,7 @@ class _SignupPageState extends State<SignupPage> {
                         TextSpan(
                           text: signupController.emailid.value,
                           style: TextStyle(
-                            color: textGrey,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             fontFamily: Constants.fontFamily,
@@ -618,7 +585,7 @@ class _SignupPageState extends State<SignupPage> {
                   child: Text(
                     'Verification Code',
                     style: TextStyle(
-                      color: textBlack,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -628,7 +595,7 @@ class _SignupPageState extends State<SignupPage> {
                 Container(
                   padding: EdgeInsets.all(0),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -742,7 +709,7 @@ class _SignupPageState extends State<SignupPage> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: blackcolor.withOpacity(0.6),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -822,22 +789,19 @@ class _SignupPageState extends State<SignupPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 2,),
+              SizedBox(height: 2),
               Text(
-                
                 usernameMessage,
-               // textAlign: TextAlign.start,
+                // textAlign: TextAlign.start,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
-                  color:  isAvailable ? Colors.green : Colors.red,
+                  color: isAvailable ? Colors.green : Colors.red,
                 ),
               ),
             ],
           ),
         );
-
-      
       }
     });
   }
@@ -855,13 +819,22 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   bool _isValidPassword(String password) {
-   /*  // special charecer compulsory
+    /*  // special charecer compulsory
    return RegExp(
       r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>?/\\[\]{}|~`]).{8,}$',
     ).hasMatch(password); */
 
-      return RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(password);
+    // special charecer optional
+    return RegExp(
+      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$',
+    ).hasMatch(password);
 
+    // no special charecer
+    // return RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(password);
+
+    //   ^(?=.*[A-Za-z])       # must contain at least one letter
+    // (?=.*\d)              # must contain at least one digit
+    // [A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$   # allowed characters, min length 8
   }
 
   bool _isValidUsername(String username) {
@@ -880,7 +853,7 @@ class _SignupPageState extends State<SignupPage> {
     BuildContext context,
   ) {
     if (_username.isEmpty ||
-       // _username.trim().length < 4 ||
+        // _username.trim().length < 4 ||
         !_isValidUsername(_username)) {
       SnackBarHelper.showFailureSnackBar(
         context,
@@ -932,7 +905,10 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     if (_password != _conpassword) {
-      SnackBarHelper.showFailureSnackBar(context, "Confirm password not match");
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Password and Confirm Password do not match",
+      );
       return false;
     }
 
@@ -968,7 +944,7 @@ class _SignupPageState extends State<SignupPage> {
             contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             counter: Offstage(),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(width: 1.5, color: Colors.black12),
+              borderSide: BorderSide(width: 1.5, color: Theme.of(context).colorScheme.onSurfaceVariant),
               borderRadius: BorderRadius.circular(32),
             ),
             focusedBorder: OutlineInputBorder(

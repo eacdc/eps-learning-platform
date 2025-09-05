@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/response_model/api_response.dart';
+import 'package:test_your_learing/models/response_model/api_response_new.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
 import 'package:test_your_learing/views/screen/authentication/forgotpasswordpage/resetpassword_page.dart';
 
+import '../helper/sharedpreference_helper.dart';
+import '../views/screen/authentication/login.dart';
 
 class ForgotPasswordController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var showPrefix = false.obs;
+  var hidePassword = true.obs;
   var isLoading = false.obs;
   var isLogin = true;
   var phoneNo = "".obs;
@@ -34,80 +38,127 @@ class ForgotPasswordController extends GetxController
     super.onInit();
   }
 
-void sendOTP(String email, BuildContext context) async {
-  isLoading.value = true;
+  void changePassword(
+    String token,
+    String currentP,
+    String newP,
+    String confirmP,
+    BuildContext context,
+  ) async {
+    isLoading.value = true;
 
-  try {
-    final ApiResponse response = await ApiManager.request(
-      endpoint: ApiManager.sendOTP,
-      method: "POST",
-      body: {"email": email},
-    );
-
-    if (response.statusCode == 200) {
-      isOtpSent.value = true;
-
-      SnackBarHelper.showSuccessSnackBar(
-        context,
-        response.data["message"] ?? "OTP sent successfully",
+    try {
+      final ApiResponseNew response = await ApiManager.requestNew(
+        endpoint: ApiManager.changePassword,
+        method: "POST",
+        token: token,
+        body: {
+          "oldPassword": currentP,
+          "newPassword": newP,
+          "confirmPassword": confirmP,
+        },
       );
 
-      startResendOtpTimer();
-    } else {
-      SnackBarHelper.showFailureSnackBar(
-        context,
-        response.data["message"] ?? "Failed to send OTP",
-      );
+      if (response.isSuccess) {
+        SnackBarHelper.showSuccessSnackBar(
+          context,
+          response.data["message"] ?? "Password Changed successfully",
+        );
+
+        SharedPreferencesService.clearAllPreferences();
+        SharedPreferencesService.setFirstTimeStatus(
+          false,
+        ); // for not showing onboard screen
+
+        //logi
+        Get.offAll(() => LoginPage());
+      } else {
+        SnackBarHelper.showFailureSnackBar(
+          context,
+          response.data["message"] ?? "Failed to change password",
+        );
+      }
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+    } finally {
+      isLoading.value = false;
     }
-  } catch (e) {
-    SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
-  } finally {
-    isLoading.value = false;
   }
-}
 
-void verifyOTP(String email, String otp, BuildContext context) async {
-  isLoading.value = true;
+  void sendFPOTP(String email, BuildContext context) async {
+    isLoading.value = true;
 
-  try {
-    final ApiResponse response = await ApiManager.request(
-      endpoint: ApiManager.verifyOTP,
-      method: "POST",
-      body: {"email": email, "otp": otp},
-    );
-
-    if (response.statusCode == 200) {
-      SnackBarHelper.showSuccessSnackBar(
-        context,
-        response.data["message"] ?? "OTP verified successfully",
+    try {
+      final ApiResponseNew response = await ApiManager.requestNew(
+        endpoint: ApiManager.forgotPasswordOtp,
+        method: "POST",
+        body: {"email": email},
       );
 
-      // Navigate to reset password screen with email as argument
-      Get.off(() => ResetPasswordPage(), arguments: [
-        {"EMAIL": email},
-      ]);
-    } else {
-      SnackBarHelper.showFailureSnackBar(
-        context,
-        response.data["message"] ?? "Failed to verify OTP",
-      );
+      if (response.isSuccess) {
+        isOtpSent.value = true;
+
+        SnackBarHelper.showSuccessSnackBar(
+          context,
+          response.data["message"] ?? "OTP sent successfully",
+        );
+
+        startResendOtpTimer();
+      } else {
+        SnackBarHelper.showFailureSnackBar(
+          context,
+          response.data["message"] ?? "Failed to send OTP",
+        );
+      }
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+    } finally {
+      isLoading.value = false;
     }
-  } catch (e) {
-    SnackBarHelper.showFailureSnackBar(
-      context,
-      "Unexpected error: $e",
-    );
-  } finally {
-    isLoading.value = false;
   }
-}
+
+  void verifyOTPResetPassword(
+    String email,
+    String otp,
+    String newPassword,
+    BuildContext context,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final ApiResponseNew response = await ApiManager.requestNew(
+        endpoint: ApiManager.verifyOtpResetPassword,
+        method: "POST",
+        body: {"email": email, "otp": otp, "newPassword": newPassword},
+      );
+
+      if (response.isSuccess) {
+        SnackBarHelper.showSuccessSnackBar(
+          context,
+          response.data["message"] ?? "OTP verified successfully",
+        );
+
+        //logi
+        Get.offAll(() => LoginPage());
+      } else {
+        SnackBarHelper.showFailureSnackBar(
+          context,
+          response.data["message"] ?? "Failed to verify OTP",
+        );
+      }
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   resendOtp(String email, BuildContext context) async {
     resendOTP.value = false;
-    sendOTP(email, context);
+    sendFPOTP(email, context);
   }
 
-/*   getOtp() async {
+  /*   getOtp() async {
     FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: '+91' + phoneNo.value,
       verificationCompleted: (PhoneAuthCredential credential) {},
@@ -130,15 +181,19 @@ void verifyOTP(String email, String otp, BuildContext context) async {
     String phoneNumberWithoutCountrycode = phoneNo.value;
 
     // Step 1: Verify if the phone number exists in Firestore
-    bool phoneExists =
-        await checkPhoneNumberExists(phoneNumberWithoutCountrycode, context);
+    bool phoneExists = await checkPhoneNumberExists(
+      phoneNumberWithoutCountrycode,
+      context,
+    );
 
     if (phoneExists) {
       // Step 2: Send OTP if the phone number exists
     } else {
       // Step 3: Show error if phone number does not exist
       SnackBarHelper.showFailureSnackBar(
-          context, "Phone number does not exist,please contact your admin.");
+        context,
+        "Phone number does not exist,please contact your admin.",
+      );
 
       statusMessage.value =
           "Phone number does not exist in the agent database.";
@@ -146,9 +201,11 @@ void verifyOTP(String email, String otp, BuildContext context) async {
     }
   }
 
-// Helper method to check if phone number exists in Firestore
+  // Helper method to check if phone number exists in Firestore
   Future<bool> checkPhoneNumberExists(
-      String phoneNumber, BuildContext context) async {
+    String phoneNumber,
+    BuildContext context,
+  ) async {
     return false;
     /*    try {
       final QuerySnapshot result = await FirebaseFirestore.instance

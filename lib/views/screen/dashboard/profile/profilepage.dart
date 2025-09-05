@@ -104,8 +104,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = Theme.of(context).colorScheme;
+
     return Container(
-      color: whitecolor,
+      color: themeColors.surface,
 
       child: Stack(
         fit: StackFit.expand,
@@ -213,6 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
+                                         color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -220,7 +223,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       phone,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: graytext,
+                                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -275,12 +278,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
-                        side: BorderSide(color: textBlack), // ➔ Black border
+                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface,),
                       ),
                     ),
                     child: Text(
                       'Logout',
-                      style: TextStyle(fontSize: 16, color: textBlack),
+                      style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
                 ),
@@ -356,7 +359,7 @@ class InfoItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: lightGrayBg,
+        color: Theme.of(context).colorScheme.secondaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
@@ -390,19 +393,25 @@ class InfoItem extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: textBlack,
+                        color:
+                            Theme.of(
+                              context,
+                            ).colorScheme.onSurface, // adaptive text color
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: graytext,
+                        color:
+                            Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant, // lighter variant
                       ),
                     ),
                   ],
@@ -414,7 +423,7 @@ class InfoItem extends StatelessWidget {
                   "assets/icons/svg_next_arrow.svg",
                   height: 16,
                   width: 16,
-                  colorFilter: ColorFilter.mode(blacktext, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.onSurfaceVariant, BlendMode.srcIn),
                 ),
               ),
             ],

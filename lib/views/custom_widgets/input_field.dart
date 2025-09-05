@@ -45,7 +45,7 @@ class InputField extends StatelessWidget {
                 title,
                 style: TextStyle(
                     fontSize: 12.5,
-                    color: textBlack,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w600),
               ),
               Visibility(
@@ -67,21 +67,21 @@ class InputField extends StatelessWidget {
         SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: whitecolor,
-            borderRadius: BorderRadius.circular(10.0),
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(32.0),
           ),
           child: TextFormField(
             controller: controller,
             obscureText: obscureText,
-            style: TextStyle(fontSize: 15, color: textBlack, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 15, color:  Theme.of(context).colorScheme.onSecondaryContainer, fontWeight: FontWeight.w500),
             onChanged: onChanged,
             onSaved: onSaved,
             validator: validator, 
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: heading6.copyWith(color: textGrey),
-              border: customBorder(color: bordercolor),
-              enabledBorder: customBorder(color: bordercolor),
+              hintStyle: heading6.copyWith(color:  Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(150)),
+              border: customBorder(color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(80)),
+              enabledBorder: customBorder(color:  Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(80)),
               focusedBorder: customBorder(color: primarycolor),
               errorBorder: customBorder(color: Colors.red),
               disabledBorder: customBorder(color: bordercolor),

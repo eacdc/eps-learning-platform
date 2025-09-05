@@ -38,14 +38,14 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:  Theme.of(context).colorScheme.surface,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Column(
             children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
+                backgroundColor:  Theme.of(context).colorScheme.surface,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
                 title: Stack(
@@ -57,10 +57,10 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    const Text(
+                     Text(
                       'Help Center',
                       style: TextStyle(
-                        color: Colors.black,
+                        color:  Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -68,7 +68,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                   ],
                 ),
               ),
-              Divider(color: textWhiteGrey, height: 1),
+                             Divider(color: Theme.of(context).dividerColor, height: 1),
             ],
           ),
         ),
@@ -113,14 +113,14 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? primarycolor : whitecolor,
+          color: isSelected ? primarycolor :  Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: isSelected ? primarycolor : graylight),
+          border: Border.all(color: isSelected ? primarycolor : Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(100)),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
+            color: isSelected ? Colors.white :  Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -163,7 +163,7 @@ class FaqWidget extends StatelessWidget {
                   "Frequently Asked\nQuestion",
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    color: textBlack,
+                    color:  Theme.of(context).colorScheme.onSurface,
                     fontSize: 22,
                   ),
                 ),
@@ -175,7 +175,7 @@ class FaqWidget extends StatelessWidget {
               child: SearchField(),
             ),
             Divider(
-              color: lightGrayBg,
+              color:  Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(50),
               height: 48,
               thickness: 8,
               indent: 0,
@@ -191,16 +191,16 @@ class FaqWidget extends StatelessWidget {
                   final category = faqcategorylist[index];
                   return ExpansionTile(
                     // collapsedBackgroundColor: Colors.grey[100],
-                    backgroundColor: Colors.white,
-                    collapsedIconColor: graydark,
+                    backgroundColor:  Theme.of(context).colorScheme.surface,
+                    collapsedIconColor: Theme.of(context).colorScheme.onSurfaceVariant,
                     shape: Border.all(color: Colors.transparent),
 
-                    iconColor: graydark,
+                    iconColor:  Theme.of(context).colorScheme.onSurfaceVariant,
                     title: Text(
                       category?.title ?? '',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: textBlack,
+                        color:  Theme.of(context).colorScheme.onSurface,
                         fontSize: 15,
                       ),
                     ),
@@ -211,7 +211,7 @@ class FaqWidget extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: lightGrayBg,
+                          color:  Theme.of(context).colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -237,14 +237,14 @@ class FaqWidget extends StatelessWidget {
                                 item?.question ?? '',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: textBlack.withAlpha(210),
+                                  color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
                                   fontSize: 14.5,
                                 ),
                               ),
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: whitecolor,
+                                    color: Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   padding: const EdgeInsets.symmetric(
@@ -255,7 +255,7 @@ class FaqWidget extends StatelessWidget {
                                   child: Text(
                                     item?.answer ?? '',
                                     style: TextStyle(
-                                      color: graytext,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       fontSize: 13.5,
                                     ),
                                   ),
@@ -378,7 +378,7 @@ class HelpCenterItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: lightGrayBg,
+        color: Theme.of(context).colorScheme.secondaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
@@ -415,7 +415,7 @@ class HelpCenterItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: textBlack,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -424,7 +424,7 @@ class HelpCenterItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: graytext,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],

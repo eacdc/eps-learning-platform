@@ -64,37 +64,9 @@ class NotificationController extends GetxController
     isSortApplied.value = sortBy.isNotEmpty || sortOrder.isNotEmpty;
   }
 
-  String buildFilterUrl() {
-    final baseUrl = ApiManager.mySubscriptionList;
-    final queryParams = <String>[];
 
-    queryParams.add("limit=${limit.value}");
-    queryParams.add("page=${pageNo.value}");
-
-    if (searchString.value.isNotEmpty) {
-      queryParams.add("search=${searchString.value}");
-    }
-    if (sortOrder.value.isNotEmpty) {
-      queryParams.add("sortOrder=${sortOrder.value}");
-    }
-    if (sortBy.value.isNotEmpty) {
-      queryParams.add("sortBy=${sortBy.value}");
-    }
-    if (subjectFilter.value.isNotEmpty) {
-      queryParams.add("subject=${subjectFilter.value}");
-    }
-    if (gradeFilter.value.isNotEmpty) {
-      queryParams.add("grade=${gradeFilter.value}");
-    }
-
-    // Combine all params with '&'
-    final queryString = queryParams.join("&");
-
-    return "$baseUrl?$queryString";
-  }
-
-  String buildCollectionUrl() {
-    final baseUrl = ApiManager.myBooksCollection;
+  String buildAllNotificationUrl() {
+    final baseUrl = ApiManager.allNotification;
     final queryParams = <String>[];
 
     queryParams.add("limit=${limit.value}");
@@ -123,7 +95,7 @@ class NotificationController extends GetxController
   }
 
   //used
-  void getMyBooksCollectionFilter({
+  void getAllNotificationFilter({
     required String token,
     required BuildContext context,
     int pageSize = 10, // Default page size is 10
@@ -150,7 +122,7 @@ class NotificationController extends GetxController
 
     isLoading.value = true;
 
-    final url = buildCollectionUrl();
+    final url = buildAllNotificationUrl();
 
     print("url" + url);
 
@@ -172,20 +144,20 @@ class NotificationController extends GetxController
 
     try {
       if (response.isSuccess) {
-        if (response.data["success"]) {
-          List<AllNotificationModel> booksCollection =
-              (response.data["data"]["books"] as List)
+        if (response.data is List) {
+          List<AllNotificationModel> notificationList =
+              (response.data as List)
                   .map((item) => AllNotificationModel.fromJson(item))
                   .toList();
           // use books
           // mySubscriptionList.value = books;
 
-          if (booksCollection.isNotEmpty) {
+          if (notificationList.isNotEmpty) {
             (pageNumber == 1)
                 ? (allNotificationList
                   ..clear()
-                  ..addAll(booksCollection))
-                : allNotificationList.addAll(booksCollection);
+                  ..addAll(notificationList))
+                : allNotificationList.addAll(notificationList);
 
           } else {
             isMoreDataAvailable.value = false;
@@ -218,57 +190,30 @@ class NotificationController extends GetxController
   }
 
 
-/*   void unsubscribeBook({
+  void seenNotification({
     required String token,
     required BuildContext context,
-    required String bookId,
+    required String notificationId,
 
     // Default to false , Clear all data and filter value
   }) async {
     isSubscribeLoading.value = true;
 
     var response = await ApiManager.requestNew(
-      endpoint: ApiManager.unsubscribe(bookId),
-      method: "DELETE",
-      /* body: {
-          "page": pageNumber,
-         // "department_id": selectedDepartment?.value?.id ?? "",
-        //  "severity": selectedSeverity.value?.title ?? "",
-          "start_date": datefromFilter.value,
-          "end_date": dateToFilter.value,
-          "search": searchString.value,
-          // "page": 1,
-          "page_size": pageSize,
-        }, */
+      endpoint: ApiManager.notificationSeen(notificationId),
+      method: "PUT",
+
       token: token,
     );
 
     try {
       if (response.isSuccess) {
-        getSubscriptionList(context: context, token: token);
+        getAllNotificationFilter(context: context, token: token);
 
         if (response.data is List) {
-          List<SubscribedBookModel> books =
-              (response.data as List)
-                  .map((item) => SubscribedBookModel.fromJson(item))
-                  .toList();
-          // use books
-          mySubscriptionList.value = books;
+         
         } else if (response.data is Map) {
-          if (response.data.containsKey('error') ||
-              response.data.containsKey('message')) {
-            print(
-              "Error: ${response.data['error'] ?? response.data['message']}",
-            );
-
-            SnackBarHelper.showSuccessSnackBar(
-              context,
-              response.data['error'] ?? response.data['message'],
-            );
-          } else {
-            BookList book = BookList.fromJson(response.data);
-            // use single book
-          }
+        
         } else {
           print("Unhandled response format");
           SnackBarHelper.showFailureSnackBar(
@@ -288,24 +233,13 @@ class NotificationController extends GetxController
       SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
     } finally {
       isSubscribeLoading.value = false;
-      if (context != null && Navigator.canPop(context)) {
+    /*   if (context != null && Navigator.canPop(context)) {
         Navigator.pop(context);
-      }
+      } */
     }
   }
- */
+ 
   
   
-  
-  void paginateTask() {
-    scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        print("reach end");
-        pageNo.value = pageNo.value + 1;
 
-        //get More Task
-      }
-    });
-  }
 }

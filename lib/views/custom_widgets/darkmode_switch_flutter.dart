@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/controllers/dashboard_controller.dart';
 import 'package:test_your_learing/helper/getx_helper.dart';
+import 'package:test_your_learing/utils/getxtheme/theme_controller.dart';
 
 import '../../constants/colors.dart';
 
-class DashboardSwitch extends StatefulWidget {
+class DarkModeSwitch extends StatefulWidget {
   // final bool initialValue;
   final ValueChanged<bool> onChanged;
 
-  const DashboardSwitch({
+  const DarkModeSwitch({
     Key? key,
     // this.initialValue = false,
     required this.onChanged,
@@ -19,14 +20,14 @@ class DashboardSwitch extends StatefulWidget {
   _DashboardSwitchState createState() => _DashboardSwitchState();
 }
 
-class _DashboardSwitchState extends State<DashboardSwitch> {
-  final dashboardController = findOrPut(() => DashboardController());
+class _DashboardSwitchState extends State<DarkModeSwitch> {
+  final themeController = findOrPut(() => ThemeController());
   late bool switchStatus;
   //late IconData knobIcon;
   //late Alignment knobAlignment;
 
-  final IconData gridIcon = Icons.grid_view;
-  final IconData listIcon = Icons.menu_rounded;
+  final IconData darkIcon = Icons.dark_mode_outlined;
+  final IconData lightIcon = Icons.light_mode_outlined;
   //final IconData lightThemeIcon = Icons.dehaze;
 
   @override
@@ -40,11 +41,13 @@ class _DashboardSwitchState extends State<DashboardSwitch> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      var switchStatus = dashboardController.isListStyle.value;
+      var switchStatus = themeController.isDarkMode.value;
       return GestureDetector(
         onTap: () {
           //toggle
-          dashboardController.isListStyle.value = !switchStatus;
+          //dashboardController.isListStyle.value = !switchStatus;
+          themeController.toggleTheme();
+        // / widget.onChanged(switchStatus);
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -52,7 +55,7 @@ class _DashboardSwitchState extends State<DashboardSwitch> {
           height: 36,
           curve: Curves.decelerate,
           decoration: BoxDecoration(
-           color: Theme.of(context).colorScheme.secondaryContainer,
+            color: Theme.of(context).colorScheme.secondaryContainer,
             border: Border.all(color:  Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(80), width: 1),
             borderRadius: BorderRadius.circular(100),
           ),
@@ -65,7 +68,7 @@ class _DashboardSwitchState extends State<DashboardSwitch> {
                   child: Container(
                     height: 28,
                     width: 28,
-                    child: Icon(gridIcon, size: 16, color: Theme.of(context).colorScheme.onSecondaryContainer),
+                    child: Icon(lightIcon, size: 16, color: Theme.of(context).colorScheme.onSecondaryContainer),
                   ),
                 ),
               ),
@@ -76,7 +79,7 @@ class _DashboardSwitchState extends State<DashboardSwitch> {
                   child: Container(
                     height: 28,
                     width: 28,
-                    child: Icon(listIcon, size: 16, color: Theme.of(context).colorScheme.onSecondaryContainer),
+                    child: Icon(darkIcon, size: 16, color: Theme.of(context).colorScheme.onSecondaryContainer),
                   ),
                 ),
               ),
@@ -95,7 +98,7 @@ class _DashboardSwitchState extends State<DashboardSwitch> {
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Icon(
-                      switchStatus ? listIcon : gridIcon,
+                      switchStatus ? darkIcon : lightIcon,
                       size: 16,
                       color: primarycolor,
                     ),

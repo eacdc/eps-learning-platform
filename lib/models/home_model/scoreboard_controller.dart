@@ -48,7 +48,7 @@ class QuizSummary {
   final int? totalQuizzesInProgress;
   final int? totalCompletedQuizzes;
   final double? totalHoursSpent;
-  final int? totalPointsEarned;
+  final num? totalPointsEarned;
   final int? currentStreak;
   final int? achievementsUnlocked;
 
@@ -82,10 +82,10 @@ class Quiz {
   final int? questionsAnswered;
   final int? totalQuestions;
   final int? completionPercentage;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final double? scorePercentage;
-  final int? pointsEarned;
+  final num? pointsEarned;
   final String? lastAttempted;
   final String? status;
 

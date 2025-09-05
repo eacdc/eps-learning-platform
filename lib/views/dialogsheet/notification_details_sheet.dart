@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/theme.dart';
@@ -7,13 +8,17 @@ import 'package:test_your_learing/views/custom_widgets/primary_button.dart';
 import 'package:test_your_learing/views/custom_widgets/secondary_button.dart';
 import 'package:test_your_learing/views/screen/authentication/login.dart';
 
-class LogoutSheet extends StatelessWidget {
-  final String? title;
-  final Widget? content;
+import '../../models/notification_model/all_notification_model.dart';
+
+class NotificationDetailsSheet extends StatelessWidget {
+  final AllNotificationModel? notificationData;
   final VoidCallback? onReadMore;
 
-  const LogoutSheet({Key? key, this.title, this.content, this.onReadMore})
-    : super(key: key);
+  const NotificationDetailsSheet({
+    Key? key,
+    this.notificationData,
+    this.onReadMore,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +55,9 @@ class LogoutSheet extends StatelessWidget {
                     const SizedBox(height: 15),
                     Center(
                       child: Text(
-                        "Logout",
+                        "Notification Details",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                         ),
@@ -98,77 +103,46 @@ class LogoutSheet extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Are you sure you want to logout?",
+                    notificationData?.title ?? "",
+
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          (notificationData?.seenStatus == "no")
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: PrimaryButton(
-                          buttonColor: primarycolor,
-                          textValue: "Yes,Logout",
-                          textColor: whitecolor,
-                          onPressed: () {
-                            print('Confirmed');
-                            Navigator.of(context).pop();
-
-                            SharedPreferencesService.clearAllPreferences();
-                            SharedPreferencesService.setFirstTimeStatus(
-                              false,
-                            ); // for not showing onboard screen
-                            Get.offAll(() => LoginPage());
-                          },
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: SecondaryButton(
-                          buttonColor: primarycolor,
-                          textValue: "Cancel",
-                          textColor: primarycolor,
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ),
-
-                      /* 
-
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          "CLOSE",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                        ),
-                        onPressed: onReadMore ?? () {},
-                        child: Text(
-                          "Read More",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                      ), */
-                    ],
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 0,vertical: 1),
+                    decoration: BoxDecoration(
+                      //color: lightGrayBg,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      notificationData?.message ?? "",
+                    
+                      style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                    ),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      
+                      formatDate(notificationData?.createdAt),
+                    
+                      softWrap: false,
+                    
+                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
@@ -176,5 +150,15 @@ class LogoutSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String formatDate(String? dateStr) {
+    if (dateStr == null) return "";
+    try {
+      DateTime dateTime = DateTime.parse(dateStr);
+      return DateFormat("dd MMM yyyy, hh:mm a").format(dateTime);
+    } catch (e) {
+      return dateStr; // fallback
+    }
   }
 }

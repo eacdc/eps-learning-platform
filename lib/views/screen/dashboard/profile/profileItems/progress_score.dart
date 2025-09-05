@@ -42,7 +42,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         // AppBar with custom layout
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -50,7 +50,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
             children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
                 title: Container(
@@ -67,10 +67,10 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                           },
                         ),
                       ),
-                      const Text(
+                       Text(
                         'Scores & Progress',
                         style: TextStyle(
-                          color: Colors.black,
+                          color:  Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -80,7 +80,8 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                 ),
               ),
               // Gray divider
-              Divider(color: textWhiteGrey, height: 1),
+               Divider(color: Theme.of(context).dividerColor, height: 1),
+
             ],
           ),
         ),
