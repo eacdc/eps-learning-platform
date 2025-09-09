@@ -84,6 +84,12 @@ class ApiManager {
   }
 
 
+    static String unifiedScores(String userId) {
+    return "/api/unified-scores/$userId";
+  }
+
+
+
 
 
 

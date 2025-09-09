@@ -1,6 +1,16 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:google_sign_in/google_sign_in.dart'
+    show
+        GoogleSignIn,
+        GoogleSignInClientAuthorization,
+        GoogleSignInAuthenticationEvent,
+        GoogleSignInAccount,
+        GoogleSignInAuthenticationEventSignIn,
+        GoogleSignInAuthenticationEventSignOut;
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/constants/constant.dart';
 
@@ -14,6 +24,8 @@ import 'package:test_your_learing/views/custom_widgets/input_field.dart';
 import 'package:test_your_learing/views/screen/authentication/signup_page.dart';
 import 'package:test_your_learing/views/screen/dashboard/dashboardpage.dart';
 import 'package:test_your_learing/views/screen/authentication/forgotpasswordpage/forgotpassword_page.dart';
+
+import '../../custom_widgets/progressbar_widget.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -39,6 +51,92 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  List<String> scopes = <String>[
+    //'https://www.googleapis.com/auth/contacts.readonly',
+    'email',
+    'profile',
+    'openid',
+  ];
+
+  void googleAccountLogin() {
+    // _handleSignOut();
+    final GoogleSignIn signIn = GoogleSignIn.instance;
+
+    unawaited(
+      signIn
+          .initialize(
+            clientId: Constants.googleLoginClientId,
+            serverClientId: Constants.googleLoginServerClientId,
+          )
+          .then((_) {
+            signIn.authenticationEvents
+                .listen(_handleAuthenticationEvent)
+                .onError(_handleAuthenticationError);
+
+            /// This example always uses the stream-based approach to determining
+            /// which UI state to show, rather than using the future returned here,
+            /// if any, to conditionally skip directly to the signed-in state.
+            // signIn.attemptLightweightAuthentication();
+
+            signIn.authenticate(scopeHint: scopes);
+          }),
+    );
+  }
+
+  Future<void> _handleAuthenticationEvent(
+    GoogleSignInAuthenticationEvent event,
+  ) async {
+    // #docregion CheckAuthorization
+    final GoogleSignInAccount? user = // ...
+    // #enddocregion CheckAuthorization
+    switch (event) {
+      GoogleSignInAuthenticationEventSignIn() => event.user,
+      GoogleSignInAuthenticationEventSignOut() => null,
+    };
+
+    // Check for existing authorization.
+    // #docregion CheckAuthorization
+    final GoogleSignInClientAuthorization? authorization = await user
+        ?.authorizationClient
+        .authorizationForScopes(scopes);
+    // #enddocregion CheckAuthorization
+
+    print("ggl\n " + (authorization?.accessToken.toString() ?? "__"));
+    print("ggl\n " + (user?.authentication.idToken.toString() ?? "__"));
+    print("ggl name \n " + (user?.displayName.toString() ?? "__"));
+    print("ggl email \n " + (user?.email.toString() ?? "__"));
+    print("ggl google id\n " + (user?.id.toString() ?? "__"));
+
+    // If the user has already granted access to the required scopes, call the
+    // REST API.
+    if (user != null && authorization != null) {
+      //unawaited(_handleGetContact(user));
+      print("ggl" + "user sign in");
+
+      final _name = user.displayName.toString() ?? "";
+      final _email = user.email.toString() ?? "";
+      final _google_id = user.id.toString() ?? "";
+
+      loginController.googleLoginVerify(_name, _email, _google_id, context);
+    } else {
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "unable to fetch google account details",
+      );
+    }
+  }
+
+  Future<void> _handleAuthenticationError(Object e) async {
+    // e is GoogleSignInException ? e.toString() : 'Unknown error: $e';
+    print(e.toString());
+  }
+
+  Future<void> _handleSignOut() async {
+    // Disconnect instead of just signing out, to reset the example state as
+    // much as possible.
+    await GoogleSignIn.instance.disconnect();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,287 +155,344 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildGetOtpForm(BuildContext context) {
     return SafeArea(
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey5,
-          child: Obx(
-            () => Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 60),
-                InkWell(
-                  onTap: () {
-                    // Get.to(() => DashboardPage());
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(100)),
-                      //  color: lightGray.withAlpha(40)
+      child: Obx(()=>Stack(
+        children: [
+          SingleChildScrollView(
+            child: Form(
+              key: _formKey5,
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 60),
+                    InkWell(
+                      onTap: () {
+                        // Get.to(() => DashboardPage());
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(100)),
+                          //  color: lightGray.withAlpha(40)
+                        ),
+                        padding: EdgeInsets.all(10),
+                        child: Image.asset(
+                          "assets/images/logo.png",
+                          height: 90,
+                          width: 90,
+                        ),
+                      ),
                     ),
-                    padding: EdgeInsets.all(10),
-                    child: Image.asset(
-                      "assets/images/logo.png",
-                      height: 90,
-                      width: 90,
+          
+                    SizedBox(height: 24),
+                    /*  Text("Welcome back to ${Constants.appname}",
+                        style: Typo.Medium.copyWith(
+                            color: graylight,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400)),
+                    SizedBox(
+                      height: 32,
+                    ), */
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Welcome Back!",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-
-                SizedBox(height: 24),
-                /*  Text("Welcome back to ${Constants.appname}",
-                    style: Typo.Medium.copyWith(
-                        color: graylight,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400)),
-                SizedBox(
-                  height: 32,
-                ), */
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Welcome Back!",
+                    SizedBox(height: 8),
+          
+                    Text(
+                      "Please login first to start your journey!!",
+                      textAlign: TextAlign.start,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 8),
-
-                Text(
-                  "Please login first to start your journey!!",
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                SizedBox(height: 24),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      /*  InputField(
-                        title: "Email address",
-                        hintText: 'Enter your email',
-                        suffixIcon: _buildSuffixIcon(),
-                        controller: emailController,
-                        prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: gray,
-                          size: 16,
-                        ),
-                        onChanged: (val) {
-                          authController.emailid.value = val;
-                        },
-                        onSaved: (val) => authController.emailid.value = val!,
-                        validator: (val) => (val!.isEmpty || val!.length < 10)
-                            ? "Enter valid number"
-                            : null,
+                    SizedBox(height: 24),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                       */
-                      InputField(
-                        title: "User Name",
-                        hintText: 'Enter your User Name',
-                        suffixIcon: _buildSuffixIcon(),
-                        controller: emailController,
-                        prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: graytext,
-                          size: 16,
-                        ),
-                        onChanged: (val) {
-                          authController.emailid.value = val;
-                        },
-                        onSaved: (val) => authController.emailid.value = val!,
-                        validator:
-                            (val) =>
-                                (val!.isEmpty || val!.length < 10)
-                                    ? "Enter valid User Name"
-                                    : null,
-                      ),
-                      SizedBox(height: 16),
-                      InputField(
-                        title: "Password",
-                        hintText: 'Enter your password',
-                        controller: passwordController,
-                        obscureText: !passwordVisible,
-                        suffixIcon: IconButton(
-                          color: textGrey,
-                          splashRadius: 1,
-                          icon: Icon(
-                            passwordVisible
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            size: 20,
-                          ),
-                          onPressed: togglePassword,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.lock_outline,
-                          color: graytext,
-                          size: 16,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: isRememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isRememberMe = value!;
-                                  });
-                                },
-                                activeColor: primarycolor,
-                               
-                                side: BorderSide(),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                visualDensity: VisualDensity.compact,
-                                
-
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                  side: BorderSide(
-                                    color: gray,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                'Remember Me',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                ),
-                                //
-                              ),
-                            ],
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Get.to(() => ForgotPasswordPage());
-
-                              //  Get.to(() => SignupPage());
+                          /*  InputField(
+                            title: "Email address",
+                            hintText: 'Enter your email',
+                            suffixIcon: _buildSuffixIcon(),
+                            controller: emailController,
+                            prefixIcon: Icon(
+                              Icons.email_outlined,
+                              color: gray,
+                              size: 16,
+                            ),
+                            onChanged: (val) {
+                              authController.emailid.value = val;
                             },
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                "Forgot Password? ",
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            onSaved: (val) => authController.emailid.value = val!,
+                            validator: (val) => (val!.isEmpty || val!.length < 10)
+                                ? "Enter valid number"
+                                : null,
+                          ),
+                           */
+                          InputField(
+                            title: "User Name",
+                            hintText: 'Enter your User Name',
+                            suffixIcon: _buildSuffixIcon(),
+                            controller: emailController,
+                            prefixIcon: Icon(
+                              Icons.email_outlined,
+                              color: graytext,
+                              size: 16,
+                            ),
+                            onChanged: (val) {
+                              authController.emailid.value = val;
+                            },
+                            onSaved: (val) => authController.emailid.value = val!,
+                            validator:
+                                (val) =>
+                                    (val!.isEmpty || val!.length < 10)
+                                        ? "Enter valid User Name"
+                                        : null,
+                          ),
+                          SizedBox(height: 16),
+                          InputField(
+                            title: "Password",
+                            hintText: 'Enter your password',
+                            controller: passwordController,
+                            obscureText: !passwordVisible,
+                            suffixIcon: IconButton(
+                              color: textGrey,
+                              splashRadius: 1,
+                              icon: Icon(
+                                passwordVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                size: 20,
                               ),
+                              onPressed: togglePassword,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              color: graytext,
+                              size: 16,
                             ),
                           ),
-                        ],
-                      ),
-
-                      SizedBox(height: 24),
-                      CustomGradiantButton(
-                        loading: loginController.isLoading.value,
-                        buttonColor: primarycolor,
-                        textValue: 'Sign In',
-                        textColor: onprimary,
-                        onPressed: () {
-                          /*     final form = _formKey.currentState;
-                            if (form!.validate()) {
-                              form.save();
-                              authController.getOtp(context);
-                              authController.showProgressbar.value = true;
-                            } */
-
-                          final _email = emailController.text;
-                          final _password = passwordController.text;
-
-                          if (validateCredentials(_email, _password, context)) {
-                            /* loginController.loginUser(
-                                  _email, _password, context); */
-                            loginController.loginUser(
-                              _email,
-                              _password,
-                              context,
-                            );
-
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          }
-                        },
-                      ),
-                      SizedBox(height: 32),
-
-                      InkWell(
-                        onTap: () {
-                          // showCustomerOnboardBottomsheet(context);
-                          Get.to(() => SignupPage());
-                        },
-                        child: Align(
-                          alignment: AlignmentDirectional.center,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: RichText(
-                              text: TextSpan(
-                                text: 'New to EPS?  ',
-                                style: TextStyle(
-                                  color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                  fontFamily: Constants.fontFamily,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                // style: DefaultTextStyle.of(context).style,
-                                children: <TextSpan>[
-                                  /* TextSpan(
-                          text: 'bold',
-                          style: TextStyle(fontWeight: FontWeight.bold)), */
-                                  TextSpan(
-                                    text: 'Create Account',
-                                    style: TextStyle(
-                                      color: primarycolor,
-                                      fontWeight: FontWeight.w700,
+                          SizedBox(height: 12),
+          
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: isRememberMe,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        isRememberMe = value!;
+                                      });
+                                    },
+                                    activeColor: primarycolor,
+          
+                                    side: BorderSide(),
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    visualDensity: VisualDensity.compact,
+          
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      side: BorderSide(color: gray),
                                     ),
+                                  ),
+                                  Text(
+                                    'Remember Me',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color:
+                                          Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                    //
                                   ),
                                 ],
                               ),
+                              InkWell(
+                                onTap: () {
+                                  Get.to(() => ForgotPasswordPage());
+          
+                                  //  Get.to(() => SignupPage());
+                                },
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    "Forgot Password? ",
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+          
+                          SizedBox(height: 16),
+                          CustomGradiantButton(
+                            loading: loginController.isLoading.value,
+                            buttonColor: primarycolor,
+                            textValue: 'Sign In',
+                            textColor: onprimary,
+                            onPressed: () {
+                              /*     final form = _formKey.currentState;
+                                if (form!.validate()) {
+                                  form.save();
+                                  authController.getOtp(context);
+                                  authController.showProgressbar.value = true;
+                                } */
+          
+                              final _email = emailController.text;
+                              final _password = passwordController.text;
+          
+                              if (validateCredentials(_email, _password, context)) {
+                                /* loginController.loginUser(
+                                      _email, _password, context); */
+                                loginController.loginUser(
+                                  _email,
+                                  _password,
+                                  context,
+                                );
+          
+                                FocusManager.instance.primaryFocus?.unfocus();
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 16),
+          
+                          Material(
+                            borderRadius: BorderRadius.circular(32.0),
+                            elevation: 0,
+                            child: Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                ),
+                                /*  gradient: LinearGradient(
+                          colors: [
+                            primarycolor,
+                            primarycolor
+                          ], // Replace with your gradient colors
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ), */
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(32.0),
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  googleAccountLogin();
+                                },
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/icon_google.png",
+                                        height: 24,
+                                        width: 24,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        "Login with Google",
+                                        style: heading6.copyWith(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 16),
+                          InkWell(
+                            onTap: () {
+                              // showCustomerOnboardBottomsheet(context);
+                              Get.to(() => SignupPage());
+                            },
+                            child: Align(
+                              alignment: AlignmentDirectional.center,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: 'New to EPS?  ',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                      fontFamily: Constants.fontFamily,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    // style: DefaultTextStyle.of(context).style,
+                                    children: <TextSpan>[
+                                      /* TextSpan(
+                              text: 'bold',
+                              style: TextStyle(fontWeight: FontWeight.bold)), */
+                                      TextSpan(
+                                        text: 'Create Account',
+                                        style: TextStyle(
+                                          color: primarycolor,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+          
+                          SizedBox(height: 16),
+                        ],
                       ),
-
-                      SizedBox(height: 32),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
             ),
           ),
-        ),
+           ProgressBarWidget(
+                  visible:loginController.getStartLoading.value,
+                ),
+        ],
       ),
-    );
+    ));
   }
 
   Widget _buildVerifyOtpForm(BuildContext context) {

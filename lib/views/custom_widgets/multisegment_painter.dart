@@ -36,7 +36,7 @@ class MultiSegmentCircle extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             Text(
-              '145',
+              '-',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text('hours', style: TextStyle(fontSize: 12, color: Colors.grey)),
