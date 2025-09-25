@@ -22,7 +22,6 @@ import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
 import 'package:test_your_learing/views/custom_widgets/input_field.dart';
 import 'package:test_your_learing/views/screen/authentication/signup_page.dart';
-import 'package:test_your_learing/views/screen/dashboard/dashboardpage.dart';
 import 'package:test_your_learing/views/screen/authentication/forgotpasswordpage/forgotpassword_page.dart';
 
 import '../../custom_widgets/progressbar_widget.dart';
