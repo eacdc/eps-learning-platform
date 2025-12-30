@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+
+class AskAiMessageModel {
+  final String role;
+  final String content;
+  final bool isAudio;
+  final String? audioFileId;
+  final String? messageId;
+  final String id;
+  final String timestamp;
+  final bool aiLoading ; // Default value, can be set later if needed
+   final GlobalKey key = GlobalKey();
+
+
+  AskAiMessageModel({
+    required this.role,
+    required this.content,
+    required this.isAudio,
+    this.audioFileId,
+    this.messageId,
+    this.aiLoading = false, // Default value
+    required this.id,
+    required this.timestamp,
+  });
+
+  factory AskAiMessageModel.fromJson(Map<String, dynamic> json) {
+    return AskAiMessageModel(
+      role: json['role'] ?? '',
+      content: json['content'] ?? '',
+      isAudio: json['isAudio'] ?? false,
+      audioFileId: json['audioFileId'],
+      messageId: json['messageId'],
+      id: json['_id'] ?? '',
+      timestamp: json['timestamp'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'role': role,
+      'content': content,
+      'isAudio': isAudio,
+      'audioFileId': audioFileId,
+      'messageId': messageId,
+      '_id': id,
+      'timestamp': timestamp,
+    };
+  }
+}

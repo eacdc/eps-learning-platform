@@ -3,22 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
-import 'package:test_your_learing/controllers/collection_controller.dart';
 import 'package:test_your_learing/controllers/dashboard_controller.dart';
 import 'package:test_your_learing/controllers/my_subscription_controller.dart';
 import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
-import 'package:test_your_learing/views/custom_widgets/search_field.dart';
 
 import '../../../../constants/grade_list.dart';
 import '../../../../constants/master_list.dart';
-import '../../../../models/my_subscription_model/my_subscription_model.dart';
 import '../../../../models/my_subscription_model/mycollection_model.dart';
 import '../../../custom_widgets/primary_button.dart';
 import '../../../custom_widgets/progressbar_widget.dart';
 import '../../../custom_widgets/search_input_field.dart';
 import '../../../custom_widgets/secondary_button.dart';
 import '../../../dialogsheet/book_subscribe_sheet.dart';
+import '../ask_learn/ask_ai_page.dart';
 import '../quiz/qnapage/qna_page.dart';
 
 class MySubscriptionPage extends StatefulWidget {
@@ -60,9 +58,12 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         decoration: BoxDecoration(
-          color: isSelected ? primarycolor : Theme.of(context).colorScheme.surface,
+          color:
+              isSelected ? primarycolor : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(100),
-          border: Border.all(color:  Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(80)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(80),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -91,7 +92,10 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                  color:
+                      isSelected
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -280,7 +284,7 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
                         ),
                       ),
 
-                      SizedBox(height: 12),
+                      /*  SizedBox(height: 4),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -302,7 +306,6 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
                               "assets/icons/png_science_category.png",
                               false,
                               () {},
-                              
                             ),
                             SizedBox(width: 8),
                             _buildFilterItem(
@@ -315,6 +318,8 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
                           ],
                         ),
                       ),
+
+                    */
 
                       //SizedBox(height: 4),
                     ],
@@ -631,7 +636,11 @@ Widget bookGridItem({
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
-        BoxShadow(color:Theme.of(context).colorScheme.onSurface.withAlpha(40), blurRadius: 6, offset: Offset(0, 2)),
+        BoxShadow(
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(40),
+          blurRadius: 6,
+          offset: Offset(0, 2),
+        ),
       ],
     ),
     child: Column(
@@ -744,7 +753,11 @@ Widget bookListItem({
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
-        BoxShadow(color:Theme.of(context).colorScheme.onSurface.withAlpha(40), blurRadius: 6, offset: Offset(0, 2)),
+        BoxShadow(
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(40),
+          blurRadius: 6,
+          offset: Offset(0, 2),
+        ),
       ],
     ),
     child: Row(
@@ -889,7 +902,7 @@ void _showChapterBottomsheet(
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -923,7 +936,8 @@ void _showChapterBottomsheet(
                                   "Book Details",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1055,7 +1069,10 @@ void _showChapterBottomsheet(
                                             "Subject - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1066,7 +1083,10 @@ void _showChapterBottomsheet(
                                             bookData.subject ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1080,7 +1100,10 @@ void _showChapterBottomsheet(
                                             "Publisher - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1092,7 +1115,10 @@ void _showChapterBottomsheet(
                                             bookData.author ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1105,7 +1131,10 @@ void _showChapterBottomsheet(
                                             "Grade - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1116,7 +1145,10 @@ void _showChapterBottomsheet(
                                             bookData.grade ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1235,95 +1267,113 @@ void _showChapterBottomsheet(
                                 vertical: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(
-                                  150,
-                                ), //  Background color
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer
+                                    .withAlpha(150), //  Background color
                                 borderRadius: BorderRadius.circular(
                                   10,
                                 ), //  Curved border
                                 border: Border.all(
-                                  color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(20),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer
+                                      .withAlpha(20),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 5,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: primarycolor.withAlpha(25),
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            '${index + 1}',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: primarycolor,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: primarycolor.withAlpha(25),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            chapterdata.title ?? "No Name",
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              /* height:
-                                                  1.4, */
-                                              // improves readability for multi-line
-                                            ),
-                                            softWrap: true,
+                                        child: Text(
+                                          '${index + 1}',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: primarycolor,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          chapterdata.title ?? "No Name",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            /* height:
+                                                    1.4, */
+                                            // improves readability for multi-line
+                                          ),
+                                          softWrap: true,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      Get.to(
-                                        () => const QnaPage(),
-                                        arguments: {
-                                          'chapterId': chapterdata.id ?? '',
-                                          'chapterName':
-                                              chapterdata.title ?? '',
-                                          'bookId': chapterdata.bookId ?? '',
-                                        },
-                                      );
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: primarycolor,
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      child: const Text(
-                                        'Start Quiz',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: SecondaryButton(
+                                          buttonColor: primarycolor,
+                                          textValue: "Learn",
+                                          textColor: primarycolor,
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Get.to(
+                                              () => const AskAiPage(),
+                                              arguments: {
+                                                'chapterId':
+                                                    chapterdata.id ?? '',
+                                                'chapterName':
+                                                    chapterdata.title ?? '',
+                                                'bookId':
+                                                    chapterdata.bookId ?? '',
+                                              },
+                                            );
+                                          },
+                                          height: 34,
+                                          startIcon: "assets/images/learn.png",
                                         ),
                                       ),
-                                    ),
+                                      SizedBox(width: 24),
+                                      Expanded(
+                                        child: PrimaryButton(
+                                          buttonColor: primarycolor,
+                                          textValue: "Start Quiz",
+                                          textColor: whitecolor,
+                                          startIcon: "assets/images/quiz.png",
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Get.to(
+                                              () => const QnaPage(),
+                                              arguments: {
+                                                'chapterId':
+                                                    chapterdata.id ?? '',
+                                                'chapterName':
+                                                    chapterdata.title ?? '',
+                                                'bookId':
+                                                    chapterdata.bookId ?? '',
+                                              },
+                                            );
+                                          },
+                                          height: 34,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -1375,7 +1425,7 @@ void _showSortBottomsheet(
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -1412,7 +1462,10 @@ void _showSortBottomsheet(
                                       "Sort",
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -1468,7 +1521,8 @@ void _showSortBottomsheet(
                                   "Sort By :",
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1484,7 +1538,10 @@ void _showSortBottomsheet(
                                                   .value ==
                                               option.value;
                                           return ChoiceChip(
-                                            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                            backgroundColor:
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .secondaryContainer,
                                             selectedColor: primarycolor,
                                             label: Text(option.label),
                                             side: BorderSide.none,
@@ -1503,7 +1560,9 @@ void _showSortBottomsheet(
                                               color:
                                                   isSelected
                                                       ? whitecolor
-                                                      : Theme.of(context).colorScheme.onSecondaryContainer,
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .onSecondaryContainer,
                                             ),
                                             selected: isSelected,
                                             onSelected: (_) {
@@ -1531,7 +1590,8 @@ void _showSortBottomsheet(
                                   "Sort Order :",
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1547,7 +1607,10 @@ void _showSortBottomsheet(
                                                   .value ==
                                               option.value;
                                           return ChoiceChip(
-                                            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                            backgroundColor:
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .secondaryContainer,
                                             selectedColor: primarycolor,
                                             label: Text(option.label),
                                             side: BorderSide.none,
@@ -1560,7 +1623,9 @@ void _showSortBottomsheet(
                                               color:
                                                   isSelected
                                                       ? whitecolor
-                                                      : Theme.of(context).colorScheme.onSecondaryContainer,
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .onSecondaryContainer,
                                             ),
                                             selected: isSelected,
                                             onSelected: (_) {
@@ -1675,7 +1740,7 @@ void _showFilterBottomsheet(
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -1712,7 +1777,10 @@ void _showFilterBottomsheet(
                                       "Filter",
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -1768,7 +1836,8 @@ void _showFilterBottomsheet(
                                   "Subject :",
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1784,7 +1853,10 @@ void _showFilterBottomsheet(
                                                   .value ==
                                               option.value;
                                           return ChoiceChip(
-                                            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                            backgroundColor:
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .secondaryContainer,
                                             selectedColor: primarycolor,
                                             label: Text(option.label),
                                             side: BorderSide.none,
@@ -1803,7 +1875,9 @@ void _showFilterBottomsheet(
                                               color:
                                                   isSelected
                                                       ? whitecolor
-                                                      : Theme.of(context).colorScheme.onSecondaryContainer,
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .onSecondaryContainer,
                                             ),
                                             selected: isSelected,
                                             onSelected: (_) {
@@ -1833,7 +1907,8 @@ void _showFilterBottomsheet(
                                   "Grade :",
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1849,7 +1924,10 @@ void _showFilterBottomsheet(
                                                   .value ==
                                               option.value.toString();
                                           return ChoiceChip(
-                                            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                            backgroundColor:
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .secondaryContainer,
                                             selectedColor: primarycolor,
                                             label: Text(
                                               option.value.toString(),
@@ -1864,7 +1942,9 @@ void _showFilterBottomsheet(
                                               color:
                                                   isSelected
                                                       ? whitecolor
-                                                      : Theme.of(context).colorScheme.onSecondaryContainer,
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .onSecondaryContainer,
                                             ),
                                             selected: isSelected,
                                             onSelected: (_) {

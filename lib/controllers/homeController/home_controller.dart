@@ -8,6 +8,7 @@ import 'package:test_your_learing/networks/api_manager.dart';
 
 import '../../helper/snackbar_helper.dart';
 import '../../models/home_model/chapter_states_model.dart';
+import '../../models/home_model/ranking_response_model.dart';
 import '../../models/home_model/recent_activity_model.dart';
 
 class HomeController extends GetxController {
@@ -15,6 +16,7 @@ class HomeController extends GetxController {
   var recent_activity = Rxn<RecentActivityModel>();
   var scoreboard = Rxn<ScoreboardModel>();
   var chapterStates = Rxn<ChapterStates>();
+  var myRanking = Rxn<RankingResponse>();
 
   @override
   void onInit() {
@@ -206,4 +208,56 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
+
+void getMyRanking({
+    required String token,
+    required BuildContext context,
+  }) async {
+    isLoading.value = true;
+
+    var response = await ApiManager.requestNew(
+      endpoint: ApiManager.myRanking(),
+      method: "GET",
+      token: token,
+    );
+
+    try {
+      if (response.isSuccess) {
+        if (response.data is Map) {
+          if (response.data.containsKey('error') ||
+              response.data.containsKey('message')) {
+            SnackBarHelper.showFailureSnackBarGetx(
+              response.data['error'] ?? response.data['message'],
+            );
+          } else {
+            myRanking.value = RankingResponse.fromJson(response.data);
+          }
+        } else {
+          print("Unhandled response format");
+        }
+      } else {
+        print("Request failed: ${response.statusCode}");
+        if (response.data.containsKey('error') ||
+            response.data.containsKey('message')) {
+          SnackBarHelper.showFailureSnackBarGetx(
+            response.data['error'] ?? response.data['message'],
+          );
+        } else {
+          SnackBarHelper.showFailureSnackBarGetx(
+            "Request failed: ${response.statusCode}",
+          );
+        }
+      }
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBarGetx(e.toString());
+
+    
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+
+
 }

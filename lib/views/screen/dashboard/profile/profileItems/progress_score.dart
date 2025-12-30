@@ -36,10 +36,16 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
       final token = SharedPreferencesService.getAccessToken() ?? '';
       final userId = SharedPreferencesService.getUserId() ?? '';
 
-      scoreand_progress_controller.getScoreAndProgress(
+      /* scoreand_progress_controller.getScoreAndProgress(
         token: token,
         userid: userId,
         context: context,
+      ); */
+
+      scoreController.getAllUnifiedScore(
+        token: token,
+        context: context,
+        userId: userId,
       );
 
       scoreController.getUnifiedScore(
@@ -97,17 +103,25 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
           ),
         ),
         body: Obx(() {
-          final scoreboard =
-              scoreand_progress_controller.scoreprogress.value?.data;
+          /* final scoreboard =
+              scoreController.all_unified_score.value?.data; */
+
+               final unified_scoreboard =
+          scoreController.all_unified_score.value?.data?.scoreboard;
+             final unified_basic =
+          scoreController.all_unified_score.value?.data?.basic;
+
+
+          
 
           final String booksStarted =
-              (scoreboard?.booksStarted?.toString() ?? 'N/A');
+              (unified_basic?.booksStarted?.toString() ?? 'N/A');
           final String chaptersCompleted =
-              (scoreboard?.chaptersCompleted?.toString() ?? 'N/A');
+               (unified_basic?.chaptersCompleted?.toString() ?? 'N/A');
           final String quizzesTaken =
-              (scoreboard?.quizzesTaken?.toString() ?? 'N/A');
+              (unified_basic?.quizzesTaken?.toString() ?? 'N/A');
           final String overallScore =
-              (scoreboard?.overallScore?.toString() ?? 'N/A');
+              (unified_basic?.overallScore?.toString() ?? 'N/A');
 
           final assesment_data =
               scoreController.unified_score.value?.data?.assessmentData;

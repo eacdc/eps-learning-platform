@@ -12,6 +12,7 @@ import 'package:markdown_widget/widget/markdown.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/controllers/ask_ai_controller.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/qna_model/chatmessage_model.dart';
@@ -20,7 +21,6 @@ import 'package:test_your_learing/views/custom_widgets/progressbar_widget.dart';
 import 'package:test_your_learing/views/custom_widgets/typing_indicator.dart';
 
 import '../../../../../controllers/qna_controller.dart';
-import '../../../../custom_widgets/chat_tringle.dart';
 import 'package:record/record.dart';
 import 'package:path/path.dart' as p;
 import 'package:waveform_recorder/waveform_recorder.dart';
@@ -30,25 +30,28 @@ import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:waved_audio_player/waved_audio_player.dart';
 
-class ChatWidget extends StatefulWidget {
+import '../../../../models/askAi_model/ask_message_model.dart';
+import '../../../custom_widgets/chat_tringle.dart';
+
+class AskAiWidget extends StatefulWidget {
   final String chapterId;
   final String chapterName;
 
-  const ChatWidget({
+  const AskAiWidget({
     Key? key,
     required this.chapterId,
     required this.chapterName,
   }) : super(key: key);
 
   @override
-  State<ChatWidget> createState() => _ChatWidgetState();
+  State<AskAiWidget> createState() => _AskAiWidgetState();
 }
 
-class _ChatWidgetState extends State<ChatWidget>
+class _AskAiWidgetState extends State<AskAiWidget>
     with SingleTickerProviderStateMixin {
   final TextEditingController messageController = TextEditingController();
 
-  final qnaController = Get.put(QnaController());
+  final askAiController = Get.put(AskAiController());
 
   bool isTyping = false;
   //late final AnimationController _dotsController;
@@ -85,7 +88,7 @@ class _ChatWidgetState extends State<ChatWidget>
  */
     // After the widget has been built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      qnaController.getChatHistoryCollection(
+      askAiController.getAskHistoryCollection(
         token: token,
         context: context,
         chapterId: widget.chapterId,
@@ -103,11 +106,11 @@ class _ChatWidgetState extends State<ChatWidget>
     });
 
     // Scroll when chat list updates
-    ever(qnaController.chatMessageList, (_) => _scrollToBottom());
+    ever(askAiController.chatMessageList, (_) => _scrollToBottom());
 
     // Optional: Scroll when typing changes
     //ever(qnaController.isTyping.obs, (_) => _scrollToBottom());
-    ever(qnaController.aiThinking, (_) => _scrollToBottom());
+    ever(askAiController.aiThinking, (_) => _scrollToBottom());
 
     /* _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
@@ -137,7 +140,7 @@ class _ChatWidgetState extends State<ChatWidget>
     _focusNode.dispose();
     _audioRecorder.dispose();
     _audioPlayer.dispose();
-    qnaController.dispose();
+    askAiController.dispose();
     super.dispose();
   }
 
@@ -147,8 +150,8 @@ class _ChatWidgetState extends State<ChatWidget>
 
     // 1 Add user message immediately to the chat list
 
-    qnaController.addMessageToList(
-      ChatMessageModel(
+    askAiController.addMessageToList(
+      AskAiMessageModel(
         role: 'user',
         content: text.trim(),
         isAudio: false,
@@ -171,7 +174,7 @@ class _ChatWidgetState extends State<ChatWidget>
     ); */
 
     //  Call API to send the message and wait for response
-    qnaController.sendChatMessage(
+    askAiController.sendAskMessage(
       token: token,
       context: context,
       chapterId: widget.chapterId,
@@ -271,7 +274,7 @@ class _ChatWidgetState extends State<ChatWidget>
                   Expanded(
                     child: Obx(
                       () =>
-                          qnaController.chatMessageList.isEmpty
+                          askAiController.chatMessageList.isEmpty
                               ? Center(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -287,7 +290,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                       //  child: Center(child: Text("No Category Found")),
                                     ),
                                     SizedBox(height: 2),
-                                    (qnaController.isLoading.value)
+                                    (askAiController.isLoading.value)
                                         ? SizedBox.shrink()
                                         : InkWell(
                                           onTap: () {
@@ -304,7 +307,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                               color: primarycolor.withAlpha(20),
                                             ),
                                             child: Text(
-                                              "Start Quiz",
+                                              "Start Learning",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: primarycolor,
@@ -321,20 +324,20 @@ class _ChatWidgetState extends State<ChatWidget>
                                 shrinkWrap: true,
                                 reverse: true,
 
-                                controller: qnaController.scrollController,
+                                controller: askAiController.scrollController,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                 ),
-                                itemCount: qnaController.chatMessageList.length,
+                                itemCount: askAiController.chatMessageList.length,
                                 /* +(qnaController.aiThinking.value ? 1 : 0) */
                                 itemBuilder: (context, index) {
                                   final reversedIndex =
-                                      qnaController.chatMessageList.length -
+                                      askAiController.chatMessageList.length -
                                       1 -
                                       index;
 
                                   final message =
-                                      qnaController
+                                      askAiController
                                           .chatMessageList[reversedIndex];
                                   bool isUser = message.role == 'user';
 
@@ -374,7 +377,7 @@ class _ChatWidgetState extends State<ChatWidget>
                     ),
                   ),
 
-                 qnaController.hideChatBox.value?SizedBox(height: 8,) :Padding(
+                  Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 12,
                       horizontal: 8,
@@ -443,108 +446,8 @@ class _ChatWidgetState extends State<ChatWidget>
               ),
             ),
 
-            Positioned(
-              bottom: 90,
-              right: 20,
-              child:
-                  qnaController.scoreCardOpacity == 0.0
-                      ? SizedBox.shrink()
-                      : AnimatedOpacity(
-                        //opacity: 1.0,
-                        opacity: qnaController.scoreCardOpacity.value,
-                        duration: const Duration(milliseconds: 300),
-
-                        child: Center(
-                          child: GlowContainer(
-                            glowRadius: 16,
-                            gradientColors: [
-                              Colors.blue,
-                              Colors.purple,
-                              Colors.pink,
-                            ],
-                            rotationDuration: Duration(seconds: 2),
-                            glowLocation: GlowLocation.both,
-                            containerOptions: ContainerOptions(
-                              width: 130,
-                              height: 122,
-                              borderRadius: 16,
-                              backgroundColor: lightGrayBg,
-                              borderSide: BorderSide(
-                                width: 1.0,
-                                color: Colors.black,
-                              ),
-                            ),
-                            transitionDuration: Duration(milliseconds: 200),
-                            showAnimatedBorder: true,
-                            child: Container(
-                              margin: EdgeInsets.all(2),
-                              // width: 50,
-                              // height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                color: whitecolor,
-                              ),
-
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(height: 6),
-                                  Text(
-                                    "Curent Score",
-
-                                    style: TextStyle(
-                                      color: primarycolor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-
-                                  Shimmer.fromColors(
-                                    baseColor: primarycolor,
-                                    highlightColor: primarycolor.withAlpha(50),
-                                    loop: 0,
-                                    period: Duration(seconds: 2),
-                                    child: Text(
-                                      //" -/--",
-                                      qnaController.scoreValue.value,
-                                      style: TextStyle(
-                                        color: primarycolor,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 6),
-                                  Text(
-                                    "Question Answered ",
-
-                                    style: TextStyle(
-                                      color: primarycolor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    qnaController.answerQuestion.value,
-
-                                    style: TextStyle(
-                                      color: primarycolor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-            ),
-
-            ProgressBarWidget(visible: qnaController.isLoading.value),
+          
+            ProgressBarWidget(visible: askAiController.isLoading.value),
           ],
         );
       }),
@@ -622,7 +525,6 @@ class _ChatWidgetState extends State<ChatWidget>
                       children: [
                         MarkdownWidget(
                           data: message,
-                          selectable: false,
                           shrinkWrap:
                               true, // Important: prevents infinite height
                           physics:
@@ -852,10 +754,6 @@ class _ChatWidgetState extends State<ChatWidget>
           Expanded(
             child: TextField(
               controller: messageController,
-              enableInteractiveSelection: false,
-              contextMenuBuilder: (context, editableTextState) {
-                return SizedBox.shrink();
-              },
               focusNode: _focusNode,
               minLines: 1,
               maxLines: 10,
@@ -864,10 +762,7 @@ class _ChatWidgetState extends State<ChatWidget>
 
               decoration: InputDecoration(
                 hintText: 'Type your message...',
-                hintStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 14,
-                ),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
                 /* border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         
@@ -893,10 +788,7 @@ class _ChatWidgetState extends State<ChatWidget>
               "assets/icons/svg_send_message.svg",
               height: 20,
               width: 20,
-              colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.onSurface,
-                BlendMode.srcIn,
-              ),
+              colorFilter: ColorFilter.mode( Theme.of(context).colorScheme.onSurface, BlendMode.srcIn)
             ),
             onPressed: () => sendMessage(messageController.text.trim()),
             style: IconButton.styleFrom(
@@ -1044,7 +936,9 @@ class _ChatWidgetState extends State<ChatWidget>
                     IconButton(
                       icon: Icon(Icons.send, color: Colors.blue),
                       onPressed: () {
-                        qnaController.sendAudioFile(
+
+                        SnackBarHelper.showFailureSnackBar(context, "Audio is not supported yet");
+                       /*  qnaController.sendAudioFile(
                           token: token,
                           context: context,
                           chapterId: widget.chapterId,
@@ -1053,7 +947,7 @@ class _ChatWidgetState extends State<ChatWidget>
                         );
                         setState(() {
                           isVoiceRecording = false;
-                        });
+                        }); */
                       },
                     ),
                   ],

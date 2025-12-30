@@ -146,6 +146,8 @@ class SignupController extends GetxController
     }
   }
 
+
+
   void verifySignupOTP(String email, String otp, BuildContext context) async {
     isLoading.value = true;
 

@@ -2,19 +2,20 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/views/screen/dashboard/ask_learn/askAiwidget.dart';
 import 'package:test_your_learing/views/screen/dashboard/quiz/qnapage/chatwidget.dart';
 
 import '../../../../../theme.dart';
-import '../../../../custom_widgets/circular_back_button.dart';
+import '../../../custom_widgets/circular_back_button.dart';
 
-class QnaPage extends StatefulWidget {
-  const QnaPage({Key? key}) : super(key: key);
+class AskAiPage extends StatefulWidget {
+  const AskAiPage({Key? key}) : super(key: key);
 
   @override
-  State<QnaPage> createState() => _QnaPageState();
+  State<AskAiPage> createState() => _AskAiPageState();
 }
 
-class _QnaPageState extends State<QnaPage> {
+class _AskAiPageState extends State<AskAiPage> {
   late String chapterId;
   late String bookId;
   late String chapterName;
@@ -96,7 +97,7 @@ class _QnaPageState extends State<QnaPage> {
               ],
             ),
           ),
-          body: ChatWidget(chapterId: chapterId, chapterName: chapterName),
+          body: AskAiWidget(chapterId: chapterId, chapterName: chapterName),
         ),
       ),
     );

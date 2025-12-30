@@ -4,6 +4,7 @@ class MultiSegmentCircle extends StatelessWidget {
   final double completedPercent;
   final double inProgressPercent;
   final double notStartedPercent;
+  final num totalHoursSpent;
 
   final Color completedColor;
   final Color inProgressColor;
@@ -14,6 +15,7 @@ class MultiSegmentCircle extends StatelessWidget {
     required this.completedPercent,
     required this.inProgressPercent,
     required this.notStartedPercent,
+    required this.totalHoursSpent,
     required this.completedColor,
     required this.inProgressColor,
     required this.notStartedColor,
@@ -34,9 +36,9 @@ class MultiSegmentCircle extends StatelessWidget {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children:  [
             Text(
-              '-',
+             totalHoursSpent.toString(),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text('hours', style: TextStyle(fontSize: 12, color: Colors.grey)),

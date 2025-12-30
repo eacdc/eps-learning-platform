@@ -154,12 +154,13 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildGetOtpForm(BuildContext context) {
     return SafeArea(
-      child: Obx(()=>Stack(
-        children: [
-          SingleChildScrollView(
-            child: Form(
-              key: _formKey5,
-              child: Column(
+      child: Obx(
+        () => Stack(
+          children: [
+            SingleChildScrollView(
+              child: Form(
+                key: _formKey5,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -181,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-          
+
                     SizedBox(height: 24),
                     /*  Text("Welcome back to ${Constants.appname}",
                         style: Typo.Medium.copyWith(
@@ -206,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(height: 8),
-          
+
                     Text(
                       "Please login first to start your journey!!",
                       textAlign: TextAlign.start,
@@ -256,7 +257,8 @@ class _LoginPageState extends State<LoginPage> {
                             onChanged: (val) {
                               authController.emailid.value = val;
                             },
-                            onSaved: (val) => authController.emailid.value = val!,
+                            onSaved:
+                                (val) => authController.emailid.value = val!,
                             validator:
                                 (val) =>
                                     (val!.isEmpty || val!.length < 10)
@@ -287,7 +289,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           SizedBox(height: 12),
-          
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -301,12 +303,12 @@ class _LoginPageState extends State<LoginPage> {
                                       });
                                     },
                                     activeColor: primarycolor,
-          
+
                                     side: BorderSide(),
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
                                     visualDensity: VisualDensity.compact,
-          
+
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(5),
                                       side: BorderSide(color: gray),
@@ -318,7 +320,9 @@ class _LoginPageState extends State<LoginPage> {
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                       color:
-                                          Theme.of(context).colorScheme.onSurface,
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                     ),
                                     //
                                   ),
@@ -327,7 +331,7 @@ class _LoginPageState extends State<LoginPage> {
                               InkWell(
                                 onTap: () {
                                   Get.to(() => ForgotPasswordPage());
-          
+
                                   //  Get.to(() => SignupPage());
                                 },
                                 child: Align(
@@ -347,8 +351,9 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-          
+
                           SizedBox(height: 16),
+
                           CustomGradiantButton(
                             loading: loginController.isLoading.value,
                             buttonColor: primarycolor,
@@ -356,30 +361,34 @@ class _LoginPageState extends State<LoginPage> {
                             textColor: onprimary,
                             onPressed: () {
                               /*     final form = _formKey.currentState;
-                                if (form!.validate()) {
-                                  form.save();
-                                  authController.getOtp(context);
-                                  authController.showProgressbar.value = true;
-                                } */
-          
+                                     if (form!.validate()) {
+                                 form.save();
+                                 authController.getOtp(context);
+                                     authController.showProgressbar.value = true;
+                                  } */
+
                               final _email = emailController.text;
                               final _password = passwordController.text;
-          
-                              if (validateCredentials(_email, _password, context)) {
+
+                              if (validateCredentials(
+                                _email,
+                                _password,
+                                context,
+                              )) {
                                 /* loginController.loginUser(
-                                      _email, _password, context); */
+                                  _email, _password, context); */
                                 loginController.loginUser(
                                   _email,
                                   _password,
                                   context,
                                 );
-          
+
                                 FocusManager.instance.primaryFocus?.unfocus();
                               }
                             },
                           ),
                           const SizedBox(height: 16),
-          
+
                           Material(
                             borderRadius: BorderRadius.circular(32.0),
                             elevation: 0,
@@ -477,21 +486,20 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-          
+
                           SizedBox(height: 16),
                         ],
                       ),
                     ),
                   ],
                 ),
+              ),
             ),
-          ),
-           ProgressBarWidget(
-                  visible:loginController.getStartLoading.value,
-                ),
-        ],
+            ProgressBarWidget(visible: loginController.getStartLoading.value),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildVerifyOtpForm(BuildContext context) {

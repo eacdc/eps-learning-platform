@@ -20,6 +20,7 @@ import '../../../../controllers/score_controller.dart';
 import '../../../../helper/getx_helper.dart';
 import '../../../../helper/sharedpreference_helper.dart'
     show SharedPreferencesService;
+import '../../../../models/home_model/ranking_response_model.dart';
 import '../../../../models/my_subscription_model/my_subscription_model.dart';
 import '../../../custom_widgets/performance_overview_card.dart';
 import '../quiz/qnapage/qna_page.dart';
@@ -566,11 +567,12 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       token = SharedPreferencesService.getAccessToken() ?? '';
       userId = SharedPreferencesService.getUserId() ?? '';
-      homeController.getRecentActivity(
+
+      /* homeController.getRecentActivity(
         token: token,
         userid: userId,
         context: context,
-      );
+      ); */
 
       /* homeController.getScoreBoard(
         token: token,
@@ -578,17 +580,29 @@ class _HomePageState extends State<HomePage> {
         context: context,
       ); */
 
-      scoreController.getUnifiedScore(
+      scoreController.getAllUnifiedScore(
         token: token,
         context: context,
         userId: userId,
       );
 
-      homeController.getChapterStats(
+       scoreController.getPerformanceOverview(
+                      token: token,
+                      context: context,
+                      userid: userId,
+                      filter: null,
+                    );
+
+      /*   scoreController.getUnifiedScore(
         token: token,
         context: context,
-        userid: userId,
-      );
+        userId: userId,
+      ); */
+
+      /*    homeController.getMyRanking(
+        token: token,
+        context: context,
+      ); */
     });
   }
 
@@ -597,8 +611,11 @@ class _HomePageState extends State<HomePage> {
     final themeColors = Theme.of(context).colorScheme;
 
     return Obx(() {
-      final recentBooks =
-          homeController.recent_activity.value?.data?.recentBooks ?? [];
+      /* final recentBooks =
+          homeController.recent_activity.value?.data?.recentBooks ?? []; */
+
+   final recentactivity =
+          scoreController.all_unified_score.value?.data?.recent?.activities ?? []; 
 
       /*    final scoreboard = homeController.scoreboard.value?.data?.summary;
      
@@ -611,16 +628,26 @@ class _HomePageState extends State<HomePage> {
       final String pointsEarned =
           (scoreboard?.totalPointsEarned?.toString() ?? 'N/A'); */
 
-      final unifiedscore = scoreController.unified_score.value?.data?.basic;
+      final unifiedscore_basic =
+          scoreController.all_unified_score.value?.data?.basic;
+
+      final unified_scoreboard =
+          scoreController.all_unified_score.value?.data?.scoreboard;
 
       final String quizInProgress =
-          (unifiedscore?.chaptersInProgress?.toString() ?? 'N/A');
+          (unified_scoreboard?.summary?.inProgressCount?.toString() ?? 'N/A');
       final String quizCompleted =
-          (unifiedscore?.chaptersCompleted?.toString() ?? 'N/A');
+          (unified_scoreboard?.summary?.completedCount?.toString() ?? 'N/A');
       final String totalHours =
-          (unifiedscore?.totalTimeSpentHours?.toString() ?? 'N/A');
+          (unifiedscore_basic?.totalTimeSpentHours?.toString() ?? 'N/A');
+
+      final String totalLearningHours =
+          (unifiedscore_basic?.learningTimeSpentHours?.toString() ?? 'N/A');
+
+      final String totalQuizHours =
+          (unifiedscore_basic?.quizTimeSpentHours?.toString() ?? 'N/A');
       final String pointsEarned =
-          (unifiedscore?.totalPointsEarned?.toString() ?? 'N/A');
+          (unifiedscore_basic?.totalPointsEarned?.toString() ?? 'N/A');
 
       return Container(
         // color: Theme.of(context).colorScheme.surface,
@@ -841,14 +868,7 @@ class _HomePageState extends State<HomePage> {
                       description: 'Completed Quizzes',
                       onTap: () => print('Tapped New Users'),
                     ),
-                    buildDashboardItem(
-                      topColor: const Color(0xff9962DE),
-                      bottomColor: const Color(0xff948DFF),
-                      value: totalHours,
-                      iconPath: 'assets/icons/png_dash_totalhour.png',
-                      description: 'Total Hours spent',
-                      onTap: () => print('Tapped New Users'),
-                    ),
+
                     buildDashboardItem(
                       topColor: const Color(0xff3A9F9F),
                       bottomColor: const Color(0xff00D5AA),
@@ -856,6 +876,20 @@ class _HomePageState extends State<HomePage> {
                       iconPath: 'assets/icons/png_dash_pointearn.png',
                       description: 'Points earned',
                       onTap: () => print('Tapped New Users'),
+                    ),
+
+                    buildDashboardItem(
+                      topColor: const Color(0xff9962DE),
+                      bottomColor: const Color(0xff948DFF),
+                      value: totalHours,
+                      iconPath: 'assets/icons/png_dash_totalhour.png',
+                      description: 'Total Hours spent',
+                      onTap: () => print('Tapped New Users'),
+                      subItem: true,
+                      subItem1Title: "Learning",
+                      subItem1Desc: totalLearningHours,
+                      subItem2Title: "Quiz",
+                      subItem2Desc: totalQuizHours,
                     ),
                   ],
                 ),
@@ -879,24 +913,24 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 12),
 
                 SizedBox(
-                  height: 150,
+                  height: 120,
 
                   // child: Image.asset("assets/images/png_no_recentactivity.png"),
                   child:
-                      recentBooks.isNotEmpty
+                      recentactivity.isNotEmpty
                           ? ListView.builder(
                             //physics: NeverScrollableScrollPhysics(),
                             scrollDirection: Axis.horizontal,
                             padding: EdgeInsets.symmetric(horizontal: 0),
                             shrinkWrap: true,
-                            itemCount: recentBooks.length,
+                            itemCount: recentactivity.length,
                             itemBuilder: (context, index) {
                               final Gradient randomGradient =
                                   getGradientByIndex(index);
 
-                              final books = recentBooks[index];
-                              final progressPercentage =
-                                  books.progressPercentage ?? 0.0;
+                              final books = recentactivity[index];
+                              final progressPercentage =0.0;
+                                //  books.progressPercentage ?? 0.0;
                               return Container(
                                 width: 270,
                                 margin: EdgeInsets.only(right: 1, left: 10),
@@ -954,7 +988,7 @@ class _HomePageState extends State<HomePage> {
                                         // Title Text with overflow fix
                                         Expanded(
                                           child: Text(
-                                            books.title ?? "",
+                                            books.chapterTitle ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w700,
@@ -968,9 +1002,9 @@ class _HomePageState extends State<HomePage> {
                                       ],
                                     ),
                                     SizedBox(height: 8),
-                                    Row(
+                                   /*  Row(
                                       children: [
-                                        Center(
+                                       /*  Center(
                                           child: Text(
                                             "${books.chaptersCompleted ?? 0}/${books.chaptersAttempted ?? 0} Chapters",
                                             style: TextStyle(
@@ -979,7 +1013,7 @@ class _HomePageState extends State<HomePage> {
                                               color: whitecolor,
                                             ),
                                           ),
-                                        ),
+                                        ), */
                                         Spacer(),
                                         Text(
                                           //"${books.chaptersCompleted ?? 0}/${books.chaptersAttempted ?? 0} Chapters",
@@ -1020,32 +1054,45 @@ class _HomePageState extends State<HomePage> {
                                         );
                                       },
                                     ),
-                                    SizedBox(height: 8),
+                                    SizedBox(height: 8), */
+                                    Spacer(),
+
 
                                     Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
+
                                       children: [
                                         Center(
                                           child: Text(
-                                            "Quiz in-Progress",
+                                             books.type ?? "",
                                             style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
-                                              color: whitecolor.withAlpha(200),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: whitecolor.withAlpha(250),
                                             ),
                                           ),
                                         ),
                                         Spacer(),
                                         InkWell(
                                           onTap: () {
-                                            _showChapterBottomsheet(
+                                            /* _showChapterBottomsheet(
                                               context,
                                               mysubscriptionController,
                                               books.bookId ?? "",
                                               books,
                                               token,
-                                            );
+                                            ); */
+
+                                             Get.to(
+                                          () => const QnaPage(),
+                                          arguments: {
+                                            'chapterId': books.chapterId ?? '',
+                                            'chapterName':
+                                                books.chapterTitle ?? '',
+                                            'bookId': books.chapterId ?? '',
+                                          },
+                                        );
                                           },
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
@@ -1088,11 +1135,24 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 SizedBox(height: 16),
+
+                buildRankingButton(context, homeController),
+
+                SizedBox(height: 12),
+
                 PerformanceOverviewCard(
                   chapterStats:
-                      homeController.chapterStates.value?.data?.overall,
+                      scoreController.performance_overview_new.value,
+                     // homeController.chapterStates.value?.data?.overall,
                   onChanged: (value) {
-                    homeController.getChapterStats(
+                    /* homeController.getChapterStats(
+                      token: token,
+                      context: context,
+                      userid: userId,
+                      filter: value,
+                    ); */
+
+                     scoreController.getPerformanceOverview(
                       token: token,
                       context: context,
                       userid: userId,
@@ -1104,11 +1164,716 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
 
-            ProgressBarWidget(visible: homeController.isLoading.value),
+            ProgressBarWidget(visible: homeController.isLoading.value || scoreController.isLoading.value),
           ],
         ),
       );
     });
+  }
+
+  Widget buildRankingButton(
+    BuildContext context,
+    HomeController rankingController,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        _showRankingBottomsheet(context, rankingController, token);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [primarycolor, primarycolor.withAlpha(200)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: primarycolor.withAlpha(100),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(50),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.emoji_events,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'My Ranking',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'View Leaderboard',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withAlpha(200),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(50),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRankingBottomsheet(
+    BuildContext context,
+    HomeController rankingController,
+    String token,
+  ) {
+    rankingController.getMyRanking(context: context, token: token);
+
+    showModalBottomSheet(
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: SafeArea(
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.8,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              builder: (
+                BuildContext context,
+                ScrollController scrollController,
+              ) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Fixed Header Section
+                      Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 12,
+                              right: 12,
+                              top: 12,
+                              bottom: 1,
+                            ),
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 50,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                      color: lightbluetext,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                Center(
+                                  child: Text(
+                                    "Leaderboard",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Divider(thickness: 1, color: lightbluetext),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            right: 10,
+                            top: 10,
+                            child: Material(
+                              color: lightbluetext,
+                              elevation: 0,
+                              borderRadius: BorderRadius.circular(32),
+                              child: InkWell(
+                                onTap: () => Navigator.pop(context),
+                                borderRadius: BorderRadius.circular(32),
+                                splashColor: primarycolor.withAlpha(50),
+                                child: Container(
+                                  height: 32,
+                                  width: 32,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // Scrollable Content
+                      Expanded(
+                        child: Obx(() {
+                          if (rankingController.isLoading.value) {
+                            return Center(
+                              child: ProgressBarWidget(
+                                visible: rankingController.isLoading.value,
+                              ),
+                            );
+                          }
+
+                          final rankingData =
+                              rankingController.myRanking.value?.data;
+
+                          if (rankingData == null) {
+                            return Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    height: 100,
+                                    width: 100,
+                                    padding: const EdgeInsets.all(5),
+                                    child: Image.asset(
+                                      "assets/images/png_no_collection.png",
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "No Ranking Data Found",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: primarycolor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView(
+                            controller: scrollController,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            children: [
+                              // Current User Stats Card
+                              _buildUserStatsCard(
+                                context,
+                                rankingData.userRanking,
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Top 5 Users Section
+                              if (rankingData.usersAbove.isNotEmpty) ...[
+                                _buildSectionHeader(
+                                  context,
+                                  "Top Performers 🏆",
+                                ),
+                                const SizedBox(height: 8),
+                                ...rankingData.usersAbove.map(
+                                  (user) => _buildRankingCard(
+                                    context,
+                                    user,
+                                    isTopRanker: user.rank <= 3,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Current User Highlight
+                              _buildSectionHeader(context, "Your Position"),
+                              const SizedBox(height: 8),
+                              _buildCurrentUserCard(
+                                context,
+                                rankingData.userRanking,
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              // Users Below Section
+                              if (rankingData.usersBelow.isNotEmpty) ...[
+                                _buildSectionHeader(
+                                  context,
+                                  "Close Competitors",
+                                ),
+                                const SizedBox(height: 8),
+                                ...rankingData.usersBelow.map(
+                                  (user) => _buildRankingCard(context, user),
+                                ),
+                              ],
+
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // User Stats Card
+  Widget _buildUserStatsCard(BuildContext context, UserRanking userRanking) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primarycolor, primarycolor.withAlpha(200)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: primarycolor.withAlpha(80),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userRanking.fullname,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '@${userRanking.username}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white.withAlpha(200),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.emoji_events,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Rank ${userRanking.rank}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: primarycolor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(color: Colors.white38, height: 1),
+          const SizedBox(height: 16),
+
+          // Stats Grid
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem(
+                icon: Icons.star,
+                label: 'Points',
+                value: '${userRanking.points}',
+              ),
+              Container(width: 1, height: 40, color: Colors.white38),
+              _buildStatItem(
+                icon: Icons.quiz,
+                label: 'Quiz Time',
+                value: '${userRanking.quizTimeHours.toStringAsFixed(1)}h',
+              ),
+              Container(width: 1, height: 40, color: Colors.white38),
+              _buildStatItem(
+                icon: Icons.school,
+                label: 'Learning',
+                value: '${userRanking.learningTimeHours.toStringAsFixed(1)}h',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white, size: 22),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.white.withAlpha(200),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Section Header
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        color: Theme.of(context).colorScheme.onSurface,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+
+  // Ranking Card for Other Users
+  Widget _buildRankingCard(
+    BuildContext context,
+    RankedUser user, {
+    bool isTopRanker = false,
+  }) {
+    Color getRankColor(int rank) {
+      switch (rank) {
+        case 1:
+          return const Color(0xFFFFD700); // Gold
+        case 2:
+          return const Color(0xFFC0C0C0); // Silver
+        case 3:
+          return const Color(0xFFCD7F32); // Bronze
+        default:
+          return primarycolor;
+      }
+    }
+
+    String getRankEmoji(int rank) {
+      switch (rank) {
+        case 1:
+          return '🥇';
+        case 2:
+          return '🥈';
+        case 3:
+          return '🥉';
+        default:
+          return '';
+      }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color:
+            isTopRanker
+                ? Theme.of(
+                  context,
+                ).colorScheme.secondaryContainer.withAlpha(100)
+                : Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color:
+              isTopRanker
+                  ? getRankColor(user.rank).withAlpha(100)
+                  : Theme.of(
+                    context,
+                  ).colorScheme.onSecondaryContainer.withAlpha(50),
+          width: isTopRanker ? 2 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Rank Badge
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color:
+                  isTopRanker
+                      ? getRankColor(user.rank).withAlpha(50)
+                      : primarycolor.withAlpha(25),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                isTopRanker && user.rank <= 3
+                    ? getRankEmoji(user.rank)
+                    : '${user.rank}',
+                style: TextStyle(
+                  fontSize: isTopRanker ? 20 : 14,
+                  color: isTopRanker ? getRankColor(user.rank) : primarycolor,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // User Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.fullname,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isTopRanker ? FontWeight.w700 : FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '@${user.username}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Stats
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.star, size: 14, color: Colors.amber.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${user.points}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${user.quizTimeHours.toStringAsFixed(1)}h',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Current User Highlight Card
+  Widget _buildCurrentUserCard(BuildContext context, UserRanking userRanking) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primarycolor.withAlpha(40), primarycolor.withAlpha(20)],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: primarycolor.withAlpha(100), width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              color: primarycolor,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '${userRanking.rank}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      userRanking.fullname,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: primarycolor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        'YOU',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '@${userRanking.username}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.star, size: 15, color: Colors.amber.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${userRanking.points}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${userRanking.quizTimeHours.toStringAsFixed(1)}h',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -1119,10 +1884,17 @@ Widget buildDashboardItem({
   required String iconPath,
   required String description,
   VoidCallback? onTap,
+  bool subItem = false,
+  String? subItem1Title,
+  String? subItem1Desc,
+  String? subItem2Title,
+  String? subItem2Desc,
 }) {
   return InkWell(
     onTap: onTap,
+    borderRadius: BorderRadius.circular(12),
     child: Container(
+      // height: subItem ? 130 : 100,
       height: 100,
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -1132,12 +1904,11 @@ Widget buildDashboardItem({
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Value Text
+          /// ---------------- Top Section ----------------
           Row(
             children: [
               Text(
@@ -1148,36 +1919,107 @@ Widget buildDashboardItem({
                   color: Colors.white,
                 ),
               ),
-              Spacer(),
-              // Icon
+              const Spacer(),
               Container(
-                padding: EdgeInsets.all(6),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: whitecolor,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: Image.asset(
-                  iconPath,
-                  width: 16,
-                  height: 16,
-                  //color: Colors.white,
-                ),
+                child: Image.asset(iconPath, width: 16, height: 16),
               ),
             ],
           ),
 
-          // Description
+          subItem ? const SizedBox(height: 3) : SizedBox(height: 16),
+
           Text(
             description,
-            style: const TextStyle(
-              fontSize: 13,
+            style: TextStyle(
+              fontSize: subItem ? 11 : 13,
               color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
-            textAlign: TextAlign.center,
           ),
+            subItem ? Spacer() : SizedBox.shrink(),
+
+          /// ---------------- Sub Items ----------------
+          if (subItem) ...[
+            SizedBox(
+              height: 1,
+              child: Divider(
+                  color: Colors.white.withAlpha(150),
+                thickness: 0.4,
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: _SubItemWidget(
+                    title: subItem1Title,
+                    desc: subItem1Desc,
+                  ),
+                ),
+
+                Container(
+                  height: 16,
+                  width: 1,
+                  color: Colors.white.withAlpha(150),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+
+                Expanded(
+                  child: _SubItemWidget(
+                    title: subItem2Title,
+                    desc: subItem2Desc,
+                    alignEnd: true,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     ),
   );
+}
+
+class _SubItemWidget extends StatelessWidget {
+  final String? title;
+  final String? desc;
+  final bool alignEnd;
+
+  const _SubItemWidget({this.title, this.desc, this.alignEnd = false});
+
+  @override
+  Widget build(BuildContext context) {
+    if ((title?.isEmpty ?? true) && (desc?.isEmpty ?? true)) {
+      return const SizedBox();
+    }
+
+    return Column(
+      crossAxisAlignment:
+          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(
+          desc ?? "",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
+        ),
+
+        const SizedBox(height: 0),
+        Text(
+          title ?? "",
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
 }

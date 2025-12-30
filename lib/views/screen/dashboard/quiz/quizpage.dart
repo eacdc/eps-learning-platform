@@ -5,7 +5,10 @@ import 'package:test_your_learing/controllers/collection_controller.dart';
 import 'package:test_your_learing/controllers/my_subscription_controller.dart';
 import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
+import 'package:test_your_learing/views/custom_widgets/primary_button.dart';
 import 'package:test_your_learing/views/custom_widgets/search_field.dart';
+import 'package:test_your_learing/views/custom_widgets/secondary_button.dart';
+import 'package:test_your_learing/views/screen/dashboard/ask_learn/ask_ai_page.dart';
 
 import '../../../../models/collection_model/books_collection_list.dart';
 import '../../../../models/my_subscription_model/my_subscription_model.dart';
@@ -122,12 +125,11 @@ class _MySubscriptionPageState extends State<QuizPage> {
         print("reach end");
         mysubscriptionController.pageNo.value =
             mysubscriptionController.pageNo.value + 1;
-       mysubscriptionController.getMyBooksCollectionFilter(
+        mysubscriptionController.getMyBooksCollectionFilter(
           token: token,
           context: context,
           pageNumber: mysubscriptionController.pageNo.value,
         );
-
 
         //get More Task
       }
@@ -147,8 +149,7 @@ class _MySubscriptionPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     return Obx(
       () => Container(
-            color: Theme.of(context).colorScheme.surface
-,
+        color: Theme.of(context).colorScheme.surface,
         child: Stack(
           // fit: StackFit.loose,
           //  alignment: AlignmentDirectional.center,
@@ -160,7 +161,7 @@ class _MySubscriptionPageState extends State<QuizPage> {
               //  mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 1),
-        
+
                 mysubscriptionController.bookCollectionList.value.isNotEmpty
                     ? Expanded(
                       // height: 200,
@@ -212,12 +213,9 @@ class _MySubscriptionPageState extends State<QuizPage> {
                                   // Optional: Handle cancel action
                                   print('User canceled');
                                 },
-                                
-                                
                               );
                             },
-                         context: context
-                         
+                            context: context,
                           );
                         },
                       ),
@@ -230,16 +228,16 @@ class _MySubscriptionPageState extends State<QuizPage> {
                     ),
               ],
             ),
-          
-          ProgressBarWidget(visible: mysubscriptionController.isLoading.value)
-          
-             ],
+
+            ProgressBarWidget(
+              visible: mysubscriptionController.isLoading.value,
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 
 Widget bookListItem({
   required String imageUrl,
@@ -248,16 +246,19 @@ Widget bookListItem({
   required VoidCallback onViewChapter,
   required VoidCallback onSubscribe,
   required BuildContext context,
-
 }) {
   return Container(
     margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     padding: const EdgeInsets.all(12),
-    decoration:BoxDecoration(
+    decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
-        BoxShadow(color:Theme.of(context).colorScheme.onSurface.withAlpha(40), blurRadius: 6, offset: Offset(0, 2)),
+        BoxShadow(
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(40),
+          blurRadius: 6,
+          offset: Offset(0, 2),
+        ),
       ],
     ),
     child: Row(
@@ -401,7 +402,7 @@ void _showChapterBottomsheet(
             /* ............... */
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -435,7 +436,8 @@ void _showChapterBottomsheet(
                                   "Book Details",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color:  Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -567,7 +569,10 @@ void _showChapterBottomsheet(
                                             "Subject - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -578,7 +583,10 @@ void _showChapterBottomsheet(
                                             bookData.subject ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -592,7 +600,10 @@ void _showChapterBottomsheet(
                                             "Publisher - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -604,7 +615,10 @@ void _showChapterBottomsheet(
                                             bookData.author ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -617,7 +631,10 @@ void _showChapterBottomsheet(
                                             "Grade - ",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -625,10 +642,13 @@ void _showChapterBottomsheet(
 
                                           //  Spacer(),
                                           Text(
-                                             bookData.grade ?? "",
+                                            bookData.grade ?? "",
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -747,95 +767,115 @@ void _showChapterBottomsheet(
                                 vertical: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(
-                                  150,
-                                ), //  Background color
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer
+                                    .withAlpha(150), //  Background color
                                 borderRadius: BorderRadius.circular(
                                   10,
                                 ), //  Curved border
                                 border: Border.all(
-                                  color: Theme.of(context).colorScheme.onSecondaryContainer.withAlpha(20),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer
+                                      .withAlpha(20),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 5,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: primarycolor.withAlpha(25),
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            '${index + 1}',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: primarycolor,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: primarycolor.withAlpha(25),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            chapterdata.title ?? "No Name",
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              /* height:
-                                                  1.4, */
-                                              // improves readability for multi-line
-                                            ),
-                                            softWrap: true,
+                                        child: Text(
+                                          '${index + 1}',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: primarycolor,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          chapterdata.title ?? "No Name",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            /* height:
+                                                1.4, */
+                                            // improves readability for multi-line
+                                          ),
+                                          softWrap: true,
+                                        ),
+                                      ),
+                                    ],
                                   ),
 
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      Get.to(
-                                        () => const QnaPage(),
-                                        arguments: {
-                                          'chapterId': chapterdata.id ?? '',
-                                          'chapterName':
-                                              chapterdata.title ?? '',
-                                          'bookId': chapterdata.bookId ?? '',
-                                        },
-                                      );
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: primarycolor,
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      child: const Text(
-                                        'Start Quiz',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
+                                  SizedBox(height: 8),
+
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: SecondaryButton(
+                                          buttonColor: primarycolor,
+                                          textValue: "Learn",
+                                          textColor: primarycolor,
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Get.to(
+                                              () => const AskAiPage(),
+                                              arguments: {
+                                                'chapterId':
+                                                    chapterdata.id ?? '',
+                                                'chapterName':
+                                                    chapterdata.title ?? '',
+                                                'bookId':
+                                                    chapterdata.bookId ?? '',
+                                              },
+                                            );
+                                          },
+                                          height: 34,
+                                          startIcon: "assets/images/learn.png",
                                         ),
                                       ),
-                                    ),
+                                      SizedBox(width: 24),
+                                      Expanded(
+                                        child: PrimaryButton(
+                                          buttonColor: primarycolor,
+                                          textValue: "Start Quiz",
+                                          textColor: whitecolor,
+                                          startIcon: "assets/images/quiz.png",
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Get.to(
+                                              () => const QnaPage(),
+                                              arguments: {
+                                                'chapterId':
+                                                    chapterdata.id ?? '',
+                                                'chapterName':
+                                                    chapterdata.title ?? '',
+                                                'bookId':
+                                                    chapterdata.bookId ?? '',
+                                              },
+                                            );
+                                          },
+                                          height: 34,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

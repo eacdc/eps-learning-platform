@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:test_your_learing/models/response_model/api_response.dart';
 import 'package:test_your_learing/models/response_model/api_response_new.dart';
 
+import '../helper/sharedpreference_helper.dart';
+import '../views/screen/authentication/login.dart';
+
 class ApiManager {
   static const String baseUrl = "https://chatbot-backend-v-4.onrender.com";
 
@@ -41,11 +44,15 @@ class ApiManager {
     return "/api/chat/chapter-history/$chapterId";
   }
 
+  static String askHistoryList(String chapterId) {
+    return "/api/chapters/chat_ask-history/$chapterId";
+  }
 
-   static String getChatStats(String chapterId) {
+  static const String askChat = "/api/chapters/chat_ask";
+
+  static String getChatStats(String chapterId) {
     return "/api/chat/chapter-stats/$chapterId";
   }
-  
 
   static const String userProfile = "/api/users/me";
   static const String updateProfile = "/api/users/profile";
@@ -83,15 +90,17 @@ class ApiManager {
     return "/api/scores/chapter-stats/$userId";
   }
 
-
-    static String unifiedScores(String userId) {
+  static String unifiedScores(String userId) {
     return "/api/unified-scores/$userId";
   }
 
+   static String myRanking() {
+    return "/api/ranking/my-ranking";
+  }
 
-
-
-
+  static String getPerformanceOverview(String userId) {
+    return "/api/unified-scores/$userId?include=scoreboard";
+  }
 
   //-----------------------------------------\\
 
@@ -211,6 +220,15 @@ class ApiManager {
 
       final dynamic decoded = jsonDecode(response.body);
 
+      /// TOKEN EXPIRED HANDLING
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        await _handleTokenExpired();
+        return ApiResponseNew(
+          statusCode: response.statusCode,
+          data: {"message": "Session expired"},
+        );
+      }
+
       return ApiResponseNew(statusCode: response.statusCode, data: decoded);
     } catch (e) {
       print("XCV " + endpoint + " " + e.toString());
@@ -219,6 +237,15 @@ class ApiManager {
         data: {"message": "Something went wrong: $e"},
       );
     }
+  }
+
+  static Future<void> _handleTokenExpired() async {
+    SharedPreferencesService.clearAllPreferences();
+    SharedPreferencesService.setFirstTimeStatus(
+      false,
+    ); // for not showing onboard screen
+    Get.offAll(() => LoginPage());
+ //   Get.snackbar("Session Expired", "Please login again");
   }
 
   /*   static Future<dynamic> request({

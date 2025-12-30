@@ -5,6 +5,7 @@ class ChatResponseModel {
   final String? agentType;
   final String? previousQuestionId;
   final Score? score;
+  final String? agentName;
 
   ChatResponseModel({
     this.message,
@@ -13,18 +14,21 @@ class ChatResponseModel {
     this.agentType,
     this.previousQuestionId,
     this.score,
+    this.agentName,
   });
 
   factory ChatResponseModel.fromJson(Map<String, dynamic> json) {
     return ChatResponseModel(
       message: json['message'],
       questionId: json['questionId'],
-      fullQuestion: json['fullQuestion'] != null
-          ? FullQuestion.fromJson(json['fullQuestion'])
-          : null,
+      fullQuestion:
+          json['fullQuestion'] != null
+              ? FullQuestion.fromJson(json['fullQuestion'])
+              : null,
       agentType: json['agentType'],
       previousQuestionId: json['previousQuestionId'],
       score: json['score'] != null ? Score.fromJson(json['score']) : null,
+      agentName: json['agentName'],
     );
   }
 
@@ -36,11 +40,10 @@ class ChatResponseModel {
       'agentType': agentType,
       'previousQuestionId': previousQuestionId,
       'score': score?.toJson(),
+      'agentName': agentName,
     };
   }
 }
-
-
 
 class FullQuestion {
   final String? questionId;
@@ -90,18 +93,12 @@ class FullQuestion {
   }
 }
 
-
-
 class Score {
   final num? marksAwarded;
   final num? maxMarks;
   final String? previousQuestion;
 
-  Score({
-    this.marksAwarded,
-    this.maxMarks,
-    this.previousQuestion,
-  });
+  Score({this.marksAwarded, this.maxMarks, this.previousQuestion});
 
   factory Score.fromJson(Map<String, dynamic> json) {
     return Score(

@@ -997,6 +997,8 @@ class _SignupPageState extends State<SignupPage> {
     return RegExp(r'^[a-zA-Z0-9._]{2,}$').hasMatch(username);
   }
 
+  
+  
   bool validateCredentials(
     String _username,
     String _fullname,

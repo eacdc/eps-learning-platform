@@ -282,8 +282,9 @@ class _CollectionPageState extends State<CollectionPage> {
                         ),
                       ),
 
-                      SizedBox(height: 12),
-                      SingleChildScrollView(
+                      SizedBox(height: 4),
+
+                     /*  SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           mainAxisAlignment:
@@ -316,7 +317,7 @@ class _CollectionPageState extends State<CollectionPage> {
                           ],
                         ),
                       ),
-
+ */
                       //SizedBox(height: 4),
                     ],
                   ),

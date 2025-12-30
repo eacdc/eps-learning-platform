@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'package:test_your_learing/constants/colors.dart';
-import 'package:test_your_learing/controllers/homeController/home_controller.dart';
-import 'package:test_your_learing/views/custom_widgets/multisegment_circulsr_indicator.dart';
+import 'package:test_your_learing/models/score_model/all_unified_score.dart';
 
 import '../../models/home_model/chapter_states_model.dart';
 import 'multisegment_painter.dart';
 
 class PerformanceOverviewCard extends StatefulWidget {
-  final OverallStats? chapterStats;
+  //final OverallStats? chapterStats;
+  final Scoreboard? chapterStats;
     final ValueChanged<String> onChanged;
 
   const PerformanceOverviewCard({super.key, required this.chapterStats,required this.onChanged,});
@@ -20,21 +17,44 @@ class PerformanceOverviewCard extends StatefulWidget {
 }
 
 class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
-  String selectedPeriod = 'Weekly';
-  final List<String> periods = ['Weekly', 'Monthly', 'Yearly'];
-
+String selectedPeriod = 'Last 7 Days';
+final List<String> periods = [
+  'Last 7 Days',
+  'Last 30 Days',
+  'Last 90 Days',
+];
   @override
   Widget build(BuildContext context) {
-    final chapterStats = widget.chapterStats;
+    final chapterStats = widget.chapterStats?.summary;
 
-    final totalbooks = chapterStats?.totalBooks ?? '-';
+    /* final totalbooks = chapterStats?.totalBooks ?? '-';
     final totalchapters = chapterStats?.totalChapters ?? '-';
     final completed = chapterStats?.completed?.count ??'-' ;
     final completed_percentage = (chapterStats?.completed?.percentage ?? 0)/100;
     final inProgress = chapterStats?.inProgress ?.count?? '-';
     final inProgress_percent =(chapterStats?.inProgress?.percentage??0)/100;
     final notStatrted = chapterStats?.notStarted?.count ?? '-';
-    final notStatrted_perentag = (chapterStats?.notStarted?.percentage??0)/100;
+    final notStatrted_perentag = (chapterStats?.notStarted?.percentage??0)/100; */
+
+    final int totalChapters = chapterStats?.totalQuizzes ?? 0;
+final int completed = chapterStats?.completedCount ?? 0;
+final int inProgress = chapterStats?.inProgressCount ?? 0;
+final int notStarted = chapterStats?.notStarted ?? 0;
+
+// --- Percentage calculations (safe) ---
+final double completedPercentage =
+    totalChapters > 0 ? completed / totalChapters : 0;
+
+final double inProgressPercentage =
+    totalChapters > 0 ? inProgress / totalChapters : 0;
+
+final double notStartedPercentage =
+    totalChapters > 0 ? notStarted / totalChapters : 0;
+
+    final num totalHoursSpent =
+    widget.chapterStats?.totalHoursSpent ?? 0;
+
+
     return Card(
       elevation: 0.5,
       color: Theme.of(context).colorScheme.secondaryContainer,
@@ -111,12 +131,13 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
             height: 120,
             width: 120,
              child: MultiSegmentCircle(
-               completedPercent:completed_percentage,
-               inProgressPercent: inProgress_percent,
-               notStartedPercent: notStatrted_perentag,
+               completedPercent: completedPercentage,
+               inProgressPercent: inProgressPercentage,
+               notStartedPercent: notStartedPercentage,
                completedColor:Colors.green,
                   inProgressColor:Colors.orange,
                notStartedColor: Colors.red,
+               totalHoursSpent: totalHoursSpent,
                
                ),
             
@@ -130,14 +151,14 @@ class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat("$completed/$totalchapters", 'Completed', Colors.green),
+                _buildStat("$completed/$totalChapters", 'Completed', Colors.green),
                 _buildStat(
-                  "$inProgress/$totalchapters",
+                  "$inProgress/$totalChapters",
                   'In Progress',
                   Colors.orange,
                 ),
                 _buildStat(
-                  "$notStatrted/$totalchapters",
+                  "$notStarted/$totalChapters",
                   'Not Started',
                   Colors.red,
                 ),

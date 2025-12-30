@@ -13,24 +13,17 @@ import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/chapter_model/chapter_model.dart';
 import 'package:test_your_learing/models/collection_model/books_collection_list.dart';
 import 'package:test_your_learing/models/qna_model/chat_response_nodel.dart';
-import 'package:test_your_learing/models/qna_model/chatmessage_model.dart';
+import 'package:test_your_learing/models/askAi_model/ask_message_model.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
 
-import '../models/qna_model/chat_state_model.dart';
+import '../models/askAi_model/ask_ai_response.dart';
 
-class QnaController extends GetxController
+class AskAiController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var isLoading = false.obs;
   var aiThinking = false.obs;
-  var scoreCardOpacity = 0.0.obs;
-  var scoreValue = "".obs;
-  var answerQuestion = "".obs;
-
-  var hideChatBox = false.obs;
 
   var pageNo = 1.obs;
-
-  var agentName = "closurechat.ai";
 
   //var selectedDepartment = Rxn<Department>(); // Holds the selected department
   //var selectedSeverity = Rxn<Severity>(); // Holds the selected department
@@ -42,9 +35,9 @@ class QnaController extends GetxController
 
   var isMoreDataAvailable = true.obs; // Tracks if more pages are available
 
-  var chatMessageList = List<ChatMessageModel>.empty().obs;
+  var chatMessageList = List<AskAiMessageModel>.empty().obs;
 
-  void _handleScrollForReverseList(ChatMessageModel message) {
+  void _handleScrollForReverseList(AskAiMessageModel message) {
     if (!scrollController.hasClients) return;
 
     final context = message.key.currentContext;
@@ -74,7 +67,7 @@ class QnaController extends GetxController
     }
   }
 
-  void addMessageToList(ChatMessageModel newChatModel) {
+  void addMessageToList(AskAiMessageModel newChatModel) {
     chatMessageList.add(newChatModel);
 
     // Wait for the UI to build so we can measure
@@ -83,7 +76,7 @@ class QnaController extends GetxController
     });
   }
 
-  DashboardController() {}
+  AskAiController() {}
 
   @override
   onInit() async {
@@ -102,7 +95,7 @@ class QnaController extends GetxController
     super.onClose();
   }
 
-  void getChatHistoryCollection({
+  void getAskHistoryCollection({
     required String token,
     required BuildContext context,
     required String chapterId,
@@ -154,7 +147,7 @@ class QnaController extends GetxController
     }
 
     var response = await ApiManager.requestNew(
-      endpoint: ApiManager.chatHistoryList(chapterId),
+      endpoint: ApiManager.askHistoryList(chapterId),
       method: "GET",
       /* body: {
           "page": pageNumber,
@@ -171,13 +164,14 @@ class QnaController extends GetxController
 
     try {
       if (response.isSuccess) {
-        /* if (response.data is List) {
-          List<ChatMessageModel> chatList =
+        if (response.data is List) {
+          List<AskAiMessageModel> chatList =
               (response.data as List)
-                  .map((item) => ChatMessageModel.fromJson(item))
+                  .map((item) => AskAiMessageModel.fromJson(item))
                   .toList();
           // use books
           chatMessageList.value = chatList;
+
 
           /*   // Scroll to top of the new message if needed
           Future.delayed(const Duration(milliseconds: 50), () {
@@ -187,34 +181,22 @@ class QnaController extends GetxController
               );
             }
           }); */
-        } else */
-
-        if (response.data is Map) {
-          if (response.data.containsKey('error')) {
+        } else if (response.data is Map) {
+          if (response.data.containsKey('error') ||
+              response.data.containsKey('message')) {
             print(
               "Error: ${response.data['error'] ?? response.data['message']}",
             );
 
             SnackBarHelper.showFailureSnackBar(
               context,
-              response.data['error'] ?? "Something went wrong",
+              response.data['error'] ?? response.data['message'],
             );
-          } else if (response.data.containsKey('messages')) {
-            /* List<ChatMessageModel> chatList =
-              (response.data as List)
-                  .map((item) => ChatMessageModel.fromJson( response.data['messages']))
-                  .toList(); */
-            List<ChatMessageModel> chatList =
-                (response.data['messages'] as List)
-                    .map((item) => ChatMessageModel.fromJson(item))
-                    .toList();
-
-            chatMessageList.value = chatList;
-
-            response.data['agentName'] != null &&
-                    response.data['agentName'] == agentName
-                ? hideChatBox.value = true
-                : hideChatBox.value = false;
+          } else {
+            AskAiMessageModel chatList = AskAiMessageModel.fromJson(
+              response.data,
+            );
+            // use single book
           }
         } else {
           print("Unhandled response format");
@@ -242,7 +224,7 @@ class QnaController extends GetxController
     }
   }
 
-  void sendChatMessage({
+  void sendAskMessage({
     required String token,
     required BuildContext context,
     required String chapterId,
@@ -251,7 +233,7 @@ class QnaController extends GetxController
   }) async {
     aiThinking.value = true;
 
-    final aiLoadingModel = ChatMessageModel(
+    final aiLoadingModel = AskAiMessageModel(
       role: 'assistant',
       content: "Ai Thinking...",
       isAudio: false,
@@ -278,7 +260,7 @@ class QnaController extends GetxController
     ); */
 
     var response = await ApiManager.requestNew(
-      endpoint: ApiManager.sendChat,
+      endpoint: ApiManager.askChat,
       method: "POST",
       body: {
         "userId": userId,
@@ -306,19 +288,17 @@ class QnaController extends GetxController
             );
             print("xxx2");
           } else {
-            ChatResponseModel chatResponseModel = ChatResponseModel.fromJson(
+            AskAiResponse chatResponseModel = AskAiResponse.fromJson(
               response.data,
             );
-
-
 
             print("xxx3");
             // use single book
 
-            final chatModel = ChatMessageModel(
+            final chatModel = AskAiMessageModel(
               id: DateTime.now().toIso8601String(),
               role: 'assistant',
-              content: chatResponseModel.message ?? "Something Went Wrong",
+              content: chatResponseModel.response ?? "Something Went Wrong",
               isAudio: false,
               audioFileId: null,
               messageId: null,
@@ -343,18 +323,6 @@ class QnaController extends GetxController
                 scoreValue.value ="";
               });
             } */
-
-            getChapterStats(
-              token: token,
-              context: context,
-              chapterId: chapterId,
-              userId: userId,
-            );
-            //disable chat box
-
-            chatResponseModel.agentName != null && chatResponseModel.agentName == agentName ? hideChatBox.value = true : hideChatBox.value = false;
-
-
           }
         } else {
           print("Unhandled response format");
@@ -469,7 +437,7 @@ class QnaController extends GetxController
               data.containsKey('redirect')) {
             //SnackBarHelper.showSuccessSnackBarGetx(data['transcription']);
             chatMessageList.add(
-              ChatMessageModel(
+              AskAiMessageModel(
                 id: DateTime.now().toIso8601String(),
                 role: 'user',
                 content: data['transcription'] ?? "",
@@ -480,7 +448,7 @@ class QnaController extends GetxController
               ),
             );
 
-            sendChatMessage(
+            sendAskMessage(
               token: token,
               context: context,
               chapterId: chapterId,
@@ -520,97 +488,5 @@ class QnaController extends GetxController
         //get More Task
       }
     });
-  }
-
-  void getChapterStats({
-    required String token,
-    required BuildContext context,
-    required String chapterId,
-    required String userId,
-  }) async {
-    //  isLoading.value = true;
-
-    var response = await ApiManager.requestNew(
-      endpoint: ApiManager.getChatStats(chapterId),
-      method: "GET",
-
-      token: token,
-    );
-
-    try {
-      if (response.isSuccess) {
-        if (response.data is List) {
-          /*  List<ChatMessageModel> chatList =
-              (response.data as List)
-                  .map((item) => ChatMessageModel.fromJson(item))
-                  .toList();
-          // use books
-          chatMessageList.value = chatList; */
-        } else if (response.data is Map) {
-          if (response.data.containsKey('error')) {
-            print(
-              "Error: ${response.data['error'] ?? response.data['message']}",
-            );
-            print("xxx2");
-          } else {
-            ChatStats chatState = ChatStats.fromJson(response.data);
-
-            // visible Score Graphics
-
-            if (chatState.hasStats != null && chatState.hasStats == true) {
-              scoreCardOpacity.value = 1.0;
-              scoreValue.value =
-                  "${formatNumber(chatState.earnedMarks)} / ${formatNumber(chatState.totalMarks)}";
-
-              answerQuestion.value = chatState.answeredQuestions.toString();
-              Future.delayed(const Duration(seconds: 6), () {
-                scoreCardOpacity.value = 0.0;
-                scoreValue.value = "";
-              });
-            }
-          }
-        } else {
-          print("Unhandled response format");
-        }
-      } else {
-        print("Request failed: ${response.statusCode}");
-
-        if (response.data.containsKey('error')) {
-          /*   final chatXModel = ChatMessageModel(
-            id: DateTime.now().toIso8601String(),
-            role: 'assistant',
-            content:
-                //"ttttttttttttttttttt",
-                "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum(The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from de Finibus Bonorum et Malorum by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham",
-            isAudio: false,
-            audioFileId: null,
-            messageId: null,
-            timestamp: DateTime.now().toIso8601String(),
-          );
-
-          addMessageToList(chatXModel); */
-
-          SnackBarHelper.showFailureSnackBar(
-            context,
-            response.data['error'] ?? "Something Went Wrong!",
-          );
-        }
-      }
-    } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, e.toString());
-
-      /*       isMoreDataAvailable.value = false; // No more pages to load
-      SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
-    } finally {
-      //isLoading.value = false;
-    }
-  }
-
-  String formatNumber(num? value) {
-    if (value == null) return "";
-    if (value % 1 == 0) {
-      return value.toInt().toString(); // remove .0
-    }
-    return value.toString(); // keep decimal if it exists
   }
 }
