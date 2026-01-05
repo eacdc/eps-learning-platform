@@ -121,17 +121,17 @@ class BasicStats {
   final int? totalChaptersInBooks;
   final int? quizzesTaken;
   final int? totalQuestionsAnswered;
-  final int? totalMarksEarned;
-  final int? totalMarksAvailable;
+  final num? totalMarksEarned;
+  final num? totalMarksAvailable;
   final num? overallScore;
-  final int? totalTimeSpentMinutes;
+  final num? totalTimeSpentMinutes;
   final num? totalTimeSpentHours;
-  final int? quizTimeSpentMinutes;
+  final num? quizTimeSpentMinutes;
   final num? quizTimeSpentHours;
-  final int? learningTimeSpentMinutes;
+  final num? learningTimeSpentMinutes;
   final num? learningTimeSpentHours;
-  final int? totalPointsEarned;
-  final int? points;
+  final num? totalPointsEarned;
+  final num? points;
 
   BasicStats({
     this.booksStarted,
@@ -302,8 +302,8 @@ class ChapterProgress {
   final int? questionsAnswered;
   final int? totalQuestions;
   final num? completionPercentage;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final num? scorePercentage;
   final String? sessionStatus;
   final int? sessionId;
@@ -408,8 +408,8 @@ class Breakdown {
 class SubjectBreakdown {
   final String? subject;
   final int? questionsAnswered;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final num? percentage;
   final int? chaptersAttempted;
 
@@ -448,8 +448,8 @@ class SubjectBreakdown {
 class GradeBreakdown {
   final String? grade;
   final int? questionsAnswered;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final num? percentage;
   final int? booksAttempted;
 
@@ -488,8 +488,8 @@ class GradeBreakdown {
 class PublisherBreakdown {
   final String? publisher;
   final int? questionsAnswered;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final num? percentage;
   final int? booksAttempted;
 
@@ -565,15 +565,15 @@ class Activity {
   final String? subject;
   final int? questionsAnswered;
   final int? totalQuestions;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final num? scorePercentage;
   final int? messageCount;
   final int? sessionId;
   final String? sessionStatus;
   final String? timestamp;
   final String? bookCoverImgLink;
-  final int? pointsEarned;
+  final num? pointsEarned;
 
   Activity({
     this.type,
@@ -638,10 +638,10 @@ class Activity {
 }
 
 class ActivitySummary {
-  final int? totalActivities;
-  final int? quizActivities;
+  final num? totalActivities;
+  final num? quizActivities;
   final int? chapterVisits;
-  final int? totalPointsEarned;
+  final num? totalPointsEarned;
 
   ActivitySummary({
     this.totalActivities,
@@ -672,12 +672,12 @@ class ActivitySummary {
 class Scoreboard {
   final List<QuizScore>? completedQuizzes;
   final List<QuizScore>? quizzesInProgress;
-  final int? totalPointsEarned;
-  final int? totalTimeSpentMinutes;
+  final num? totalPointsEarned;
+  final num? totalTimeSpentMinutes;
   final num? totalHoursSpent;
-  final int? quizTimeSpentMinutes;
+  final num? quizTimeSpentMinutes;
   final num? quizTimeSpentHours;
-  final int? learningTimeSpentMinutes;
+  final num? learningTimeSpentMinutes;
   final num? learningTimeSpentHours;
   final StreakData? streakData;
   final ScoreboardSummary? summary;
@@ -737,7 +737,7 @@ class Scoreboard {
   }
 }
 
-class QuizScore {
+class   QuizScore {
   final String? chapterId;
   final String? chapterTitle;
   final String? bookTitle;
@@ -745,13 +745,13 @@ class QuizScore {
   final int? questionsAnswered;
   final int? totalQuestions;
   final num? completionPercentage;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final num? scorePercentage;
-  final int? pointsEarned;
+  final num? pointsEarned;
   final int? sessionId;
   final String? sessionStatus;
-  final String? startSessionAfter;
+  final int? startSessionAfter;
   final String? lastAttempted;
   final String? status;
 
@@ -1111,10 +1111,10 @@ class SubjectWiseTrend {
   final num? score;
   final num? totalQuizHours;
   final num? totalLearningHours;
-  final int? marksEarned;
-  final int? marksAvailable;
+  final num? marksEarned;
+  final num? marksAvailable;
   final int? questionsAnswered;
-  final int? quizzes;
+  final num? quizzes;
 
   SubjectWiseTrend({
     this.subject,
@@ -1161,10 +1161,10 @@ class BookWiseTrend {
   final num? score;
   final num? totalQuizHours;
   final num? totalLearningHours;
-  final int? marksEarned;
-  final int? marksAvailable;
-  final int? questionsAnswered;
-  final int? quizzes;
+  final num? marksEarned;
+  final num? marksAvailable;
+  final num? questionsAnswered;
+  final num? quizzes;
 
   BookWiseTrend({
     this.bookId,

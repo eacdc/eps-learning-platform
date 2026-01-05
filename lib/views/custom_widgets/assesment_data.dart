@@ -295,7 +295,7 @@ class _PerformanceOverviewCardState extends State<AssesmentDataCard> {
   }
 
 
-  String formatAccuracy(double? value) {
+  String formatAccuracy(num? value) {
   if (value == null) {
     return "";
   }

@@ -631,175 +631,192 @@ class _AskAiWidgetState extends State<AskAiWidget>
   }
 
   Widget textInputWidget() {
-    return Container(
-      padding: const EdgeInsets.only(left: 12, right: 3, top: 2, bottom: 2),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+    return Obx((){
 
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(
-              context,
-            ).colorScheme.onSecondaryContainer.withAlpha(50),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(1, 3), // changes position of shadow
+        final isAiThink = askAiController .aiThinking.value;
+      return AbsorbPointer(
+        absorbing: isAiThink,
+        child: Opacity(
+          opacity: isAiThink ? 0.6 : 1,
+          child: Container(
+          padding: const EdgeInsets.only(left: 12, right: 3, top: 2, bottom: 2),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+          
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSecondaryContainer.withAlpha(50),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(1, 3), // changes position of shadow
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () async {
-              if (isVoiceRecording) {
-                return;
-              } else {
-                var status = await Permission.microphone.status;
-
-                if (status.isGranted) {
-                  // Permission granted, start recording
-
-                  await _waveController.startRecording();
-                  setState(() {
-                    isVoiceRecording = true;
-                  });
-                } else {
-                  // Ask for permission
-                  var result = await Permission.microphone.request();
-                  if (result.isGranted) {
-                    // Permission granted after request, start recording
-
-                    await _waveController.startRecording();
-                    setState(() {
-                      isVoiceRecording = true;
-                    });
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () async {
+                  if (isVoiceRecording) {
+                    return;
                   } else {
-                    // Permission denied – you may show a message
-                    SnackBarHelper.showFailureSnackBarGetx(
-                      "Microphone permission not granted.",
-                    );
+                    var status = await Permission.microphone.status;
+          
+                    if (status.isGranted) {
+                      // Permission granted, start recording
+          
+                      await _waveController.startRecording();
+                      setState(() {
+                        isVoiceRecording = true;
+                      });
+                    } else {
+                      // Ask for permission
+                      var result = await Permission.microphone.request();
+                      if (result.isGranted) {
+                        // Permission granted after request, start recording
+          
+                        await _waveController.startRecording();
+                        setState(() {
+                          isVoiceRecording = true;
+                        });
+                      } else {
+                        // Permission denied – you may show a message
+                        SnackBarHelper.showFailureSnackBarGetx(
+                          "Microphone permission not granted.",
+                        );
+                      }
+                    }
                   }
-                }
-              }
-
-              /*   setState(() {
-                                      isVoiceRecording= true;
-                                    }); */
-
-              /*   if (isRecording) {
-                                      /* String? filePath =
-                                          await _audioRecorder.stop(); */
-                                      await _audioRecorder.stop().then((
-                                        filePath,
-                                      ) {
-                                        if (filePath != null) {
-                                          /*  qnaController.sendAudioMessage(
-                                            token: token,
-                                            context: context,
-                                            chapterId: widget.chapterId,
-                                            userId: userId,
-                                            audioFilePath: filePath,
-                                          ); */
-                            
-                                          recordingPath = filePath;
-                                        }
-                                        setState(() {
-                                          isRecording = false;
-                                        });
-                                      });
-                                    } else {
-                                      if (await _audioRecorder
-                                          .hasPermission()) {
-                                        final Directory appDucumentDirectory =
-                                            await getApplicationDocumentsDirectory();
-                            
-                                        final String filePath = p.join(
-                                          appDucumentDirectory.path,
-                                          "recording.wav",
-                                        );
-                                        // Start recording
-                            
-                                        await _audioRecorder
-                                            .start(
-                                              const RecordConfig(),
-                                              path: filePath,
-                                            )
-                                            .then((_) {
-                                              setState(() {
-                                                isRecording = true;
-                                                recordingPath = null;
-                                              });
+          
+                  /*   setState(() {
+                                          isVoiceRecording= true;
+                                        }); */
+          
+                  /*   if (isRecording) {
+                                          /* String? filePath =
+                                              await _audioRecorder.stop(); */
+                                          await _audioRecorder.stop().then((
+                                            filePath,
+                                          ) {
+                                            if (filePath != null) {
+                                              /*  qnaController.sendAudioMessage(
+                                                token: token,
+                                                context: context,
+                                                chapterId: widget.chapterId,
+                                                userId: userId,
+                                                audioFilePath: filePath,
+                                              ); */
+                                
+                                              recordingPath = filePath;
+                                            }
+                                            setState(() {
+                                              isRecording = false;
                                             });
-                                      }
-                                    } */
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: primarycolor,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.all(8),
-              child: SvgPicture.asset(
-                isRecording
-                    ? "assets/icons/svg_send_message.svg"
-                    : "assets/icons/svg_microphone.svg",
-                height: 20,
-                width: 20,
-                colorFilter: ColorFilter.mode(whitecolor, BlendMode.srcIn),
-              ),
-            ),
-          ),
-
-          Expanded(
-            child: TextField(
-              controller: messageController,
-              focusNode: _focusNode,
-              minLines: 1,
-              maxLines: 10,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-
-              decoration: InputDecoration(
-                hintText: 'Type your message...',
-                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
-                /* border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        
-                                      ), */
-                border: InputBorder.none,
-
-                //  filled: true,
-                fillColor: whitecolor,
-                labelStyle: TextStyle(fontSize: 12),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 8,
+                                          });
+                                        } else {
+                                          if (await _audioRecorder
+                                              .hasPermission()) {
+                                            final Directory appDucumentDirectory =
+                                                await getApplicationDocumentsDirectory();
+                                
+                                            final String filePath = p.join(
+                                              appDucumentDirectory.path,
+                                              "recording.wav",
+                                            );
+                                            // Start recording
+                                
+                                            await _audioRecorder
+                                                .start(
+                                                  const RecordConfig(),
+                                                  path: filePath,
+                                                )
+                                                .then((_) {
+                                                  setState(() {
+                                                    isRecording = true;
+                                                    recordingPath = null;
+                                                  });
+                                                });
+                                          }
+                                        } */
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: primarycolor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: SvgPicture.asset(
+                    isRecording
+                        ? "assets/icons/svg_send_message.svg"
+                        : "assets/icons/svg_microphone.svg",
+                    height: 20,
+                    width: 20,
+                    colorFilter: ColorFilter.mode(whitecolor, BlendMode.srcIn),
+                  ),
                 ),
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
               ),
-            ),
+          
+              Expanded(
+                child: TextField(
+                  controller: messageController,
+                  focusNode: _focusNode,
+                  minLines: 1,
+                  maxLines: 10,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+          
+                  decoration: InputDecoration(
+                    hintText: 'Type your message...',
+                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
+                    /* border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                            
+                                          ), */
+                    border: InputBorder.none,
+          
+                    //  filled: true,
+                    fillColor: whitecolor,
+                    labelStyle: TextStyle(fontSize: 12),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                color: primarycolor,
+                icon: SvgPicture.asset(
+                  "assets/icons/svg_send_message.svg",
+                  height: 20,
+                  width: 20,
+                  colorFilter: ColorFilter.mode( Theme.of(context).colorScheme.onSurface, BlendMode.srcIn)
+                ),
+                onPressed: () => sendMessage(messageController.text.trim()),
+                style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                  foregroundColor: primarycolor,
+                  shape: CircleBorder(),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            color: primarycolor,
-            icon: SvgPicture.asset(
-              "assets/icons/svg_send_message.svg",
-              height: 20,
-              width: 20,
-              colorFilter: ColorFilter.mode( Theme.of(context).colorScheme.onSurface, BlendMode.srcIn)
-            ),
-            onPressed: () => sendMessage(messageController.text.trim()),
-            style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-              foregroundColor: primarycolor,
-              shape: CircleBorder(),
-            ),
-          ),
-        ],
-      ),
-    );
+              ),
+        ),
+      );
+ 
+ 
+
+    });
+    
+    
+    
+   
   }
 
   Widget recorderWidget() {

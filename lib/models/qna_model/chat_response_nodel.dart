@@ -6,6 +6,7 @@ class ChatResponseModel {
   final String? previousQuestionId;
   final Score? score;
   final String? agentName;
+  final ChatSession? chatSession;
 
   ChatResponseModel({
     this.message,
@@ -15,6 +16,7 @@ class ChatResponseModel {
     this.previousQuestionId,
     this.score,
     this.agentName,
+    this.chatSession,
   });
 
   factory ChatResponseModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,10 @@ class ChatResponseModel {
       previousQuestionId: json['previousQuestionId'],
       score: json['score'] != null ? Score.fromJson(json['score']) : null,
       agentName: json['agentName'],
+      chatSession:
+          json['session'] != null
+              ? ChatSession.fromJson(json['session'])
+              : null,
     );
   }
 
@@ -113,6 +119,42 @@ class Score {
       'marksAwarded': marksAwarded,
       'maxMarks': maxMarks,
       'previousQuestion': previousQuestion,
+    };
+  }
+}
+
+class ChatSession { 
+  final num? sessionId;
+  final String? sessionStatus;
+  final num? scorePercentage;
+  final num? startSessionAfter;
+  final bool? canStartNewSession;
+
+  ChatSession({
+    this.sessionId,
+    this.sessionStatus,
+    this.scorePercentage,
+    this.startSessionAfter,
+    this.canStartNewSession,
+  });
+
+  factory ChatSession.fromJson(Map<String, dynamic> json) {
+    return ChatSession(
+      sessionId: json['sessionId'],
+      sessionStatus: json['sessionStatus'],
+      scorePercentage: json['scorePercentage'],
+      startSessionAfter: json['startSessionAfter'],
+      canStartNewSession: json['canStartNewSession'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sessionId': sessionId,
+      'sessionStatus': sessionStatus,
+      'scorePercentage': scorePercentage,
+      'startSessionAfter': startSessionAfter,
+      'canStartNewSession': canStartNewSession,
     };
   }
 }

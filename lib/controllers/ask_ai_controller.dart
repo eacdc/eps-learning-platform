@@ -113,7 +113,7 @@ class AskAiController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-      SnackBarHelper.showNormalSnackBar(context, "No more items...");
+     // SnackBarHelper.showNormalSnackBar(context, "No more items...");
 
       return;
     } // Prevent multiple calls

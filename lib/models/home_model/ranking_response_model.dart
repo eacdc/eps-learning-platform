@@ -66,8 +66,8 @@ class UserRanking {
   final String userId;
   final String username;
   final String fullname;
-  final int points;
-  final int totalMarksEarned;
+  final num points;
+  final num totalMarksEarned;
   final double quizTimeHours;
   final double learningTimeHours;
   final DateTime lastUpdated;
@@ -121,7 +121,7 @@ class RankedUser {
   final String userId;
   final String username;
   final String fullname;
-  final int points;
+  final num points;
   final double quizTimeHours;
 
   RankedUser({

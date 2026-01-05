@@ -50,12 +50,12 @@ class BasicStats {
   final int? chaptersInProgress;
   final int? quizzesTaken;
   final int? totalQuestionsAnswered;
-  final int? totalMarksEarned;
-  final int? totalMarksAvailable;
-  final double? overallScore;
-  final int? totalTimeSpentMinutes;
-  final double? totalTimeSpentHours;
-  final int? totalPointsEarned;
+  final num? totalMarksEarned;
+  final num? totalMarksAvailable;
+  final num? overallScore;
+  final num? totalTimeSpentMinutes;
+  final num? totalTimeSpentHours;
+  final num? totalPointsEarned;
 
   BasicStats({
     this.booksStarted,
@@ -78,12 +78,12 @@ class BasicStats {
       chaptersInProgress: json['chaptersInProgress'] as int?,
       quizzesTaken: json['quizzesTaken'] as int?,
       totalQuestionsAnswered: json['totalQuestionsAnswered'] as int?,
-      totalMarksEarned: json['totalMarksEarned'] as int?,
-      totalMarksAvailable: json['totalMarksAvailable'] as int?,
-      overallScore: (json['overallScore'] as num?)?.toDouble(),
-      totalTimeSpentMinutes: json['totalTimeSpentMinutes'] as int?,
-      totalTimeSpentHours: (json['totalTimeSpentHours'] as num?)?.toDouble(),
-      totalPointsEarned: json['totalPointsEarned'] as int?,
+      totalMarksEarned: json['totalMarksEarned'] as num?,
+      totalMarksAvailable: json['totalMarksAvailable'] as num?,
+      overallScore: (json['overallScore'] as num?),
+      totalTimeSpentMinutes: json['totalTimeSpentMinutes'] as num?,
+      totalTimeSpentHours: (json['totalTimeSpentHours'] as num?),
+      totalPointsEarned: json['totalPointsEarned'] as num?,
     );
   }
 }
@@ -175,9 +175,9 @@ class AssessmentData {
 
 class PerformanceMetrics {
   final int? totalQuestions;
-  final double? avgScore;
-  final double? accuracyRate;
-  final double? completionRate;
+  final num? avgScore;
+  final num? accuracyRate;
+  final num? completionRate;
 
   PerformanceMetrics({
     this.totalQuestions,
@@ -189,9 +189,9 @@ class PerformanceMetrics {
   factory PerformanceMetrics.fromJson(Map<String, dynamic> json) {
     return PerformanceMetrics(
       totalQuestions: json['totalQuestions'] as int?,
-      avgScore: (json['avgScore'] as num?)?.toDouble(),
-      accuracyRate: (json['accuracyRate'] as num?)?.toDouble(),
-      completionRate: (json['completionRate'] as num?)?.toDouble(),
+      avgScore: (json['avgScore'] as num?),
+      accuracyRate: (json['accuracyRate'] as num?),
+      completionRate: (json['completionRate'] as num?),
     );
   }
 }
@@ -220,7 +220,7 @@ class DifficultyAnalysis {
 class DifficultyDetail {
   final int? attempted;
   final int? correct;
-  final double? avgScore;
+  final num? avgScore;
 
   DifficultyDetail({this.attempted, this.correct, this.avgScore});
 
@@ -228,7 +228,7 @@ class DifficultyDetail {
     return DifficultyDetail(
       attempted: json['attempted'] as int?,
       correct: json['correct'] as int?,
-      avgScore: (json['avgScore'] as num?)?.toDouble(),
+      avgScore: (json['avgScore'] as num?),
     );
   }
 }
@@ -236,8 +236,8 @@ class DifficultyDetail {
 class SubjectAnalysis {
   final String? subject;
   final int? attempted;
-  final double? accuracy;
-  final double? avgScore;
+  final num? accuracy;
+  final num? avgScore;
 
   SubjectAnalysis({this.subject, this.attempted, this.accuracy, this.avgScore});
 
@@ -245,8 +245,8 @@ class SubjectAnalysis {
     return SubjectAnalysis(
       subject: json['subject'] as String?,
       attempted: json['attempted'] as int?,
-      accuracy: (json['accuracy'] as num?)?.toDouble(),
-      avgScore: (json['avgScore'] as num?)?.toDouble(),
+      accuracy: (json['accuracy'] as num?),
+      avgScore: (json['avgScore'] as num?),
     );
   }
 }
@@ -254,8 +254,8 @@ class SubjectAnalysis {
 class Weakness {
   final String? subject;
   final int? attempted;
-  final double? accuracy;
-  final double? avgScore;
+  final num? accuracy;
+  final num? avgScore;
 
   Weakness({this.subject, this.attempted, this.accuracy, this.avgScore});
 
@@ -263,8 +263,8 @@ class Weakness {
     return Weakness(
       subject: json['subject'] as String?,
       attempted: json['attempted'] as int?,
-      accuracy: (json['accuracy'] as num?)?.toDouble(),
-      avgScore: (json['avgScore'] as num?)?.toDouble(),
+      accuracy: (json['accuracy'] as num?),
+      avgScore: (json['avgScore'] as num?),
     );
   }
 }

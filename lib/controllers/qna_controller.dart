@@ -14,6 +14,7 @@ import 'package:test_your_learing/models/chapter_model/chapter_model.dart';
 import 'package:test_your_learing/models/collection_model/books_collection_list.dart';
 import 'package:test_your_learing/models/qna_model/chat_response_nodel.dart';
 import 'package:test_your_learing/models/qna_model/chatmessage_model.dart';
+import 'package:test_your_learing/models/response_model/api_response_new.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
 
 import '../models/qna_model/chat_state_model.dart';
@@ -26,11 +27,13 @@ class QnaController extends GetxController
   var scoreValue = "".obs;
   var answerQuestion = "".obs;
 
-  var hideChatBox = false.obs;
+  var hideChatBox = true.obs;
+  var showNextSessionMsg = false.obs;
+  var nextSesionMsg = "".obs;
 
   var pageNo = 1.obs;
-
   var agentName = "closurechat.ai";
+  var closedSessionStatus = "closed";
 
   //var selectedDepartment = Rxn<Department>(); // Holds the selected department
   //var selectedSeverity = Rxn<Severity>(); // Holds the selected department
@@ -120,7 +123,7 @@ class QnaController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-      SnackBarHelper.showNormalSnackBar(context, "No more items...");
+     /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
 
       return;
     } // Prevent multiple calls
@@ -211,10 +214,19 @@ class QnaController extends GetxController
 
             chatMessageList.value = chatList;
 
-            response.data['agentName'] != null &&
-                    response.data['agentName'] == agentName
-                ? hideChatBox.value = true
-                : hideChatBox.value = false;
+            final String? _agentName = response.data['agentName'];
+            final String? _sessionStatus = response.data['sessionStatus'];
+            final bool? _canStartNewSession =
+                response.data['canStartNewSession'];
+            final num? _hoursUntilNextSession =
+                response.data['hoursUntilNextSession'];
+
+            handelChatSessionState(
+              agentName: _agentName,
+              sessionStatus: _sessionStatus,
+              canStartNewSession: _canStartNewSession,
+              hoursUntilNextSession: _hoursUntilNextSession,
+            );
           }
         } else {
           print("Unhandled response format");
@@ -310,8 +322,6 @@ class QnaController extends GetxController
               response.data,
             );
 
-
-
             print("xxx3");
             // use single book
 
@@ -352,9 +362,17 @@ class QnaController extends GetxController
             );
             //disable chat box
 
-            chatResponseModel.agentName != null && chatResponseModel.agentName == agentName ? hideChatBox.value = true : hideChatBox.value = false;
+          /*   chatResponseModel.agentName != null &&
+                    chatResponseModel.agentName == agentName
+                ? hideChatBox.value = true
+                : hideChatBox.value = false; */
 
-
+                    handelChatSessionState(
+              agentName: chatResponseModel.agentName,
+              sessionStatus: chatResponseModel.chatSession?.sessionStatus,
+              canStartNewSession: chatResponseModel.chatSession?.canStartNewSession??false, // statically pass as no parameter for this in response
+              hoursUntilNextSession: chatResponseModel.chatSession?.startSessionAfter,
+            );
           }
         } else {
           print("Unhandled response format");
@@ -613,4 +631,81 @@ class QnaController extends GetxController
     }
     return value.toString(); // keep decimal if it exists
   }
+
+void handelChatSessionState({
+  String? agentName,
+  String? sessionStatus,
+  bool? canStartNewSession,
+  num? hoursUntilNextSession,
+}) {
+  final bool isSessionClosed = sessionStatus == closedSessionStatus;
+  final bool cannotStartNewSession = canStartNewSession == false;
+
+  ///  Hide chat box ONLY if session is closed AND cannot start new session
+  hideChatBox.value = isSessionClosed && cannotStartNewSession;
+
+  if (hideChatBox.value) {
+    showNextSessionMsg.value = true;
+
+    if (hoursUntilNextSession != null && hoursUntilNextSession > 0) {
+      nextSesionMsg.value =
+          "Your current chat session has ended. You can start the next chat session for this chapter in ${hoursUntilNextSession.toString()} hour(s).";
+    } else {
+      nextSesionMsg.value =
+          "Your current chat session for this chapter has ended";
+    }
+  } else {
+    /// Chat is open → clear all blocking messages
+    showNextSessionMsg.value = false;
+    nextSesionMsg.value = "";
+  }
+}
+
+
+
+/*   void handelChatSessionState({
+    String? agentName,
+    String? sessionStatus,
+    bool? canStartNewSession,
+    num? hoursUntilNextSession,
+  }) {
+
+  
+    // 1️ Hide chat box if session is closed
+    if (sessionStatus != null && sessionStatus == closedSessionStatus) {
+      hideChatBox.value = true;
+
+      // 2️ Check if user CANNOT start a new session
+      if (canStartNewSession != null && canStartNewSession == false) {
+         showNextSessionMsg.value = true;
+
+         /* nextSesionMsg.value =
+              "Your current chat session for this chapter has ended"; */
+
+ 
+        // 3️ Check hours until next session
+        if (hoursUntilNextSession != null && hoursUntilNextSession > 0) {
+          nextSesionMsg.value =
+              "Your current chat session has ended. You can start the next chat session for this chapter in ${hoursUntilNextSession.toString()} hour(s).";
+        } else {
+          nextSesionMsg.value =
+              "Your current chat session for this chapter has ended";
+        }
+      } else {
+        // Can start new session
+        showNextSessionMsg.value = false;
+        nextSesionMsg.value = "";
+      }
+    } else {
+      // Session is not closed
+      hideChatBox.value = false;
+      showNextSessionMsg.value = false;
+      nextSesionMsg.value = "";
+    }
+  }
+
+ */
+
+
+
 }

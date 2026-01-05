@@ -120,7 +120,7 @@ class CollectionController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-      SnackBarHelper.showNormalSnackBar(context, "No More Books...");
+     /// SnackBarHelper.showNormalSnackBar(context, "No More Books...");
 
       return;
     } // Prevent multiple calls
@@ -217,7 +217,7 @@ class CollectionController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-      SnackBarHelper.showNormalSnackBar(context, "No more items...");
+     /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
 
       return;
     } // Prevent multiple calls
@@ -371,7 +371,7 @@ class CollectionController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-      SnackBarHelper.showNormalSnackBar(context, "No more items...");
+     /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
 
       return;
     } // Prevent multiple calls
