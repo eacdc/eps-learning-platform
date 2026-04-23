@@ -114,17 +114,11 @@ That’s why Flutter tells you to use build() or didChangeDependencies() instead
         SharedPreferencesService.getLoginStatus(); // false by default
 
     if (isFirstTime) {
-      //Navigator.pushReplacementNamed(context, '/onboarding');
-      Get.off(OnboardingScreen());
+      Get.offNamed('/onboard');
     } else if (isLoggedIn) {
-      //  Navigator.pushReplacementNamed(context, '/dashboard');
-      Get.off(DashboardPage());
-      // Get.off(HomeChatPage());
-      /// Get.off(VoiceChatPage());
+      Get.offNamed('/dashboard');
     } else {
-      // Navigator.pushReplacementNamed(context, '/login');
-      //Get.off(LoginPage());
-      Get.off(GateStatrtedScreen());
+      Get.offNamed('/getStarted');
     }
   }
 

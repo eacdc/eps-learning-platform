@@ -59,86 +59,131 @@ class _SignupPageState extends State<SignupPage> {
     });
   }
 
-  List<String> scopes = <String>[
-    //'https://www.googleapis.com/auth/contacts.readonly',
-    'email',
-    'profile',
-    'openid',
-  ];
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _googleSubscription;
+  bool _handlingGoogleEvent = false;
+  bool _googleInitialized = false;
+
+  final List<String> scopes = ['email', 'profile', 'openid'];
+
+  @override
+  void dispose() {
+    _googleSubscription?.cancel();
+    super.dispose();
+  }
 
   void googleAccountLogin() {
-    final GoogleSignIn signIn = GoogleSignIn.instance;
+    _googleSubscription?.cancel();
+    _handlingGoogleEvent = false;
 
-    unawaited(
-      signIn
-          .initialize(
-            clientId: Constants.googleLoginClientId,
-            serverClientId: Constants.googleLoginServerClientId,
-          )
-          .then((_) {
-            signIn.authenticationEvents
-                .listen(_handleAuthenticationEvent)
-                .onError(_handleAuthenticationError);
+    _googleSubscription = GoogleSignIn.instance.authenticationEvents
+        .listen(_handleAuthenticationEvent)
+          ..onError(_handleAuthenticationError);
 
-            signIn.authenticate(scopeHint: scopes);
-          }),
-    );
+    GoogleSignIn.instance.authenticate(scopeHint: scopes);
   }
 
   Future<void> _handleAuthenticationEvent(
     GoogleSignInAuthenticationEvent event,
   ) async {
-    // #docregion CheckAuthorization
-    final GoogleSignInAccount? user = // ...
-    // #enddocregion CheckAuthorization
-    switch (event) {
+    if (_handlingGoogleEvent) return;
+    _handlingGoogleEvent = true;
+    _googleSubscription?.cancel();
+    _googleSubscription = null;
+
+    final GoogleSignInAccount? user = switch (event) {
       GoogleSignInAuthenticationEventSignIn() => event.user,
       GoogleSignInAuthenticationEventSignOut() => null,
     };
 
-    // Check for existing authorization.
-    // #docregion CheckAuthorization
+    if (user == null) {
+      _handlingGoogleEvent = false;
+      return;
+    }
+
     final GoogleSignInClientAuthorization? authorization = await user
-        ?.authorizationClient
+        .authorizationClient
         .authorizationForScopes(scopes);
-    // #enddocregion CheckAuthorization
 
-    // If the user has already granted access to the required scopes, call the
-    // REST API.
-    if (user != null && authorization != null) {
-      //unawaited(_handleGetContact(user));
-      print("ggl" + "user sign in");
+    if (!mounted) return;
 
-      final _name = user.displayName.toString() ?? "";
-      final _email = user.email.toString() ?? "";
-      final _google_id = user.id.toString() ?? "";
-
-      loginController.googleLoginVerify(_name, _email, _google_id, context);
-    } else {
+    if (authorization == null) {
+      _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "unable to fetch google account details",
+        "Unable to fetch Google account details. Please try again.",
       );
+      return;
     }
+
+    final googleToken = user.authentication.idToken;
+    if (googleToken == null || googleToken.isEmpty) {
+      _handlingGoogleEvent = false;
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Unable to verify Google sign-in token. Please try again.",
+      );
+      return;
+    }
+
+    final response = await loginController.fetchAccountsByGoogleToken(
+      googleToken,
+      context,
+    );
+
+    if (!mounted) return;
+    _handlingGoogleEvent = false;
+
+    if (response.statusCode != 200) {
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        response.data["message"] ?? "Unable to continue with Google",
+      );
+      return;
+    }
+
+    signupController.googleToken.value = googleToken;
+    final email = response.data["email"]?.toString() ?? "";
+    if (email.isNotEmpty) {
+      signupController.emailid.value = email;
+      emailController.text = email;
+    }
+    SnackBarHelper.showSuccessSnackBar(
+      context,
+      "Google account verified. Complete the form to create account.",
+    );
   }
 
   Future<void> _handleAuthenticationError(Object e) async {
-    // e is GoogleSignInException ? e.toString() : 'Unknown error: $e';
-    print(e.toString());
-  }
-
-  Future<void> _handleSignOut() async {
-    // Disconnect instead of just signing out, to reset the example state as
-    // much as possible.
-    await GoogleSignIn.instance.disconnect();
+    _handlingGoogleEvent = false;
+    if (!mounted) return;
+    SnackBarHelper.showFailureSnackBar(
+      context,
+      "Google sign-in failed. Please try again.",
+    );
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
-    // Prefill data if editing
+    if (!_googleInitialized) {
+      _googleInitialized = true;
+      GoogleSignIn.instance
+          .initialize(
+            clientId: Constants.googleLoginClientId,
+            serverClientId: Constants.googleLoginServerClientId,
+          )
+          .catchError((_) {});
+    }
+    final args = Get.arguments as Map<String, dynamic>?;
+    final token = args?["googleToken"] as String?;
+    final googleEmail = args?["googleEmail"] as String?;
+    if (token != null && token.isNotEmpty) {
+      signupController.googleToken.value = token;
+    }
+    if (googleEmail != null && googleEmail.isNotEmpty) {
+      emailController.text = googleEmail;
+      signupController.emailid.value = googleEmail;
+    }
 
     try {
       role = roleList.firstWhere((role) => role == "student");
@@ -156,14 +201,7 @@ class _SignupPageState extends State<SignupPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
-          // _buildGetOtpForm(context),
-          // _buildVerifyOtpForm(context),
-          Obx(
-            () =>
-                signupController.isOtpSent.value
-                    ? _buildVerifyOtpForm(context)
-                    : _buildGetOtpForm(context),
-          ),
+          _buildGetOtpForm(context),
         ],
       ),
     );
@@ -212,7 +250,7 @@ class _SignupPageState extends State<SignupPage> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Let’s join to Test Your Learning ecosystem & experience smart learning. It’s Free!",
+                            "Let’s join to EPS Digital Learning ecosystem & experience smart learning. It’s Free!",
                             style: TextStyle(
                               color:
                                   Theme.of(
@@ -260,8 +298,8 @@ class _SignupPageState extends State<SignupPage> {
                                         signupController.emailid.value = val!,
                                 validator:
                                     (val) =>
-                                        (val!.isEmpty || val!.length < 10)
-                                            ? "Enter valid Email Address"
+                                        (val == null || val.trim().length < 2)
+                                            ? "Enter a valid username"
                                             : null,
                               ),
                               _buildUsernameMessage(signupController),
@@ -294,7 +332,7 @@ class _SignupPageState extends State<SignupPage> {
                                         signupController.emailid.value = val!,
                                 validator:
                                     (val) =>
-                                        (val!.isEmpty || val!.length < 10)
+                                        (val == null || val.trim().isEmpty)
                                             ? "Enter valid Email Address"
                                             : null,
                               ),
@@ -482,7 +520,7 @@ class _SignupPageState extends State<SignupPage> {
                                     } */
 
                                   final _username = usernameController.text;
-                                  final _fullname = usernameController.text;
+                                  final _fullname = fullnameController.text;
                                   final _email = emailController.text;
                                   final _phonenumber = phonenoController.text;
                                   final _password = passwordController.text;
@@ -505,20 +543,33 @@ class _SignupPageState extends State<SignupPage> {
                                   )) {
                                     /*  loginController.loginUser(
                                           _email, _password, context); */
-                                    signupController.emailid.value = _email;
-                                    // update email to controller
-                                    signupController.sendSignupOTP(
-                                      _username,
-                                      _fullname,
-                                      _email,
-                                      _phonenumber,
-                                      _password,
-                                      _conpassword,
-                                      _role!,
-                                      _grade!,
-                                      publisher,
-                                      context,
-                                    );
+                                    if (signupController
+                                        .googleToken
+                                        .value
+                                        .isNotEmpty) {
+                                      signupController.registerGoogleVerified(
+                                        _username,
+                                        _fullname,
+                                        _phonenumber,
+                                        _password,
+                                        _role!,
+                                        _grade,
+                                        publisher,
+                                        context,
+                                      );
+                                    } else {
+                                      signupController.registerUser(
+                                        _username,
+                                        _fullname,
+                                        _email,
+                                        _phonenumber,
+                                        _password,
+                                        _role!,
+                                        _grade,
+                                        publisher,
+                                        context,
+                                      );
+                                    }
 
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
@@ -553,7 +604,9 @@ class _SignupPageState extends State<SignupPage> {
                                   ),
                                   child: InkWell(
                                     onTap: () {
-                                      googleAccountLogin();
+                                  if (signupController.googleToken.value.isEmpty) {
+                                    googleAccountLogin();
+                                  }
                                     },
                                     borderRadius: BorderRadius.circular(10.0),
                                     child: Center(
@@ -568,7 +621,10 @@ class _SignupPageState extends State<SignupPage> {
                                           ),
                                           SizedBox(width: 8),
                                           Text(
-                                            "Signup with Google",
+                                            signupController.googleToken.value
+                                                .isNotEmpty
+                                                ? "Google verified"
+                                                : "Signup with Google",
                                             style: heading6.copyWith(
                                               color:
                                                   Theme.of(
@@ -635,7 +691,9 @@ class _SignupPageState extends State<SignupPage> {
                                 alignment: Alignment.center,
                                 child: Text(
                                   textAlign: TextAlign.center,
-                                  "By signing up to create an account I accept Eduline’s Terms of Service & Privacy Policy",
+                                  signupController.googleToken.value.isNotEmpty
+                                      ? "Google account verified. Complete the fields below to create your account."
+                                      : "By signing up to create an account I accept Eduline’s Terms of Service & Privacy Policy",
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -666,217 +724,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget _buildVerifyOtpForm(BuildContext context) {
-    List<TextEditingController> otpFieldsControler = [
-      TextEditingController(),
-      TextEditingController(),
-      TextEditingController(),
-      TextEditingController(),
-      TextEditingController(),
-      TextEditingController(),
-    ];
-
-    return SafeArea(
-      child: Obx(() {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 16),
-
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: CircularBackButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-                SizedBox(height: 50),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "OTP Verification",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: Constants.fontFamily,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "We have sent a verification code to Email ",
-                        ),
-                        TextSpan(
-                          text: signupController.emailid.value,
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: Constants.fontFamily,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 32),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Verification Code',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Container(
-                  padding: EdgeInsets.all(0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _textFieldOTP(
-                            first: true,
-                            last: false,
-                            controller: otpFieldsControler[0],
-                          ),
-                          _textFieldOTP(
-                            first: false,
-                            last: false,
-                            controller: otpFieldsControler[1],
-                          ),
-                          _textFieldOTP(
-                            first: false,
-                            last: false,
-                            controller: otpFieldsControler[2],
-                          ),
-                          _textFieldOTP(
-                            first: false,
-                            last: false,
-                            controller: otpFieldsControler[3],
-                          ),
-                          _textFieldOTP(
-                            first: false,
-                            last: false,
-                            controller: otpFieldsControler[4],
-                          ),
-                          _textFieldOTP(
-                            first: false,
-                            last: true,
-                            controller: otpFieldsControler[5],
-                          ),
-                        ],
-                      ),
-                      /*   Text(
-                      forgotPasswordController.statusMessage.value,
-                      style: TextStyle(
-                          color:
-                              forgotPasswordController.statusMessageColor.value,
-                          fontWeight: FontWeight.bold),
-                    ), */
-                      SizedBox(height: 32),
-                      CustomGradiantButton(
-                        loading: signupController.isLoading.value,
-                        buttonColor: primarycolor,
-                        textValue: 'Verify',
-                        textColor: onprimary,
-                        onPressed: () {
-                          /*     final form = _formKey.currentState;
-                              if (form!.validate()) {
-                                form.save();
-                                authController.getOtp(context);
-                                authController.showProgressbar.value = true;
-                              } */
-
-                          signupController.otp.value = "";
-                          otpFieldsControler.forEach((controller) {
-                            signupController.otp.value += controller.text;
-                          });
-
-                          if (signupController.otp.value.length == 6) {
-                            signupController.verifySignupOTP(
-                              emailController.text,
-                              signupController.otp.value,
-                              context,
-                            );
-                          } else {
-                            SnackBarHelper.showFailureSnackBar(
-                              context,
-                              "Please Enter 6 Digit OTP Sent To Your Email",
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                /* SizedBox(
-                height: 18,
-              ),
-              Text(
-                "Didn't receive any code?",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black38,
-                ),
-                textAlign: TextAlign.center,
-              ), */
-                SizedBox(height: 16),
-                Obx(
-                  () => TextButton(
-                    onPressed:
-                        () =>
-                            signupController.resendOTP.value
-                                ? signupController.resendSignupOtp(
-                                  emailController.text,
-                                  context,
-                                )
-                                // ? null
-                                : null,
-                    child: Text(
-                      signupController.resendOTP.value
-                          ? "Resend new code"
-                          : "Send Code again in ${signupController.resendAfter} seconds",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }),
-    );
+    return const SizedBox.shrink();
   }
 
   Widget _buildSuffixIcon() {
@@ -982,7 +830,7 @@ class _SignupPageState extends State<SignupPage> {
 
     // special charecer optional
     return RegExp(
-      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$',
+      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{6,}$',
     ).hasMatch(password);
 
     // no special charecer

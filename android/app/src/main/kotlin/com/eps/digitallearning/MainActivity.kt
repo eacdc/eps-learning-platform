@@ -1,4 +1,4 @@
-package com.test_your_learing
+package com.eps.digitallearning
 
 import io.flutter.embedding.android.FlutterActivity
 

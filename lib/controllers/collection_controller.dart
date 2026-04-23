@@ -112,7 +112,7 @@ class CollectionController extends GetxController
         false, // Default to false , Clear all data and filter value
   }) async {
     if (pageNumber == 1) {
-    //  bookCollectionList.value = [];
+      //  bookCollectionList.value = [];
       //clear
       pageNo.value = 1;
       isMoreDataAvailable.value = true;
@@ -120,7 +120,7 @@ class CollectionController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-     /// SnackBarHelper.showNormalSnackBar(context, "No More Books...");
+      /// SnackBarHelper.showNormalSnackBar(context, "No More Books...");
 
       return;
     } // Prevent multiple calls
@@ -217,7 +217,7 @@ class CollectionController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-     /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
+      /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
 
       return;
     } // Prevent multiple calls
@@ -371,7 +371,7 @@ class CollectionController extends GetxController
     if (
     // isLoading.value ||
     !isMoreDataAvailable.value) {
-     /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
+      /// SnackBarHelper.showNormalSnackBar(context, "No more items...");
 
       return;
     } // Prevent multiple calls
@@ -522,7 +522,7 @@ class CollectionController extends GetxController
     } finally {
       isSubscribeLoading.value = false;
       // Close BottomSheet only if it's still open
-      if (context != null && Navigator.canPop(context)) {
+      if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
     }
@@ -532,6 +532,7 @@ class CollectionController extends GetxController
     required String token,
     required BuildContext context,
     required String bookId,
+    required String couponCode,
 
     // Default to false , Clear all data and filter value
   }) async {
@@ -540,7 +541,7 @@ class CollectionController extends GetxController
     var response = await ApiManager.requestNew(
       endpoint: ApiManager.subscribe,
       method: "POST",
-      body: {"bookId": bookId},
+      body: {"bookId": bookId, "couponCode": couponCode},
       token: token,
     );
 
@@ -579,6 +580,11 @@ class CollectionController extends GetxController
         }
       } else {
         print("Request failed: ${response.statusCode}");
+        SnackBarHelper.showFailureSnackBarGetx(
+          response.data['error'] ??
+              response.data['message'] ??
+              "Failed to subscribe",
+        );
       }
     } catch (e) {
       SnackBarHelper.showFailureSnackBarGetx(e.toString());
@@ -588,130 +594,11 @@ class CollectionController extends GetxController
     } finally {
       isSubscribeLoading.value = false;
       // Close BottomSheet only if it's still open
-      if (context != null && Navigator.canPop(context)) {
+      if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
     }
   }
-
-  /*   void getIncidentFilterSearch({
-    required String token,
-    required BuildContext context,
-    int pageSize = 10, // Default page size is 10
-    int pageNumber = 1, // Default page number is 1
-    bool reloadpage =
-        false, // Default to false , Clear all data and filter value
-  }) async {
-    if (pageNumber == 1) {
-      incidentDataList.value = [];
-      //clear
-      pageNo.value = 1;
-      isMoreDataAvailable.value = true;
-    }
-    if (
-    // isLoading.value ||
-    !isMoreDataAvailable.value) {
-      SnackBarHelper.showNormalSnackBar(context, "No more items...");
-
-      return;
-    } // Prevent multiple calls
-
-    isLoading.value = true;
-
-    print(
-      "xreq ${{
-        "page": pageNumber,
-        // "department_id": selectedDepartment?.value?.id ?? "",
-        // "severity": selectedSeverity.value?.title ?? "",
-        "start_date": datefromFilter.value,
-        "end_date": dateToFilter.value,
-        "search": searchString.value,
-        // "page": 1,
-        "page_size": pageSize,
-      }}",
-    );
-
-    if (reloadpage) {
-      pageNumber = 1;
-
-      allfilter.value = true;
-      departmentfilter.value = "";
-      severityFIlter.value = "";
-      datefromFilter.value = "";
-      dateToFilter.value = "";
-      searchString.value = "";
-      //  selectedDepartment.value = null;
-      //  selectedSeverity.value = null;
-
-      /* ********* refresh page no*/
-
-      pageNo.value = 1;
-    }
-
-    var response = await ApiManager.request(
-      endpoint: ApiManager.getIncidentFilterSearch,
-      method: "POST",
-      body: {
-        "page": pageNumber,
-        // "department_id": selectedDepartment?.value?.id ?? "",
-        //  "severity": selectedSeverity.value?.title ?? "",
-        "start_date": datefromFilter.value,
-        "end_date": dateToFilter.value,
-        "search": searchString.value,
-        // "page": 1,
-        "page_size": pageSize,
-      },
-      token: token,
-    );
-
-    try {
-      if (response.statusCode == 200) {
-        incidentdata.value = IncidentFormResponse.fromJson(
-          response as Map<String, dynamic>,
-        );
-
-        print("xres" + response.toString());
-
-        final newData = incidentdata.value?.data ?? [];
-        if (newData.isNotEmpty) {
-          incidentDataList.addAll(newData);
-          // pageNo.value++;
-        } else {
-          isMoreDataAvailable.value = false; // No more pages to load
-          SnackBarHelper.showNormalSnackBar(context, "No more items...");
-        }
-
-        // Get.snackbar("Success", "Login Successful");
-
-        //  SnackBarHelper.showSuccessSnackBar(context, "Profile Fetched");
-
-        print("hii" + incidentdata.value!.data.length.toString());
-      } else {
-        // Get.snackbar("Login Failed", response["message"] ?? "Error occurred");
-        SnackBarHelper.showFailureSnackBar(context, "Error occurred");
-      }
-    } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, e.toString());
-
-      /*       isMoreDataAvailable.value = false; // No more pages to load
-      SnackBarHelper.showNormalSnackBar(context, "No more items..."); */
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void paginateTask() {
-    scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        print("reach end");
-        pageNo.value = pageNo.value + 1;
-
-        //get More Task
-      }
-    });
-  }
- */
 
   /* void updateSubscribedStatus(
     List<BookList> allBooks,

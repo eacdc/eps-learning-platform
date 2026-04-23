@@ -66,7 +66,6 @@ class AppTheme {
 
     outline: Color(0xFF938F99),
 
-    // ✅ replace deprecated background/onBackground
     surface: Color(0xFF333333),
     onSurface: Color(0xFFF3F3F3),
 
@@ -95,7 +94,7 @@ class AppTheme {
     fontFamily: Constants.fontFamily,
     colorScheme: lightColorScheme,
     dividerColor: textWhiteGrey,
-    bottomAppBarTheme: const BottomAppBarTheme(
+    bottomAppBarTheme: const BottomAppBarThemeData(
       color: textWhiteGrey,
       elevation: 4,
     ),
@@ -112,7 +111,7 @@ class AppTheme {
     fontFamily: Constants.fontFamily,
     colorScheme: darkColorScheme,
     dividerColor: graydark.withAlpha(100),
-    bottomAppBarTheme: const BottomAppBarTheme(color: textBlack, elevation: 4),
+    bottomAppBarTheme: const BottomAppBarThemeData(color: textBlack, elevation: 4),
     appBarTheme: AppBarTheme(
       backgroundColor: darkColorScheme.surface, // Dark theme AppBar color
       foregroundColor: Colors.white, // Title / icons color

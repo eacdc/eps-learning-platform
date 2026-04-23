@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/collection_controller.dart';
+import 'package:test_your_learing/controllers/dashboard_controller.dart';
 import 'package:test_your_learing/controllers/my_subscription_controller.dart';
 import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
@@ -826,57 +827,61 @@ void _showChapterBottomsheet(
 
                                   SizedBox(height: 8),
 
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: SecondaryButton(
-                                          buttonColor: primarycolor,
-                                          textValue: "Learn",
-                                          textColor: primarycolor,
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Get.to(
-                                              () => const AskAiPage(),
-                                              arguments: {
-                                                'chapterId':
-                                                    chapterdata.id ?? '',
-                                                'chapterName':
-                                                    chapterdata.title ?? '',
-                                                'bookId':
-                                                    chapterdata.bookId ?? '',
+                                  Obx(() {
+                                    final isLearnMode = Get.find<DashboardController>().isLearnMode.value;
+                                    return Row(
+                                      children: [
+                                        if (isLearnMode)
+                                          Expanded(
+                                            child: SecondaryButton(
+                                              buttonColor: primarycolor,
+                                              textValue: "Learn",
+                                              textColor: primarycolor,
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                Get.to(
+                                                  () => const AskAiPage(),
+                                                  arguments: {
+                                                    'chapterId':
+                                                        chapterdata.id ?? '',
+                                                    'chapterName':
+                                                        chapterdata.title ?? '',
+                                                    'bookId':
+                                                        chapterdata.bookId ?? '',
+                                                  },
+                                                );
                                               },
-                                            );
-                                          },
-                                          height: 34,
-                                          startIcon: "assets/images/learn.png",
-                                        ),
-                                      ),
-                                      SizedBox(width: 24),
-                                      Expanded(
-                                        child: PrimaryButton(
-                                          buttonColor: primarycolor,
-                                          textValue: "Start Quiz",
-                                          textColor: whitecolor,
-                                          startIcon: "assets/images/quiz.png",
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Get.to(
-                                              () => const QnaPage(),
-                                              arguments: {
-                                                'chapterId':
-                                                    chapterdata.id ?? '',
-                                                'chapterName':
-                                                    chapterdata.title ?? '',
-                                                'bookId':
-                                                    chapterdata.bookId ?? '',
+                                              height: 34,
+                                              startIcon: "assets/images/learn.png",
+                                            ),
+                                          ),
+                                        if (!isLearnMode)
+                                          Expanded(
+                                            child: PrimaryButton(
+                                              buttonColor: primarycolor,
+                                              textValue: "Start Quiz",
+                                              textColor: whitecolor,
+                                              startIcon: "assets/images/quiz.png",
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                Get.to(
+                                                  () => const QnaPage(),
+                                                  arguments: {
+                                                    'chapterId':
+                                                        chapterdata.id ?? '',
+                                                    'chapterName':
+                                                        chapterdata.title ?? '',
+                                                    'bookId':
+                                                        chapterdata.bookId ?? '',
+                                                  },
+                                                );
                                               },
-                                            );
-                                          },
-                                          height: 34,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                              height: 34,
+                                            ),
+                                          ),
+                                      ],
+                                    );
+                                  }),
                                 ],
                               ),
                             );

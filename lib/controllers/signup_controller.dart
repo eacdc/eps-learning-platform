@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/grade_list.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
+import 'package:test_your_learing/models/response_model/api_response.dart';
 import 'package:test_your_learing/models/response_model/error_response.dart';
-import 'package:test_your_learing/models/signup_model/signup_otp_response.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
 import 'package:test_your_learing/views/screen/authentication/login.dart';
 
@@ -23,13 +23,11 @@ class SignupController extends GetxController
   var firebaseVerificationId = "";
   var statusMessage = "".obs;
   var statusMessageColor = Colors.black.obs;
+  var googleToken = "".obs;
 
   var superAdminLogin = false.obs;
 
   var timer;
-
-  var signupOtpResponse =
-      Rxn<SignupOtpResponse>(); // Holds LoginResponse object
 
   var user_name = "".obs;
   var user_nameLoading = false.obs;
@@ -95,93 +93,108 @@ class SignupController extends GetxController
 
 
 
-  void sendSignupOTP(String _username,
+  Future<ApiResponse> registerUser(
+    String _username,
     String _fullname,
     String _email,
     String _phonenumber,
     String _password,
-    String _conpassword,
     String _role,
-    Grade _grade,
+    Grade? _grade,
     String publisher,
     BuildContext context,) async {
     isLoading.value = true;
 
     try {
       var response = await ApiManager.request(
-        endpoint: ApiManager.sendSignupOTP,
+        endpoint: ApiManager.register,
         method: "POST",
         body: {
-  "username": _username,
-  "fullname": _fullname,
-  "email": _email,
-  "phone": _phonenumber,
-  "role": _role,
-  "grade": _grade.value,
-  "password": _password,
-  "publisher": publisher
-},
+          "username": _username,
+          "fullname": _fullname,
+          "email": _email,
+          "phone": _phonenumber,
+          "role": _role,
+          "grade": _grade?.value,
+          "password": _password,
+          "publisher": publisher,
+        },
       );
 
-      if (response.statusCode == 200) {
-        signupOtpResponse.value = SignupOtpResponse.fromJson(response.data);
-
+      if (response.statusCode == 201 || response.statusCode == 200) {
         SnackBarHelper.showSuccessSnackBar(
           context,
-          signupOtpResponse.value?.message ?? "",
+          response.data["message"] ?? "Registration completed successfully",
         );
-
-         isOtpSent.value = true;
-         startResendOtpTimer();
-
-        //Get.to(() => HomeScreen());
-      } else {
-        final error = ErrorResponse.fromJson(response.data);
-        SnackBarHelper.showFailureSnackBar(context, error.message);
-      }
-    } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-
-
-  void verifySignupOTP(String email, String otp, BuildContext context) async {
-    isLoading.value = true;
-
-    try {
-      var response = await ApiManager.request(
-        endpoint: ApiManager.verifySignupOTP,
-        method: "POST",
-        body: {"email": email, "otp": otp},
-      );
-
-      if (response.statusCode == 201) {
-        signupOtpResponse.value = SignupOtpResponse.fromJson(response.data);
-
-        SnackBarHelper.showSuccessSnackBar(
-          context,
-          signupOtpResponse.value?.message ?? "",
-        );
-
         Get.offAll(() => LoginPage());
       } else {
         final error = ErrorResponse.fromJson(response.data);
         SnackBarHelper.showFailureSnackBar(context, error.message);
       }
+      return response;
     } catch (e) {
       SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      return ApiResponse(
+        statusCode: 500,
+        data: {"message": "Unexpected error: $e"},
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  resendSignupOtp(String email, BuildContext context) async {
-    resendOTP.value = false;
-   // sendSignupOTP(email, context);
+  Future<ApiResponse> registerGoogleVerified(
+    String _username,
+    String _fullname,
+    String _phonenumber,
+    String _password,
+    String _role,
+    Grade? _grade,
+    String publisher,
+    BuildContext context,
+  ) async {
+    isLoading.value = true;
+    try {
+      final response = await ApiManager.request(
+        endpoint: ApiManager.registerGoogleIdToken,
+        method: "POST",
+        body: {
+          "idToken": googleToken.value,
+          "username": _username,
+          "fullname": _fullname,
+          "phone": _phonenumber,
+          "role": _role,
+          "grade": _grade?.value,
+          "password": _password,
+          "publisher": publisher,
+        },
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        SnackBarHelper.showSuccessSnackBar(
+          context,
+          response.data["message"] ??
+              "Account created successfully! You can now sign in.",
+        );
+        Get.offAll(() => LoginPage());
+      } else {
+        final error = ErrorResponse.fromJson(response.data);
+        SnackBarHelper.showFailureSnackBar(context, error.message);
+      }
+      return response;
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      return ApiResponse(
+        statusCode: 500,
+        data: {"message": "Unexpected error: $e"},
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
+
+  // Kept temporarily for backward-compatible widget compilation.
+  void verifySignupOTP(String email, String otp, BuildContext context) {}
+  void resendSignupOtp(String email, BuildContext context) {}
 
   /*   getOtp() async {
     FirebaseAuth.instance.verifyPhoneNumber(
@@ -245,19 +258,6 @@ class SignupController extends GetxController
       statusMessage.value = "Error checking phone number: $e";
       return false;
     } */
-  }
-
-  startResendOtpTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (resendAfter.value != 0) {
-        resendAfter.value--;
-      } else {
-        resendAfter.value = 30;
-        resendOTP.value = true;
-        timer.cancel();
-      }
-      update();
-    });
   }
 
   @override

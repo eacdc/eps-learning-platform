@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/constants/constant.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
+import 'package:test_your_learing/models/login_model/google_accounts_response.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/utils/app_colors.dart';
 import 'package:test_your_learing/views/custom_widgets/primary_button.dart';
@@ -28,19 +29,37 @@ class GateStatrtedScreen extends StatefulWidget {
 
 class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
   List<String> scopes = <String>[
-    //'https://www.googleapis.com/auth/contacts.readonly',
     'email',
     'profile',
     'openid',
   ];
-  //  GoogleSignInAccount? _currentUser;
-  //  bool _isAuthorized = false; // has granted permissions?
 
   final loginController = findOrPut(() => LoginController());
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _googleSubscription;
+  bool _googleInitialized = false;
+  bool _handlingGoogleEvent = false;
 
   @override
   void initState() {
     super.initState();
+    _initGoogleSignIn();
+  }
+
+  void _initGoogleSignIn() {
+    if (_googleInitialized) return;
+    _googleInitialized = true;
+    GoogleSignIn.instance
+        .initialize(
+          clientId: Constants.googleLoginClientId,
+          serverClientId: Constants.googleLoginServerClientId,
+        )
+        .catchError((_) {});
+  }
+
+  @override
+  void dispose() {
+    _googleSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -127,17 +146,6 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
 
                           const SizedBox(height: 32),
 
-                          PrimaryButton(
-                            buttonColor: primarycolor,
-                            textValue: "Continue With Email",
-                            textColor: Colors.white,
-                            onPressed: () {
-                              Get.to(LoginPage());
-                            },
-                          ),
-
-                          const SizedBox(height: 16),
-
                           Material(
                             borderRadius: BorderRadius.circular(32.0),
                             elevation: 0,
@@ -194,96 +202,14 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          /*  Material(
-                            borderRadius: BorderRadius.circular(10.0),
-                            elevation: 0,
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.black),
-                                /*  gradient: LinearGradient(
-                      colors: [
-                        primarycolor,
-                        primarycolor
-                      ], // Replace with your gradient colors
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ), */
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(32.0),
-                              ),
-                              child: InkWell(
-                                onTap: () {},
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/icon_facebook.png",
-                                        height: 24,
-                                        width: 24,
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "Continue with Facebook",
-                                        style: heading6.copyWith(
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-      
-                          const SizedBox(height: 24), */
-
-                          // const Spacer(),
-
-                          // Footer Text
-                          InkWell(
-                            onTap: () {
-                              // showCustomerOnboardBottomsheet(context);
-                              Get.to(() => SignupPage());
-                            },
-                            child: Align(
-                              alignment: AlignmentDirectional.center,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                ),
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: 'New to EPS?  ',
-                                    style: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
-                                      fontFamily: Constants.fontFamily,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    // style: DefaultTextStyle.of(context).style,
-                                    children: <TextSpan>[
-                                      /* TextSpan(
-                                text: 'bold',
-                                style: TextStyle(fontWeight: FontWeight.bold)), */
-                                      TextSpan(
-                                        text: 'Create Account',
-                                        style: TextStyle(
-                                          color: primarycolor,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                          Text(
+                            "Sign up or login with Google to continue",
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontFamily: Constants.fontFamily,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -304,81 +230,97 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
   }
 
   void googleAccountLogin() {
-    // _handleSignOut();
-    final GoogleSignIn signIn = GoogleSignIn.instance;
+    // Cancel any previous subscription before attaching a new one.
+    _googleSubscription?.cancel();
+    _handlingGoogleEvent = false;
 
-    unawaited(
-      signIn
-          .initialize(
-            clientId: Constants.googleLoginClientId,
-            serverClientId: Constants.googleLoginServerClientId,
-          )
-          .then((_) {
-            signIn.authenticationEvents
-                .listen(_handleAuthenticationEvent)
-                .onError(_handleAuthenticationError);
+    _googleSubscription = GoogleSignIn.instance.authenticationEvents
+        .listen(_handleAuthenticationEvent)
+          ..onError(_handleAuthenticationError);
 
-            /// This example always uses the stream-based approach to determining
-            /// which UI state to show, rather than using the future returned here,
-            /// if any, to conditionally skip directly to the signed-in state.
-            // signIn.attemptLightweightAuthentication();
-
-            signIn.authenticate(scopeHint: scopes);
-          }),
-    );
+    GoogleSignIn.instance.authenticate(scopeHint: scopes);
   }
 
   Future<void> _handleAuthenticationEvent(
     GoogleSignInAuthenticationEvent event,
   ) async {
-    // #docregion CheckAuthorization
-    final GoogleSignInAccount? user = // ...
-    // #enddocregion CheckAuthorization
-    switch (event) {
+    // Guard: set immediately to block any duplicate events firing in parallel.
+    if (_handlingGoogleEvent) return;
+    _handlingGoogleEvent = true;
+    _googleSubscription?.cancel();
+    _googleSubscription = null;
+
+    final GoogleSignInAccount? user = switch (event) {
       GoogleSignInAuthenticationEventSignIn() => event.user,
       GoogleSignInAuthenticationEventSignOut() => null,
     };
 
-    // Check for existing authorization.
-    // #docregion CheckAuthorization
+    if (user == null) {
+      _handlingGoogleEvent = false;
+      return;
+    }
+
     final GoogleSignInClientAuthorization? authorization = await user
-        ?.authorizationClient
+        .authorizationClient
         .authorizationForScopes(scopes);
-    // #enddocregion CheckAuthorization
 
-    print("ggl\n " + (authorization?.accessToken.toString() ?? "__"));
-    print("ggl\n " + (user?.authentication.idToken.toString() ?? "__"));
-    print("ggl name \n " + (user?.displayName.toString() ?? "__"));
-    print("ggl email \n " + (user?.email.toString() ?? "__"));
-    print("ggl google id\n " + (user?.id.toString() ?? "__"));
+    if (!mounted) return;
 
-    // If the user has already granted access to the required scopes, call the
-    // REST API.
-    if (user != null && authorization != null) {
-      //unawaited(_handleGetContact(user));
-      print("ggl" + "user sign in");
-
-      final _name = user.displayName.toString() ?? "";
-      final _email = user.email.toString() ?? "";
-      final _google_id = user.id.toString() ?? "";
-
-      loginController.googleLoginVerify(_name, _email, _google_id, context);
-    } else {
+    if (authorization == null) {
+      _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "unable to fetch google account details",
+        "Unable to fetch Google account details. Please try again.",
+      );
+      return;
+    }
+
+    final googleToken = user.authentication.idToken;
+    if (googleToken == null || googleToken.isEmpty) {
+      _handlingGoogleEvent = false;
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Unable to verify Google sign-in token. Please try again.",
+      );
+      return;
+    }
+
+    final response = await loginController.fetchAccountsByGoogleToken(
+      googleToken,
+      context,
+    );
+
+    if (!mounted) return;
+    _handlingGoogleEvent = false;
+
+    if (response.statusCode != 200) {
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        response.data["message"] ?? "Unable to continue with Google",
+      );
+      return;
+    }
+
+    final accounts = GoogleAccountsResponse.fromJson(response.data);
+    if (accounts.users.isEmpty) {
+      Get.to(
+        () => SignupPage(),
+        arguments: {"googleToken": googleToken, "googleEmail": accounts.email},
+      );
+    } else {
+      Get.to(() => LoginPage());
+      SnackBarHelper.showSuccessSnackBar(
+        context,
+        "Google account found. Select username and enter password to sign in.",
       );
     }
   }
 
   Future<void> _handleAuthenticationError(Object e) async {
-    // e is GoogleSignInException ? e.toString() : 'Unknown error: $e';
-    print(e.toString());
-  }
-
-  Future<void> _handleSignOut() async {
-    // Disconnect instead of just signing out, to reset the example state as
-    // much as possible.
-    await GoogleSignIn.instance.disconnect();
+    _handlingGoogleEvent = false;
+    SnackBarHelper.showFailureSnackBar(
+      context,
+      "Google sign-in failed. Please try again.",
+    );
   }
 }

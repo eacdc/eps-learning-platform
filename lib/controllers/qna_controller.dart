@@ -265,7 +265,7 @@ class QnaController extends GetxController
 
     final aiLoadingModel = ChatMessageModel(
       role: 'assistant',
-      content: "Ai Thinking...",
+      content: "Teacher is Thinking...",
       isAudio: false,
       audioFileId: null,
       messageId: null,

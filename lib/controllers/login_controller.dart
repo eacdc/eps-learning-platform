@@ -4,21 +4,20 @@ import 'package:get/get.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/models/response_model/api_response.dart';
-import 'package:test_your_learing/models/response_model/error_response.dart';
 import 'package:test_your_learing/models/login_model/login_response.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
 import 'package:test_your_learing/views/screen/dashboard/dashboardpage.dart';
 
-import '../models/login_model/google_login_response.dart';
-
 class LoginController extends GetxController {
   var isLoading = false.obs;
   var getStartLoading = false.obs;
-  var loginResponse = Rxn<LoginResponse>(); // Holds LoginResponse object
-  var googleLoginResponse =
-      Rxn<GoogleLoginResponse>(); // Holds LoginResponse object
+  var loginResponse = Rxn<LoginResponse>();
 
-  void loginUser(String username, String password, BuildContext context) async {
+  Future<ApiResponse> loginUser(
+    String username,
+    String password,
+    BuildContext context,
+  ) async {
     isLoading.value = true;
 
     try {
@@ -30,82 +29,89 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         loginResponse.value = LoginResponse.fromJson(response.data);
-
-        await FlutterSecureStorage().write(
-          key: "auth_token",
-          value: loginResponse.value?.token ?? "",
-        );
-
-        SharedPreferencesService.setUserId(loginResponse.value?.userId ?? "");
-        SharedPreferencesService.setGrade(loginResponse.value?.grade ?? "");
-        SharedPreferencesService.setAccessToken(
-          loginResponse.value?.token ?? "",
-        );
-        SharedPreferencesService.setLoginStatus(true);
-
+        await _persistSession(loginResponse.value!);
         SnackBarHelper.showSuccessSnackBar(context, "Login Successful");
-
         Get.offAll(() => DashboardPage());
       } else {
-        final error = ErrorResponse.fromJson(response.data);
-        SnackBarHelper.showFailureSnackBar(context, error.message);
+        SnackBarHelper.showFailureSnackBar(
+          context,
+          response.data["message"] ?? "Login failed",
+        );
       }
+      return response;
     } catch (e) {
       SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      return ApiResponse(
+        statusCode: 500,
+        data: {"message": "Unexpected error: $e"},
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  void googleLoginVerify(
-    String name,
+  Future<ApiResponse> discoverAccountsByEmail(
     String email,
-    String google_id,
     BuildContext context,
   ) async {
-   getStartLoading .value = true;
+    isLoading.value = true;
 
     try {
       ApiResponse response = await ApiManager.request(
-        endpoint: ApiManager.verifyGoogleLogin,
+        endpoint: ApiManager.login,
         method: "POST",
-        body: {"email": email, "fullname": name, "googleId": google_id},
+        body: {"email": email},
       );
-
-      if (response.statusCode == 200) {
-        googleLoginResponse.value = GoogleLoginResponse.fromJson(response.data);
-
-        /*  await FlutterSecureStorage().write(
-        key: "auth_token",
-        value: loginResponse.value?.token ?? "",
-      ); */
-
-        if (googleLoginResponse.value?.success ?? false) {
-          SharedPreferencesService.setUserId(
-            googleLoginResponse.value?.user?.id ?? "",
-          );
-          SharedPreferencesService.setGrade(
-            googleLoginResponse.value?.user?.grade ?? "",
-          );
-          SharedPreferencesService.setAccessToken(
-            googleLoginResponse.value?.token ?? "",
-          );
-          SharedPreferencesService.setLoginStatus(true);
-
-          SnackBarHelper.showSuccessSnackBar(context, "Login Successful");
-
-          Get.offAll(() => DashboardPage());
-        }else{
-          SnackBarHelper.showFailureSnackBar(context, googleLoginResponse.value?.message ?? "Google login failed");
-        }
-      } else {
-        final error = ErrorResponse.fromJson(response.data);
-        SnackBarHelper.showFailureSnackBar(context, error.message);
-      }
+      return response;
     } catch (e) {
       SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      return ApiResponse(
+        statusCode: 500,
+        data: {"message": "Unexpected error: $e"},
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<ApiResponse> fetchAccountsByGoogleToken(
+    String idToken,
+    BuildContext context,
+  ) async {
+    getStartLoading.value = true;
+    try {
+      // Debug: confirm token is present before sending
+      assert(
+        idToken.isNotEmpty,
+        'fetchAccountsByGoogleToken: idToken is empty',
+      );
+      final response = await ApiManager.request(
+        endpoint: ApiManager.accountsByGoogleIdToken,
+        method: "POST",
+        body: {"idToken": idToken},
+      );
+      if (response.statusCode != 200) {
+        // Print full backend message to Flutter console for debugging
+        print('[Google Auth] accounts-by-google-idtoken error '
+            '${response.statusCode}: ${response.data}');
+      }
+      return response;
+    } catch (e) {
+      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      return ApiResponse(
+        statusCode: 500,
+        data: {"message": "Unexpected error: $e"},
+      );
     } finally {
       getStartLoading.value = false;
     }
+  }
+
+  Future<void> _persistSession(LoginResponse response) async {
+    await FlutterSecureStorage().write(key: "auth_token", value: response.token);
+    SharedPreferencesService.setUserId(response.userId);
+    SharedPreferencesService.setGrade(response.grade);
+    SharedPreferencesService.setAccessToken(response.token);
+    SharedPreferencesService.setLoginStatus(true);
   }
 }

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
+import 'package:test_your_learing/models/forgot_password_model/forgot_password_verify_response.dart';
 import 'package:test_your_learing/models/response_model/api_response.dart';
 import 'package:test_your_learing/models/response_model/api_response_new.dart';
 import 'package:test_your_learing/networks/api_manager.dart';
-import 'package:test_your_learing/views/screen/authentication/forgotpasswordpage/resetpassword_page.dart';
 
 import '../helper/sharedpreference_helper.dart';
 import '../views/screen/authentication/login.dart';
@@ -18,11 +18,7 @@ class ForgotPasswordController extends GetxController
   var isLoading = false.obs;
   var isLogin = true;
   var phoneNo = "".obs;
-  var emailid = "".obs;
-  var otp = "".obs;
-  var isOtpSent = false.obs;
-  var resendAfter = 30.obs;
-  var resendOTP = false.obs;
+  var username = "".obs;
   var firebaseVerificationId = "";
   var statusMessage = "".obs;
   var statusMessageColor = Colors.black.obs;
@@ -85,77 +81,79 @@ class ForgotPasswordController extends GetxController
     }
   }
 
-  void sendFPOTP(String email, BuildContext context) async {
+  /// Step 1 — Verify Google idToken, receive resetAuthToken + usernames.
+  Future<ForgotPasswordVerifyResponse?> googleVerifyForgotPassword(
+    String idToken,
+    BuildContext context,
+  ) async {
     isLoading.value = true;
-
     try {
       final ApiResponseNew response = await ApiManager.requestNew(
-        endpoint: ApiManager.forgotPasswordOtp,
+        endpoint: ApiManager.forgotPasswordGoogleVerify,
         method: "POST",
-        body: {"email": email},
+        body: {"idToken": idToken},
       );
-
       if (response.isSuccess) {
-        isOtpSent.value = true;
-
-        SnackBarHelper.showSuccessSnackBar(
-          context,
-          response.data["message"] ?? "OTP sent successfully",
+        return ForgotPasswordVerifyResponse.fromJson(
+          Map<String, dynamic>.from(response.data),
         );
-
-        startResendOtpTimer();
       } else {
         SnackBarHelper.showFailureSnackBar(
           context,
-          response.data["message"] ?? "Failed to send OTP",
+          response.data["message"] ?? "Google verification failed",
         );
+        return null;
       }
     } catch (e) {
       SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      return null;
     } finally {
       isLoading.value = false;
     }
   }
 
-  void verifyOTPResetPassword(
-    String email,
-    String otp,
+  /// Step 2 — Complete password reset using backend-issued resetAuthToken.
+  Future<void> completeForgotPasswordReset(
+    String resetAuthToken,
+    String username,
     String newPassword,
     BuildContext context,
   ) async {
     isLoading.value = true;
-
     try {
       final ApiResponseNew response = await ApiManager.requestNew(
-        endpoint: ApiManager.verifyOtpResetPassword,
+        endpoint: ApiManager.forgotPasswordComplete,
         method: "POST",
-        body: {"email": email, "otp": otp, "newPassword": newPassword},
+        body: {
+          "resetAuthToken": resetAuthToken,
+          "username": username,
+          "newPassword": newPassword,
+        },
       );
-
       if (response.isSuccess) {
         SnackBarHelper.showSuccessSnackBar(
           context,
-          response.data["message"] ?? "OTP verified successfully",
+          response.data["message"] ??
+              "Password reset successfully. Please login again.",
         );
-
-        //logi
         Get.offAll(() => LoginPage());
       } else {
-        SnackBarHelper.showFailureSnackBar(
-          context,
-          response.data["message"] ?? "Failed to verify OTP",
-        );
+        final statusCode = response.statusCode;
+        String errorMessage = response.data["message"] ?? "Failed to reset password";
+        if (statusCode == 409) {
+          errorMessage = "This reset link has already been used. Please verify with Google again.";
+        } else if (statusCode == 422) {
+          errorMessage = "Password is too weak. Use at least 8 characters with letters and numbers.";
+        } else if (statusCode == 429) {
+          errorMessage = "Too many attempts. Please try again later.";
+        }
+        SnackBarHelper.showFailureSnackBar(context, errorMessage);
       }
     } catch (e) {
       SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
     } finally {
       isLoading.value = false;
     }
-  }
-
-  resendOtp(String email, BuildContext context) async {
-    resendOTP.value = false;
-    sendFPOTP(email, context);
   }
 
   /*   getOtp() async {
@@ -220,19 +218,6 @@ class ForgotPasswordController extends GetxController
       statusMessage.value = "Error checking phone number: $e";
       return false;
     } */
-  }
-
-  startResendOtpTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (resendAfter.value != 0) {
-        resendAfter.value--;
-      } else {
-        resendAfter.value = 30;
-        resendOTP.value = true;
-        timer.cancel();
-      }
-      update();
-    });
   }
 
   @override

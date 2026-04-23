@@ -1,4 +1,4 @@
-import 'dart:async' show unawaited;
+import 'dart:async' show StreamSubscription, unawaited;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,6 +18,8 @@ import 'package:test_your_learing/controllers/auth_controller.dart';
 import 'package:test_your_learing/controllers/login_controller.dart';
 import 'package:test_your_learing/helper/getx_helper.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
+import 'package:test_your_learing/models/login_model/google_accounts_response.dart';
+import 'package:test_your_learing/models/login_model/login_discovery_response.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
 import 'package:test_your_learing/views/custom_widgets/input_field.dart';
@@ -44,96 +46,263 @@ class _LoginPageState extends State<LoginPage> {
 
   bool passwordVisible = false;
   bool isRememberMe = false;
+
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _googleSubscription;
+  bool _handlingGoogleEvent = false;
+  bool _googleInitialized = false;
+
+  final List<String> scopes = ['email', 'profile', 'openid'];
+
   void togglePassword() {
     setState(() {
       passwordVisible = !passwordVisible;
     });
   }
 
-  List<String> scopes = <String>[
-    //'https://www.googleapis.com/auth/contacts.readonly',
-    'email',
-    'profile',
-    'openid',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _initGoogleSignIn();
+  }
+
+  void _initGoogleSignIn() {
+    if (_googleInitialized) return;
+    _googleInitialized = true;
+    GoogleSignIn.instance
+        .initialize(
+          clientId: Constants.googleLoginClientId,
+          serverClientId: Constants.googleLoginServerClientId,
+        )
+        .catchError((_) {});
+  }
+
+  @override
+  void dispose() {
+    _googleSubscription?.cancel();
+    super.dispose();
+  }
 
   void googleAccountLogin() {
-    // _handleSignOut();
-    final GoogleSignIn signIn = GoogleSignIn.instance;
+    _googleSubscription?.cancel();
+    _handlingGoogleEvent = false;
 
-    unawaited(
-      signIn
-          .initialize(
-            clientId: Constants.googleLoginClientId,
-            serverClientId: Constants.googleLoginServerClientId,
-          )
-          .then((_) {
-            signIn.authenticationEvents
-                .listen(_handleAuthenticationEvent)
-                .onError(_handleAuthenticationError);
+    _googleSubscription = GoogleSignIn.instance.authenticationEvents
+        .listen(_handleAuthenticationEvent)
+          ..onError(_handleAuthenticationError);
 
-            /// This example always uses the stream-based approach to determining
-            /// which UI state to show, rather than using the future returned here,
-            /// if any, to conditionally skip directly to the signed-in state.
-            // signIn.attemptLightweightAuthentication();
-
-            signIn.authenticate(scopeHint: scopes);
-          }),
-    );
+    GoogleSignIn.instance.authenticate(scopeHint: scopes);
   }
 
   Future<void> _handleAuthenticationEvent(
     GoogleSignInAuthenticationEvent event,
   ) async {
-    // #docregion CheckAuthorization
-    final GoogleSignInAccount? user = // ...
-    // #enddocregion CheckAuthorization
-    switch (event) {
+    if (_handlingGoogleEvent) return;
+    _handlingGoogleEvent = true;
+    _googleSubscription?.cancel();
+    _googleSubscription = null;
+
+    final GoogleSignInAccount? user = switch (event) {
       GoogleSignInAuthenticationEventSignIn() => event.user,
       GoogleSignInAuthenticationEventSignOut() => null,
     };
 
-    // Check for existing authorization.
-    // #docregion CheckAuthorization
+    if (user == null) {
+      _handlingGoogleEvent = false;
+      return;
+    }
+
     final GoogleSignInClientAuthorization? authorization = await user
-        ?.authorizationClient
+        .authorizationClient
         .authorizationForScopes(scopes);
-    // #enddocregion CheckAuthorization
 
-    print("ggl\n " + (authorization?.accessToken.toString() ?? "__"));
-    print("ggl\n " + (user?.authentication.idToken.toString() ?? "__"));
-    print("ggl name \n " + (user?.displayName.toString() ?? "__"));
-    print("ggl email \n " + (user?.email.toString() ?? "__"));
-    print("ggl google id\n " + (user?.id.toString() ?? "__"));
+    if (!mounted) return;
 
-    // If the user has already granted access to the required scopes, call the
-    // REST API.
-    if (user != null && authorization != null) {
-      //unawaited(_handleGetContact(user));
-      print("ggl" + "user sign in");
+    if (authorization == null) {
+      _handlingGoogleEvent = false;
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Unable to fetch Google account details. Please try again.",
+      );
+      return;
+    }
 
-      final _name = user.displayName.toString() ?? "";
-      final _email = user.email.toString() ?? "";
-      final _google_id = user.id.toString() ?? "";
+    final googleToken = user.authentication.idToken;
+    if (googleToken == null || googleToken.isEmpty) {
+      _handlingGoogleEvent = false;
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Unable to verify Google sign-in token. Please try again.",
+      );
+      return;
+    }
 
-      loginController.googleLoginVerify(_name, _email, _google_id, context);
+    final response = await loginController.fetchAccountsByGoogleToken(
+      googleToken,
+      context,
+    );
+
+    if (!mounted) return;
+    _handlingGoogleEvent = false;
+
+    if (response.statusCode == 200) {
+      final accounts = GoogleAccountsResponse.fromJson(response.data);
+      if (accounts.users.isEmpty) {
+        Get.to(
+          () => SignupPage(),
+          arguments: {"googleToken": googleToken, "googleEmail": accounts.email},
+        );
+        return;
+      }
+      await _showGoogleAccountsDialog(accounts);
     } else {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "unable to fetch google account details",
+        response.data["message"] ?? "Google login failed",
       );
     }
   }
 
   Future<void> _handleAuthenticationError(Object e) async {
-    // e is GoogleSignInException ? e.toString() : 'Unknown error: $e';
-    print(e.toString());
+    _handlingGoogleEvent = false;
+    if (!mounted) return;
+    SnackBarHelper.showFailureSnackBar(
+      context,
+      "Google sign-in failed. Please try again.",
+    );
   }
 
-  Future<void> _handleSignOut() async {
-    // Disconnect instead of just signing out, to reset the example state as
-    // much as possible.
-    await GoogleSignIn.instance.disconnect();
+  Future<void> _showGoogleAccountsDialog(GoogleAccountsResponse accounts) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Choose an account",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Select your username, then enter the password to continue.",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...accounts.users.map(
+                  (user) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(user.username),
+                    subtitle: Text("${user.fullname} • ${user.role}"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      emailController.text = user.username;
+                      SnackBarHelper.showSuccessSnackBar(
+                        this.context,
+                        "Username selected. Enter password to sign in.",
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _discoverUsernamesByEmail(String email, String password) async {
+    final response = await loginController.discoverAccountsByEmail(email, context);
+    if (response.statusCode != 200) {
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        response.data["message"] ?? "Unable to find usernames for this email",
+      );
+      return;
+    }
+
+    final discovery = LoginDiscoveryResponse.fromJson(response.data);
+    if (!discovery.requiresUsernameSelection || discovery.usernames.isEmpty) {
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        discovery.message.isNotEmpty
+            ? discovery.message
+            : "No usernames found for this email",
+      );
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Select your username",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  discovery.message,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...discovery.usernames.map(
+                  (candidate) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(candidate.username),
+                    subtitle: Text("${candidate.fullname} • ${candidate.role}"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      emailController.text = candidate.username;
+                      if (password.trim().isNotEmpty) {
+                        loginController.loginUser(candidate.username, password, this.context);
+                      } else {
+                        SnackBarHelper.showSuccessSnackBar(
+                          this.context,
+                          "Username selected. Enter password to sign in.",
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -245,8 +414,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                            */
                           InputField(
-                            title: "User Name",
-                            hintText: 'Enter your User Name',
+                            title: "Username or Email ID",
+                            hintText: 'Enter your username or email ID',
                             suffixIcon: _buildSuffixIcon(),
                             controller: emailController,
                             prefixIcon: Icon(
@@ -261,8 +430,8 @@ class _LoginPageState extends State<LoginPage> {
                                 (val) => authController.emailid.value = val!,
                             validator:
                                 (val) =>
-                                    (val!.isEmpty || val!.length < 10)
-                                        ? "Enter valid User Name"
+                                    (val == null || val.trim().length < 2)
+                                        ? "Enter a valid username or email ID"
                                         : null,
                           ),
                           SizedBox(height: 16),
@@ -369,20 +538,24 @@ class _LoginPageState extends State<LoginPage> {
 
                               final _email = emailController.text;
                               final _password = passwordController.text;
+                              final identifier = _email.trim();
+                              if (identifier.isEmpty ||
+                                  !_isValidLoginIdentifier(identifier)) {
+                                SnackBarHelper.showFailureSnackBar(
+                                  context,
+                                  "Please enter a valid username or email ID",
+                                );
+                                return;
+                              }
 
-                              if (validateCredentials(
+                              if (_isValidEmail(identifier)) {
+                                _discoverUsernamesByEmail(identifier, _password);
+                              } else if (validateCredentials(
                                 _email,
                                 _password,
                                 context,
                               )) {
-                                /* loginController.loginUser(
-                                  _email, _password, context); */
-                                loginController.loginUser(
-                                  _email,
-                                  _password,
-                                  context,
-                                );
-
+                                loginController.loginUser(_email, _password, context);
                                 FocusManager.instance.primaryFocus?.unfocus();
                               }
                             },
@@ -690,18 +863,25 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildSuffixIcon() {
     return AnimatedOpacity(
-      opacity: _isValidEmail(authController.emailid.value) ? 1.0 : 0.0,
+      opacity: _isValidLoginIdentifier(authController.emailid.value) ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 250),
       child: Icon(Icons.check_circle, color: primarycolor, size: 18),
     );
   }
 
-  /// Function to check if email is valid
-  bool _isValidEmail(String email) {
-    // return email.length > 3;
+  bool _isValidEmail(String value) {
     return RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-    ).hasMatch(email);
+    ).hasMatch(value);
+  }
+
+  bool _isValidUsername(String value) {
+    return RegExp(r'^[a-zA-Z0-9._]{2,}$').hasMatch(value);
+  }
+
+  /// Function to check whether identifier is a valid username or email.
+  bool _isValidLoginIdentifier(String value) {
+    return _isValidEmail(value) || _isValidUsername(value);
   }
 
   bool validateCredentials(
@@ -709,25 +889,16 @@ class _LoginPageState extends State<LoginPage> {
     String password,
     BuildContext context,
   ) {
-    final RegExp emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-
-    /*   if (email.isEmpty || !emailRegex.hasMatch(email)) {
-      SnackBarHelper.showFailureSnackBar(
-          context, "Please enter a valid email address");
-      return false;
-    } */
-
-    if (email.isEmpty || email.trim().length < 2) {
+    final identifier = email.trim();
+    if (identifier.isEmpty || !_isValidLoginIdentifier(identifier)) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid User Name",
+        "Please enter a valid username or email ID",
       );
       return false;
     }
 
-    if (password.isEmpty || password.length < 2) {
+    if (password.isEmpty || password.length < 6) {
       SnackBarHelper.showFailureSnackBar(
         context,
         "Please enter a valid password",

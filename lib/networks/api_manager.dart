@@ -12,13 +12,26 @@ class ApiManager {
 
   // API Endpoints
   static const String login = "/api/users/login";
-  static const String sendSignupOTP = "/api/users/send-otp";
-  static const String verifySignupOTP = "/api/users/verify-otp";
-  static const String resendSignupOTP = "/api/users/resend-otp";
+  static const String register = "/api/users/register";
+  static const String registerGoogleVerified =
+      "/api/users/register-google-verified";
+  static const String accountsByGoogleToken =
+      "/api/users/accounts-by-google-token";
+  // Mobile-native Google Sign-In endpoints (accept Google SDK idToken directly)
+  static const String accountsByGoogleIdToken =
+      "/api/users/accounts-by-google-idtoken";
+  static const String registerGoogleIdToken =
+      "/api/users/register-google-idtoken";
   static const String checkUsername = "/api/users/check-username";
-  static const String forgotPasswordOtp = "/api/users/forgot-password";
-  static const String verifyOtpResetPassword = "/api/users/reset-password";
-  static const String verifyGoogleLogin = "/api/social-auth/google-login";
+  // Secure 2-step forgot password (new)
+  static const String forgotPasswordGoogleVerify =
+      "/api/users/forgot-password/google-verify";
+  static const String forgotPasswordComplete =
+      "/api/users/forgot-password/complete";
+  // Deprecated (backend returns 410)
+  static const String forgotPassword = "/api/users/forgot-password";
+  static const String resetPassword = "/api/users/reset-password";
+  static const String googleAuthStart = "/api/social-auth/google";
   static const String changePassword = "/api/users/change-password";
   static const String bookCollectionList = "/api/books";
   static const String bookCollectionFilterSearch =
@@ -104,22 +117,7 @@ class ApiManager {
 
   //-----------------------------------------\\
 
-  static const String loginwithplno = "/api/loginusingplno/";
-  static const String profile = "/api/employee/employeedetailsbyid";
-  static const String sendOTP = "/api/send-otp/";
-  static const String verifyOTP = "/api/verify-otp/";
-  static const String getAllIncident = "/api/incident/getallincident/";
-  static const String getAllDepartment = "/api/department/getalldepartment/";
-  static const String getAllDesignation = "/api/designation/getalldesignation/";
-  static const String getAllNearmisscause =
-      "/api/nearmisscause/getallnearmisscause/";
-  static const String s3Upload = "/api/s3/upload/";
-  static const String getAllShift = "/api/shift/getallshift/";
-  static const String submitEvents = "/api/incident/createincident/";
-  static const String getIncidentFilterSearch = "/api/incident/filtersSearch/";
 
-  static const String getIncidentDetails = "/api/incident/incidentdetailsbyid/";
-  static const String deleteAccount = "/api/employee/checkdeleteemployee/";
 
   // Dynamic Headers with Token
   static Map<String, String> headers({String? token}) {
@@ -248,48 +246,6 @@ class ApiManager {
  //   Get.snackbar("Session Expired", "Please login again");
   }
 
-  /*   static Future<dynamic> request({
-    required String endpoint,
-    String method = "GET",
-    Map<String, dynamic>? body,
-    String? token,
-  }) async {
-    try {
-      final Uri url = Uri.parse(baseUrl + endpoint);
-      final headersMap = headers(token: token);
 
-      http.Response response;
-      switch (method) {
-        case "POST":
-          response = await http.post(
-            url,
-            headers: headersMap,
-            body: jsonEncode(body), // Convert parameters to JSON
-          );
-          break;
-        case "PUT":
-          response =
-              await http.put(url, headers: headersMap, body: jsonEncode(body));
-          break;
-        case "DELETE":
-          response = await http.delete(url, headers: headersMap);
-          break;
-        default:
-          response = await http.get(url, headers: headersMap);
-      }
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return jsonDecode(response.body);
-      } else {
-        return {
-          "error": "Failed with status ${response.statusCode}",
-          "response": response.body
-        };
-      }
-    } catch (e) {
-      return {"error": e.toString()};
-    }
-  }
-
- */
 }

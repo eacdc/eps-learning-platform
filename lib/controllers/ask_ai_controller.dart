@@ -235,7 +235,7 @@ class AskAiController extends GetxController
 
     final aiLoadingModel = AskAiMessageModel(
       role: 'assistant',
-      content: "Ai Thinking...",
+      content: "Teacher is Thinking...",
       isAudio: false,
       audioFileId: null,
       messageId: null,

@@ -17,6 +17,7 @@ class InputField extends StatelessWidget {
   final int? maxLength;  //  new parameter
   final TextInputType? keyboardType;  // new parameter
   final TextInputFormatter? inputFormatter; //  new parameter
+  final bool readOnly;
 
   const InputField({
     Key? key,
@@ -24,16 +25,16 @@ class InputField extends StatelessWidget {
     required this.title,
     this.obscureText = false,
     this.mandatory = false,
-
+    this.readOnly = false,
     this.prefixIcon,
     required this.suffixIcon,
     required this.controller,
     this.onChanged,
     this.onSaved,
-    this.validator, // Initialize validator
-    this.maxLength, // new
-    this.keyboardType, // new
-    this.inputFormatter, // new
+    this.validator,
+    this.maxLength,
+    this.keyboardType,
+    this.inputFormatter,
   }) : super(key: key);
 
   @override
@@ -77,6 +78,7 @@ class InputField extends StatelessWidget {
           ),
           child: TextFormField(
             controller: controller,
+            readOnly: readOnly,
             obscureText: obscureText,
              maxLength: maxLength, //  limit input length
             keyboardType: keyboardType, //  set keyboard type

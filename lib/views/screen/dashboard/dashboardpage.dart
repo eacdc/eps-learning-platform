@@ -179,6 +179,65 @@ List<Widget> get _actionWidget => [
     });
   }
 
+  Widget _buildCenterFAB({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required bool isSelected,
+    bool useSvgIcon = false,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(28),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            color: primarycolor,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.surface,
+              width: 3,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: primarycolor.withAlpha(50),
+                      blurRadius: 16,
+                      spreadRadius: 4,
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              useSvgIcon
+                  ? SvgPicture.asset(
+                      "assets/icons/svg_message_white.svg",
+                      semanticsLabel: label,
+                      height: 26,
+                      width: 26,
+                    )
+                  : Icon(icon, color: Colors.white, size: 26),
+              SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -214,6 +273,7 @@ List<Widget> get _actionWidget => [
   Widget build(BuildContext context) {
     return Obx(() {
       final _selectedIndex = dashboardController.selectedIndex.value;
+      final _isLearnMode = dashboardController.isLearnMode.value;
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarColor:
@@ -258,9 +318,22 @@ List<Widget> get _actionWidget => [
             child: Scaffold(
               resizeToAvoidBottomInset:
                   false, // for stop floting Fab button on keyboard
-              body: Padding(
-                padding: const EdgeInsets.only(bottom: 0),
-                child: _pages[_selectedIndex],
+              body: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 0),
+                    child: _pages[_selectedIndex],
+                  ),
+                  Obx(() => dashboardController.isClassroomExpanded.value
+                      ? GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () =>
+                              dashboardController.collapseClassroom(),
+                          child: Container(color: Colors.transparent),
+                        )
+                      : const SizedBox.shrink()),
+                ],
               ),
               appBar:
                   _selectedIndex != 0
@@ -314,7 +387,9 @@ List<Widget> get _actionWidget => [
                                     ), */
                                       SizedBox(width: 2),
                                       Text(
-                                        _pagesname[_selectedIndex] ?? "",
+                                        _selectedIndex == 2 && _isLearnMode
+                                            ? "Learn"
+                                            : (_pagesname[_selectedIndex] ?? ""),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color:
@@ -399,16 +474,8 @@ List<Widget> get _actionWidget => [
                         ),
                       ),
 
-                      Expanded(
-                        child: _buildBottomNavItem(
-                          svgon: "assets/icons/svg_circular_dot.svg",
-                          svgoff: "assets/icons/svg_circular_dot.svg",
-                          icon: Icons.circle,
-                          label: "Quiz",
-                          index: 2,
-                        ),
-                      ),
-                      // SizedBox(width: 40), // Space for the center circular item
+                      // Center slot: empty so the two FABs (Learn + Quiz) sit here
+                      Expanded(child: SizedBox.shrink()),
                       Expanded(
                         child: _buildBottomNavItem(
                           svgon: "assets/icons/svg_collection_on.svg",
@@ -431,95 +498,98 @@ List<Widget> get _actionWidget => [
                   ),
                 ),
               ),
-              floatingActionButton:
-              /* MediaQuery.of(context).viewInsets.bottom != 0
-                      ? null
-                      : FAB */
-              GestureDetector(
-                onTap: () => _onItemTapped(2),
-                child: Container(
-                  //color: blackmedium,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(14),
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: primarycolor,
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.surface,
-                            width: 3,
+              floatingActionButton: Obx(() {
+                final expanded =
+                    dashboardController.isClassroomExpanded.value;
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 16),
+                    if (expanded) ...[
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildCenterFAB(
+                            icon: Icons.menu_book_rounded,
+                            label: 'Learn',
+                            onTap: () {
+                              dashboardController.setCenterMode(true);
+                              _onItemTapped(2);
+                              dashboardController.collapseClassroom();
+                            },
+                            isSelected: _selectedIndex == 2,
                           ),
-                          boxShadow:
-                              _selectedIndex == 2
-                                  ? [
-                                    BoxShadow(
-                                      color: primarycolor.withAlpha(50),
-                                      blurRadius: 20,
-                                      spreadRadius: 8,
-                                    ),
-                                  ]
-                                  : [],
-                        ),
-
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (
-                            Widget child,
-                            Animation<double> animation,
-                          ) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin:
-                                    _selectedIndex == 2
-                                        ? const Offset(0, -0.2)
-                                        : const Offset(0, 0), // from top
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              ),
-                            );
-                          },
-                          child:
-                              _selectedIndex == 2
-                                  ? SvgPicture.asset(
-                                    "assets/icons/svg_message_white.svg",
-                                    key: const ValueKey(
-                                      'selected',
-                                    ), // triggers the animation
-                                    semanticsLabel: 'My SVG Image',
-                                    height: 24,
-                                    width: 24,
-                                  )
-                                  : SvgPicture.asset(
-                                    "assets/icons/svg_message_white.svg",
-                                    key: const ValueKey(
-                                      'unselected',
-                                    ), // static version
-                                    semanticsLabel: 'My SVG Image',
-                                    height: 24,
-                                    width: 24,
-                                  ),
-                        ),
+                          SizedBox(width: 16),
+                          _buildCenterFAB(
+                            icon: Icons.chat_bubble_outline_rounded,
+                            label: 'Quiz',
+                            onTap: () {
+                              dashboardController.setCenterMode(false);
+                              _onItemTapped(2);
+                              dashboardController.collapseClassroom();
+                            },
+                            isSelected: _selectedIndex == 2,
+                            useSvgIcon: true,
+                          ),
+                        ],
                       ),
-                      // SizedBox(height: 4),
-                      /*         Text(
-                      'Quiz',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: _selectedIndex == 2 ? primarycolor : Colors.grey,
-                      ),
-                    ), */
+                      SizedBox(height: 12),
                     ],
-                  ),
-                ),
-              ),
+                    GestureDetector(
+                      onTap: () {
+                        if (expanded) {
+                          dashboardController.collapseClassroom();
+                        } else {
+                          dashboardController.toggleClassroomExpanded();
+                        }
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(14),
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: primarycolor,
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.surface,
+                                width: 3,
+                              ),
+                              boxShadow: _selectedIndex == 2
+                                  ? [
+                                      BoxShadow(
+                                        color: primarycolor.withAlpha(50),
+                                        blurRadius: 20,
+                                        spreadRadius: 8,
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            child: Icon(
+                              Icons.school_rounded,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Classroom',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _selectedIndex == 2
+                                  ? primarycolor
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }),
 
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerDocked,

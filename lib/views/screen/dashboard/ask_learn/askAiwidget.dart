@@ -349,28 +349,31 @@ class _AskAiWidgetState extends State<AskAiWidget>
                                     return Align(
                                       alignment: Alignment.centerLeft,
                                       child: Padding(
-                                        key: message.key,
+                                        key: ValueKey('loading-${message.id}-$reversedIndex'),
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 6,
                                         ),
                                         child: _AiThink(
                                           avatar:
                                               "assets/icons/png_ai_avtar.png",
-                                          message: "Ai Thinking...",
+                                          message: "Teacher is Thinking...",
                                         ),
                                       ),
                                     );
                                   }
 
-                                  return _itemChat(
-                                    isUser: isUser,
-                                    avatar:
-                                        isUser
-                                            ? 'assets/images/user_avatar.png'
-                                            : 'assets/icons/png_ai_avtar.png',
-                                    message: message.content,
-                                    time: message.timestamp,
-                                    globalkey: message.key,
+                                  return KeyedSubtree(
+                                    key: ValueKey(message.id),
+                                    child: _itemChat(
+                                      isUser: isUser,
+                                      avatar:
+                                          isUser
+                                              ? 'assets/images/user_avatar.png'
+                                              : 'assets/icons/png_ai_avtar.png',
+                                      message: message.content,
+                                      time: message.timestamp,
+                                      globalkey: message.key,
+                                    ),
                                   );
                                 },
                               ),

@@ -1,16 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:test_your_learing/constants/colors.dart';
+import 'package:test_your_learing/constants/constant.dart';
 import 'package:test_your_learing/controllers/forgotpassword_controller.dart';
 import 'package:test_your_learing/helper/snackbar_helper.dart';
 import 'package:test_your_learing/theme.dart';
+import 'package:test_your_learing/views/custom_widgets/circular_back_button.dart';
 import 'package:test_your_learing/views/custom_widgets/gradiant_button.dart';
 import 'package:test_your_learing/views/custom_widgets/input_field.dart';
-
-import '../../../custom_widgets/circular_back_button.dart';
-import '../../../custom_widgets/dotted_line.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override
@@ -20,304 +20,480 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final forgotPasswordController = Get.put(ForgotPasswordController());
 
-  final _formKey3 = GlobalKey<FormState>();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController conPasswordController = TextEditingController();
 
-  final TextEditingController emailController = TextEditingController(text: '');
+  // Google sign-in state
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _googleSubscription;
+  bool _handlingGoogleEvent = false;
+  bool _googleInitialized = false;
+  final List<String> _scopes = ['email', 'profile', 'openid'];
 
-  final TextEditingController passwordController = TextEditingController(
-    text: '',
-  );
-  final TextEditingController conPasswordController = TextEditingController(
-    text: '',
-  );
-
-  List<TextEditingController> otpFieldsControler = [
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-  ];
-
-  void togglePassword() {
-    forgotPasswordController.hidePassword.value =
-        !forgotPasswordController.hidePassword.value;
-  }
-
-  /*   void setOtpToControllers(String otpValue) {
-    for (int i = 0; i < otpFieldsControler.length; i++) {
-      otpFieldsControler[i].text = otpValue.length > i ? otpValue[i] : "";
-    }
-  } */
+  // Verification state
+  bool _googleVerified = false;
+  String _verifiedEmail = '';
+  String _selectedUsername = '';
+  List<String> _availableUsernames = [];
+  String _resetAuthToken = '';
+  int _tokenSecondsLeft = 0;
+  Timer? _countdownTimer;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Stack(
-        children: [
-          // _buildEmailForm(context)
-          Obx(
-            () =>
-                forgotPasswordController.isOtpSent.value
-                    ? _buildVerifyOtpForm(context)
-                    : _buildEmailForm(context),
-          ),
-        ],
-      ),
+  void initState() {
+    super.initState();
+    _initGoogleSignIn();
+  }
+
+  void _initGoogleSignIn() {
+    if (_googleInitialized) return;
+    _googleInitialized = true;
+    GoogleSignIn.instance
+        .initialize(
+          clientId: Constants.googleLoginClientId,
+          serverClientId: Constants.googleLoginServerClientId,
+        )
+        .catchError((_) {});
+  }
+
+  @override
+  void dispose() {
+    _googleSubscription?.cancel();
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
+  // ── Google sign-in ──────────────────────────────────────────────────────────
+
+  void _startGoogleVerification() {
+    _googleSubscription?.cancel();
+    _handlingGoogleEvent = false;
+
+    _googleSubscription = GoogleSignIn.instance.authenticationEvents
+        .listen(_handleAuthenticationEvent)
+          ..onError(_handleAuthenticationError);
+
+    GoogleSignIn.instance.authenticate(scopeHint: _scopes);
+  }
+
+  Future<void> _handleAuthenticationEvent(
+    GoogleSignInAuthenticationEvent event,
+  ) async {
+    if (_handlingGoogleEvent) return;
+    _handlingGoogleEvent = true;
+    _googleSubscription?.cancel();
+    _googleSubscription = null;
+
+    final GoogleSignInAccount? user = switch (event) {
+      GoogleSignInAuthenticationEventSignIn() => event.user,
+      GoogleSignInAuthenticationEventSignOut() => null,
+    };
+
+    if (user == null) {
+      _handlingGoogleEvent = false;
+      return;
+    }
+
+    final GoogleSignInClientAuthorization? authorization =
+        await user.authorizationClient.authorizationForScopes(_scopes);
+
+    if (!mounted) return;
+
+    if (authorization == null) {
+      _handlingGoogleEvent = false;
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Unable to fetch Google account details. Please try again.",
+      );
+      return;
+    }
+
+    final idToken = user.authentication.idToken;
+    if (idToken == null || idToken.isEmpty) {
+      _handlingGoogleEvent = false;
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "Unable to verify Google sign-in token. Please try again.",
+      );
+      return;
+    }
+
+    // Call secure Step 1 endpoint
+    final result = await forgotPasswordController.googleVerifyForgotPassword(
+      idToken,
+      context,
+    );
+
+    if (!mounted) return;
+    _handlingGoogleEvent = false;
+
+    if (result == null) return; // error already shown by controller
+
+    if (result.usernames.isEmpty) {
+      SnackBarHelper.showFailureSnackBar(
+        context,
+        "No account found linked to this Google email (${result.email}).",
+      );
+      return;
+    }
+
+    _resetAuthToken = result.resetAuthToken;
+    _verifiedEmail = result.email;
+    _availableUsernames = result.usernames;
+
+    if (result.usernames.length == 1) {
+      _applyVerifiedAccount(result.usernames.first, result.expiresIn);
+    } else {
+      await _showUsernamePicker(result.usernames, result.email, result.expiresIn);
+    }
+  }
+
+  Future<void> _handleAuthenticationError(Object e) async {
+    _handlingGoogleEvent = false;
+    if (!mounted) return;
+    SnackBarHelper.showFailureSnackBar(
+      context,
+      "Google sign-in failed. Please try again.",
     );
   }
 
-  Widget _buildEmailForm(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey3,
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: CircularBackButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
+  void _applyVerifiedAccount(String username, int expiresIn) {
+    setState(() {
+      _googleVerified = true;
+      _selectedUsername = username;
+      _tokenSecondsLeft = expiresIn;
+    });
+    _startCountdown();
+  }
+
+  // ── Token expiry countdown ──────────────────────────────────────────────────
+
+  void _startCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      setState(() {
+        if (_tokenSecondsLeft > 0) {
+          _tokenSecondsLeft--;
+        } else {
+          t.cancel();
+          _resetVerification();
+          SnackBarHelper.showFailureSnackBar(
+            context,
+            "Reset session expired. Please verify with Google again.",
+          );
+        }
+      });
+    });
+  }
+
+  String get _countdownLabel {
+    final m = _tokenSecondsLeft ~/ 60;
+    final s = _tokenSecondsLeft % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  // ── Username picker (multiple accounts) ────────────────────────────────────
+
+  Future<void> _showUsernamePicker(
+    List<String> usernames,
+    String email,
+    int expiresIn,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Select account to reset",
+                style: TextStyle(
+                  color: Theme.of(ctx).colorScheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
-                SizedBox(height: 100),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Forgot password?",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Multiple accounts found for $email. "
+                "Choose the one you want to reset the password for.",
+                style: TextStyle(
+                  color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...usernames.map(
+                (u) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: primarycolor.withAlpha(30),
+                    child: Icon(
+                      Icons.person_outline,
+                      color: primarycolor,
+                      size: 20,
                     ),
                   ),
-                ),
-                SizedBox(height: 8),
-                /*  Text("Welcome back to ${Constants.appname}",
-                      style: Typo.Medium.copyWith(
-                          color: graylight,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400)),
-                  SizedBox(
-                    height: 32,
-                  ), */
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Don’t worry! It happens. Please enter the email associated with your account.",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  title: Text(
+                    u,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _applyVerifiedAccount(u, expiresIn);
+                  },
                 ),
-
-                SizedBox(height: 32),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      InputField(
-                        title: "Email address",
-                        hintText: 'Enter your email address',
-                        suffixIcon: _buildSuffixIcon(),
-                        controller: emailController,
-                        prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: gray,
-                          size: 16,
-                        ),
-                        onChanged: (val) {
-                          forgotPasswordController.emailid.value = val;
-                        },
-                        onSaved:
-                            (val) =>
-                                forgotPasswordController.emailid.value = val!,
-                        validator:
-                            (val) =>
-                                (val!.isEmpty || val!.length < 10)
-                                    ? "Enter valid number"
-                                    : null,
-                      ),
-                      SizedBox(height: 24),
-                      CustomGradiantButton(
-                        buttonColor: primarycolor,
-                        textValue: 'Send code',
-                        textColor: onprimary,
-                        loading: forgotPasswordController.isLoading.value,
-                        onPressed: () {
-                          final RegExp emailRegex = RegExp(
-                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                          );
-
-                          if (forgotPasswordController.emailid.value.isEmpty ||
-                              !emailRegex.hasMatch(
-                                forgotPasswordController.emailid.value,
-                              )) {
-                            SnackBarHelper.showFailureSnackBar(
-                              context,
-                              "Please enter a valid email address",
-                            );
-                          } else {
-                            forgotPasswordController.sendFPOTP(
-                              forgotPasswordController.emailid.value,
-                              context,
-                            );
-
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildVerifyOtpForm(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+  // ── Reset verification state ────────────────────────────────────────────────
+
+  void _resetVerification() {
+    _countdownTimer?.cancel();
+    setState(() {
+      _googleVerified = false;
+      _verifiedEmail = '';
+      _selectedUsername = '';
+      _availableUsernames = [];
+      _resetAuthToken = '';
+      _tokenSecondsLeft = 0;
+      passwordController.clear();
+      conPasswordController.clear();
+    });
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+
+  void togglePassword() {
+    forgotPasswordController.hidePassword.value =
+        !forgotPasswordController.hidePassword.value;
+  }
+
+  // ── Build ───────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: CircularBackButton(
-                  onPressed: () {
-                    forgotPasswordController.isOtpSent.value = false;
-                    Get.back();
-                  },
-                ),
-              ),
-
-              SizedBox(height: 30),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Enter Verification Code",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: Obx(
+              () => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: CircularBackButton(onPressed: () => Get.back()),
                   ),
-                ),
-              ),
-              SizedBox(height: 8),
+                  const SizedBox(height: 48),
 
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Sent To ${emailController.text}",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 16),
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _textFieldOTP(
-                          first: true,
-                          last: false,
-                          controller: otpFieldsControler[0],
-                        ),
-                        _textFieldOTP(
-                          first: false,
-                          last: false,
-                          controller: otpFieldsControler[1],
-                        ),
-                        _textFieldOTP(
-                          first: false,
-                          last: false,
-                          controller: otpFieldsControler[2],
-                        ),
-                        _textFieldOTP(
-                          first: false,
-                          last: false,
-                          controller: otpFieldsControler[3],
-                        ),
-                        _textFieldOTP(
-                          first: false,
-                          last: false,
-                          controller: otpFieldsControler[4],
-                        ),
-                        _textFieldOTP(
-                          first: false,
-                          last: true,
-                          controller: otpFieldsControler[5],
-                        ),
-                      ],
+                  // Title
+                  Text(
+                    "Reset password",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
                     ),
-                    /*   Text(
-                      forgotPasswordController.statusMessage.value,
-                      style: TextStyle(
-                          color:
-                              forgotPasswordController.statusMessageColor.value,
-                          fontWeight: FontWeight.bold),
-                    ), */
-                    SizedBox(height: 24),
-                    Divider(color: Theme.of(context).dividerColor, height: 1),
-                    SizedBox(height: 24),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _googleVerified
+                        ? "Google verified. Enter and confirm your new password."
+                        : "First verify your identity with Google to continue.",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 14,
+                    ),
+                  ),
 
-                    /*   CustomPaint(
-                      painter: DottedLinePainter(),
+                  const SizedBox(height: 32),
+
+                  // ── Step 1: Verify with Google ──
+                  if (!_googleVerified)
+                    Material(
+                      borderRadius: BorderRadius.circular(32),
+                      elevation: 0,
                       child: Container(
-                        height:
-                            1.0, // Or whatever height is appropriate for your line
-                        width: double.infinity,
-                      ),
-                    ),
-                    SizedBox(height: 32), */
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Create New Password",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
+                          ),
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: InkWell(
+                          onTap: forgotPasswordController.isLoading.value
+                              ? null
+                              : _startGoogleVerification,
+                          borderRadius: BorderRadius.circular(32),
+                          child: forgotPasswordController.isLoading.value
+                              ? const Center(
+                                  child: SizedBox(
+                                    height: 22,
+                                    width: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/icon_google.png",
+                                        height: 22,
+                                        width: 22,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        "Verify with Google",
+                                        style: heading6.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
+
+                  // ── Step 2: Password form (only after verification) ──
+                  if (_googleVerified) ...[
+
+                    // Verified badge + countdown
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withAlpha(20),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.green.withAlpha(80)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.verified_rounded,
+                            color: Colors.green,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _verifiedEmail,
+                                  style: const TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "Session expires in $_countdownLabel",
+                                  style: TextStyle(
+                                    color: _tokenSecondsLeft < 60
+                                        ? Colors.red
+                                        : Colors.green.shade700,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _resetVerification,
+                            child: const Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Username (locked, from Google verification)
+                    InputField(
+                      title: "Username",
+                      hintText: _selectedUsername,
+                      readOnly: true,
+                      suffixIcon: const Icon(
+                        Icons.lock_rounded,
+                        size: 16,
+                        color: Colors.green,
+                      ),
+                      controller:
+                          TextEditingController(text: _selectedUsername),
+                      prefixIcon: const Icon(
+                        Icons.person_outline,
+                        color: graytext,
+                        size: 16,
+                      ),
+                    ),
+
+                    // Show "switch account" if multiple usernames are linked
+                    if (_availableUsernames.length > 1)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => _showUsernamePicker(
+                            _availableUsernames,
+                            _verifiedEmail,
+                            _tokenSecondsLeft,
+                          ),
+                          child: Text(
+                            "Switch account",
+                            style: TextStyle(
+                              color: primarycolor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(height: 16),
 
                     InputField(
-                      title: "Password",
-                      hintText: 'Create a strong password',
+                      title: "New Password",
+                      hintText: "Create a new password (min 8 characters)",
                       controller: passwordController,
                       obscureText: forgotPasswordController.hidePassword.value,
                       suffixIcon: IconButton(
@@ -331,30 +507,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                         onPressed: togglePassword,
                       ),
-                      prefixIcon: Icon(
+                      prefixIcon: const Icon(
                         Icons.lock_outline,
                         color: graytext,
                         size: 16,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "At least 8 characters with a combination of letters and numbers",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
 
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
+
                     InputField(
                       title: "Confirm Password",
-                      hintText: 'Confirm your password',
+                      hintText: "Confirm your new password",
                       controller: conPasswordController,
                       obscureText: forgotPasswordController.hidePassword.value,
                       suffixIcon: IconButton(
@@ -368,193 +532,58 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                         onPressed: togglePassword,
                       ),
-                      prefixIcon: Icon(
+                      prefixIcon: const Icon(
                         Icons.lock_outline,
                         color: graytext,
                         size: 16,
                       ),
                     ),
 
-                    SizedBox(height: 32),
+                    const SizedBox(height: 28),
 
                     CustomGradiantButton(
-                      loading: forgotPasswordController.isLoading.value,
                       buttonColor: primarycolor,
-                      textValue: 'Verify OTP & Reset Password',
+                      textValue: "Reset Password",
                       textColor: onprimary,
+                      loading: forgotPasswordController.isLoading.value,
                       onPressed: () {
-                        /*     final form = _formKey.currentState;
-                              if (form!.validate()) {
-                                form.save();
-                                authController.getOtp(context);
-                                authController.showProgressbar.value = true;
-                              } */
+                        final password = passwordController.text;
+                        final confirmPassword = conPasswordController.text;
 
-                        forgotPasswordController.otp.value = "";
-                        otpFieldsControler.forEach((controller) {
-                          forgotPasswordController.otp.value += controller.text;
-                        });
-
-                        final String _password = passwordController.text;
-                        final String _confirmPassword =
-                            conPasswordController.text;
-
-                        if (forgotPasswordController.otp.value.length != 6) {
+                        if (_tokenSecondsLeft <= 0) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
-                            "Please Enter 6 Digit OTP Sent To Your Email",
+                            "Reset session expired. Please verify with Google again.",
                           );
-                        } else if (_password.isEmpty ||
-                            !_isValidPassword(_password)) {
+                          _resetVerification();
+                          return;
+                        }
+                        if (password.length < 8) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
-                            "Please enter a valid Password ",
+                            "Password must be at least 8 characters",
                           );
-                        } else if (_confirmPassword.isEmpty ||
-                            _password != _confirmPassword) {
+                          return;
+                        }
+                        if (password != confirmPassword) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
                             "Password and Confirm Password do not match",
                           );
-                        } else {
-                          forgotPasswordController.verifyOTPResetPassword(
-                            emailController.text,
-                            forgotPasswordController.otp.value,
-                            passwordController.text,
-                            context,
-                          );
+                          return;
                         }
+
+                        forgotPasswordController.completeForgotPasswordReset(
+                          _resetAuthToken,
+                          _selectedUsername,
+                          password,
+                          context,
+                        );
                       },
                     ),
                   ],
-                ),
+                ],
               ),
-
-              /* SizedBox(
-                height: 18,
-              ),
-              Text(
-                "Didn't receive any code?",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black38,
-                ),
-                textAlign: TextAlign.center,
-              ), */
-              SizedBox(height: 16),
-              Obx(
-                () => TextButton(
-                  onPressed:
-                      () =>
-                          forgotPasswordController.resendOTP.value
-                              ? forgotPasswordController.resendOtp(
-                                emailController.text,
-                                context,
-                              )
-                              // ? null
-                              : null,
-                  child: Text(
-                    forgotPasswordController.resendOTP.value
-                        ? "Resend new code"
-                        : "Send Code again in ${forgotPasswordController.resendAfter} seconds",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSuffixIcon() {
-    return AnimatedOpacity(
-      opacity:
-          _isValidEmail(forgotPasswordController.emailid.value) ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 250),
-      child: Icon(Icons.check_circle, color: primarycolor, size: 22),
-    );
-  }
-
-  /// Function to check if email is valid
-  bool _isValidEmail(String email) {
-    // return email.length > 3;
-    return RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-    ).hasMatch(email);
-  }
-
-  bool _isValidPassword(String password) {
-    /*  // special charecer compulsory
-   return RegExp(
-      r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>?/\\[\]{}|~`]).{8,}$',
-    ).hasMatch(password); */
-    // special charecer optional
-    return RegExp(
-      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$',
-    ).hasMatch(password);
-
-    // return RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(password); // no special charecer
-
-    //   ^(?=.*[A-Za-z])       # must contain at least one letter
-    // (?=.*\d)              # must contain at least one digit
-    // [A-Za-z\d!@#$%^&*()_+=<>?/\\[\]{}|~`-]{8,}$   # allowed characters, min length 8
-  }
-
-  Widget _textFieldOTP({bool first = true, last, controller}) {
-    var height = (Get.width - 82) / 6;
-    //  var height = (Get.width - 82) / 5.5;
-    return Container(
-      height: height,
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: TextField(
-          autofocus: true,
-          controller: controller,
-          onChanged: (value) {
-            if (value.length == 1 && last == false) {
-              Get.focusScope?.nextFocus();
-            }
-            if (value.length == 0 && first == false) {
-              Get.focusScope?.previousFocus();
-            }
-          },
-          showCursor: false,
-          readOnly: false,
-          textAlign: TextAlign.center,
-          // style: TextStyle(fontSize: height / 2, fontWeight: FontWeight.w500),
-          style: TextStyle(
-            fontSize: height / 2.5,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          decoration: InputDecoration(
-            isDense: true,
-            contentPadding: EdgeInsets.only(
-              left: 16,
-              right: 14,
-              top: 5,
-              bottom: 16,
-            ),
-            counter: Offstage(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 1.2,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              borderRadius: BorderRadius.circular(32),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(width: 1.2, color: primarycolor),
-              borderRadius: BorderRadius.circular(32),
             ),
           ),
         ),
