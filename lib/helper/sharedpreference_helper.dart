@@ -11,6 +11,8 @@ class SharedPreferencesService {
   static const String _keyRole = 'role';
   static const String _keyGrade= 'grade';
   static const String _keyAccessToken = 'access_token';
+  static const String _keyHasSeenDashboardWalkthrough =
+      'hasSeenDashboardWalkthrough';
 
 
   /// Initialize SharedPreferences
@@ -29,6 +31,14 @@ class SharedPreferencesService {
     return _prefs.getBool(_keyFirstTime) ?? true;
   }
 
+  /// Dashboard walkthrough (post-login product tour)
+  static void setHasSeenDashboardWalkthrough(bool hasSeen) {
+    _prefs.setBool(_keyHasSeenDashboardWalkthrough, hasSeen);
+  }
+
+  static bool getHasSeenDashboardWalkthrough() {
+    return _prefs.getBool(_keyHasSeenDashboardWalkthrough) ?? false;
+  }
 
   /// Login Status
   static void setLoginStatus(bool loginStatus) {

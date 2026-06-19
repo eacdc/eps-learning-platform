@@ -17,6 +17,7 @@ import 'package:test_your_learing/views/screen/dashboard/homepage/notificationpa
 import '../../../../controllers/dashboard_controller.dart';
 import '../../../../controllers/my_subscription_controller.dart';
 import '../../../../controllers/score_controller.dart';
+import '../../../../controllers/walkthrough_controller.dart';
 import '../../../../helper/getx_helper.dart';
 import '../../../../helper/sharedpreference_helper.dart'
     show SharedPreferencesService;
@@ -39,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   final dashboardController = findOrPut(() => DashboardController());
   final mysubscriptionController = findOrPut(() => MysubscriptionController());
   final scoreController = findOrPut(() => ScoreController());
+  final walkthroughController = findOrPut(() => WalkthroughController());
 
   void _showChapterBottomsheet(
     context,
@@ -839,7 +841,9 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                */
-                GridView(
+                Container(
+                  key: walkthroughController.homeStatsKey,
+                  child: GridView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
@@ -892,6 +896,7 @@ class _HomePageState extends State<HomePage> {
                       subItem2Desc: totalQuizHours,
                     ),
                   ],
+                ),
                 ),
 
                 Padding(
@@ -1140,7 +1145,9 @@ class _HomePageState extends State<HomePage> {
 
                 SizedBox(height: 12),
 
-                PerformanceOverviewCard(
+                Container(
+                  key: walkthroughController.performanceOverviewKey,
+                  child: PerformanceOverviewCard(
                   chapterStats:
                       scoreController.performance_overview_new.value,
                      // homeController.chapterStates.value?.data?.overall,
@@ -1159,6 +1166,7 @@ class _HomePageState extends State<HomePage> {
                       filter: value,
                     );
                   },
+                ),
                 ),
                 SizedBox(height: 36),
               ],

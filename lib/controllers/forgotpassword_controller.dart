@@ -65,6 +65,7 @@ class ForgotPasswordController extends GetxController
         SharedPreferencesService.setFirstTimeStatus(
           false,
         ); // for not showing onboard screen
+        SharedPreferencesService.setHasSeenDashboardWalkthrough(true);
 
         //logi
         Get.offAll(() => LoginPage());

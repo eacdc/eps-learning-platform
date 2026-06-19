@@ -125,6 +125,8 @@ class LogoutSheet extends StatelessWidget {
                             SharedPreferencesService.setFirstTimeStatus(
                               false,
                             ); // for not showing onboard screen
+                            SharedPreferencesService
+                                .setHasSeenDashboardWalkthrough(true);
                             Get.offAll(() => LoginPage());
                           },
                         ),

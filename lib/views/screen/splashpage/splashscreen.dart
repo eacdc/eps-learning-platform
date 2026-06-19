@@ -9,7 +9,6 @@ import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/views/homechat_test.dart';
 import 'package:test_your_learing/views/screen/authentication/onboarding/onboarding_screen.dart';
 import 'package:test_your_learing/views/screen/dashboard/dashboardpage.dart';
-import 'package:test_your_learing/views/screen/authentication/getstartedscreen.dart';
 import 'package:test_your_learing/views/screen/authentication/login.dart';
 
 import 'dart:math';
@@ -118,7 +117,7 @@ That’s why Flutter tells you to use build() or didChangeDependencies() instead
     } else if (isLoggedIn) {
       Get.offNamed('/dashboard');
     } else {
-      Get.offNamed('/getStarted');
+      Get.offNamed('/login');
     }
   }
 
@@ -395,7 +394,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
     } else {
       // Navigator.pushReplacementNamed(context, '/login');
       //Get.off(LoginPage());
-      Get.off(GateStatrtedScreen());
+      Get.off(LoginPage());
     }
 
    

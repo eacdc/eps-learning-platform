@@ -5,7 +5,6 @@ import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/views/screen/authentication/onboarding/onboarding_contents.dart';
 import 'package:test_your_learing/views/screen/authentication/onboarding/size_config.dart';
 
-import '../getstartedscreen.dart';
 import '../login.dart';
 
 
@@ -132,7 +131,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               SharedPreferencesService.setFirstTimeStatus(false);
-                               Get.off(GateStatrtedScreen());
+                               Get.off(LoginPage());
                                //Get.off(LoginPage());
                                
 

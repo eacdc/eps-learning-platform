@@ -12,7 +12,13 @@ class NottificationSettingPage extends StatefulWidget {
 }
 
 class _NottificationSettingPageState extends State<NottificationSettingPage> {
-  bool _isNotificationEnabled = true;
+  bool _newBookAddAlerts = true;
+  bool _popularQuizzesAndBooks = true;
+  bool _showBadgeIcon = true;
+  bool _includeMutedChat = true;
+  bool _countUnreadMessage = true;
+  bool _booksRecommendations = true;
+  bool _announcementsFromPublisher = true;
 
   @override
   Widget build(BuildContext context) {
@@ -90,19 +96,19 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       SizedBox(height: 8),
                       NotificationSwitchWidget(
                         title: 'New Book Add Alerts',
-                        value: _isNotificationEnabled,
+                        value: _newBookAddAlerts,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _newBookAddAlerts = newValue;
                           });
                         },
                       ),
                       NotificationSwitchWidget(
                         title: 'Popular Quizzes & Books',
-                        value: _isNotificationEnabled,
+                        value: _popularQuizzesAndBooks,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _popularQuizzesAndBooks = newValue;
                           });
                         },
                       ),
@@ -133,29 +139,29 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       SizedBox(height: 8),
                        NotificationSwitchWidget(
                         title: 'Show Badge Icon',
-                        value: _isNotificationEnabled,
+                        value: _showBadgeIcon,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _showBadgeIcon = newValue;
                           });
                         },
                       ),
                       NotificationSwitchWidget(
                         title: 'Include Muted Chat',
-                        value: _isNotificationEnabled,
+                        value: _includeMutedChat,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _includeMutedChat = newValue;
                           });
                         },
                       ),
                      
                       NotificationSwitchWidget(
                         title: 'Count Unread Message',
-                        value: _isNotificationEnabled,
+                        value: _countUnreadMessage,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _countUnreadMessage = newValue;
                           });
                         },
                       ),
@@ -185,19 +191,19 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       SizedBox(height: 8),
                       NotificationSwitchWidget(
                         title: 'Books Recommendations',
-                        value: _isNotificationEnabled,
+                        value: _booksRecommendations,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _booksRecommendations = newValue;
                           });
                         },
                       ),
                       NotificationSwitchWidget(
                         title: 'Announcements From Publisher',
-                        value: _isNotificationEnabled,
+                        value: _announcementsFromPublisher,
                         onChanged: (newValue) {
                           setState(() {
-                            _isNotificationEnabled = newValue;
+                            _announcementsFromPublisher = newValue;
                           });
                         },
                       ),

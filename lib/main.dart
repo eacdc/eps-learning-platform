@@ -10,7 +10,7 @@ import 'package:test_your_learing/views/screen/splashpage/splashscreen.dart';
 import 'utils/getxtheme/app_theme.dart';
 import 'utils/getxtheme/theme_controller.dart';
 import 'views/screen/authentication/onboarding/onboarding_screen.dart';
-import 'views/screen/authentication/getstartedscreen.dart';
+import 'views/screen/authentication/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,8 +73,7 @@ class MainApp extends StatelessWidget {
           GetPage(name: "/splash", page: () => SplashScreenPage()),
           GetPage(name: "/onboard", page: () => OnboardingScreen()),
           GetPage(name: "/dashboard", page: () => DashboardPage()),
-          GetPage(name: "/getStarted", page: () => GateStatrtedScreen()),
-          // GetPage(name: "/splash", page: () => GateStatrtedScreen()),
+          GetPage(name: "/login", page: () => LoginPage()),
           /*   GetPage(
               name: "/reportDetails",
               page: () => ReportDetailsPage(),

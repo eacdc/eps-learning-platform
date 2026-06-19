@@ -6,10 +6,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/dashboard_controller.dart';
+import 'package:test_your_learing/controllers/walkthrough_controller.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_dashboard_switch.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_switch.dart';
 import 'package:test_your_learing/views/custom_widgets/darkmode_switch_flutter.dart';
+import 'package:test_your_learing/views/custom_widgets/walkthrough_overlay.dart';
 import 'package:test_your_learing/views/screen/dashboard/collection/collectionpage.dart';
 import 'package:test_your_learing/views/screen/dashboard/homepage/homepage.dart';
 import 'package:test_your_learing/views/screen/dashboard/my_library/mysubscription.dart';
@@ -25,6 +27,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final dashboardController = Get.put(DashboardController());
+  final walkthroughController = Get.put(WalkthroughController());
   final themeController = Get.find<ThemeController>();
 
   //int _selectedIndex = 0;
@@ -96,11 +99,13 @@ List<Widget> get _actionWidget => [
     required IconData icon,
     required String label,
     required int index,
+    Key? itemKey,
   }) {
     return Obx(() {
       final _selectedIndex = dashboardController.selectedIndex.value;
 
       return Material(
+        key: itemKey,
         color: Colors.transparent,
         //borderRadius: BorderRadius.circular(30),
         shape: const CircleBorder(), // Ensures circular ripple
@@ -267,6 +272,10 @@ List<Widget> get _actionWidget => [
         },
       ),
     ];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      walkthroughController.tryStartWalkthrough();
+    });
   }
 
   @override
@@ -314,7 +323,9 @@ List<Widget> get _actionWidget => [
             // If already on Home → allow pop (exit app)
             ///Navigator.of(context).maybePop();
           },
-          child: SafeArea(
+          child: Stack(
+            children: [
+              SafeArea(
             child: Scaffold(
               resizeToAvoidBottomInset:
                   false, // for stop floting Fab button on keyboard
@@ -462,6 +473,7 @@ List<Widget> get _actionWidget => [
                           icon: Icons.home_outlined,
                           label: "Home",
                           index: 0,
+                          itemKey: walkthroughController.navHomeKey,
                         ),
                       ),
                       Expanded(
@@ -471,6 +483,7 @@ List<Widget> get _actionWidget => [
                           icon: Icons.bookmark_border,
                           label: "My Library",
                           index: 1,
+                          itemKey: walkthroughController.navLibraryKey,
                         ),
                       ),
 
@@ -483,6 +496,7 @@ List<Widget> get _actionWidget => [
                           icon: Icons.article_outlined,
                           label: "Collection",
                           index: 3,
+                          itemKey: walkthroughController.navCollectionKey,
                         ),
                       ),
                       Expanded(
@@ -492,6 +506,7 @@ List<Widget> get _actionWidget => [
                           icon: Icons.person_outline,
                           label: "Profile",
                           index: 4,
+                          itemKey: walkthroughController.navProfileKey,
                         ),
                       ),
                     ],
@@ -507,6 +522,7 @@ List<Widget> get _actionWidget => [
                     SizedBox(height: 16),
                     if (expanded) ...[
                       Row(
+                        key: walkthroughController.learnQuizRowKey,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildCenterFAB(
@@ -536,6 +552,7 @@ List<Widget> get _actionWidget => [
                       SizedBox(height: 12),
                     ],
                     GestureDetector(
+                      key: walkthroughController.classroomFabKey,
                       onTap: () {
                         if (expanded) {
                           dashboardController.collapseClassroom();
@@ -594,6 +611,9 @@ List<Widget> get _actionWidget => [
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerDocked,
             ),
+              ),
+              const WalkthroughOverlay(),
+            ],
           ),
         ),
       );

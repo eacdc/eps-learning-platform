@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:test_your_learing/models/response_model/api_response.dart';
@@ -9,6 +11,8 @@ import '../views/screen/authentication/login.dart';
 
 class ApiManager {
   static const String baseUrl = "https://chatbot-backend-v-4.onrender.com";
+  static const Duration _requestTimeout = Duration(seconds: 45);
+  static const int _maxRetries = 2;
 
   // API Endpoints
   static const String login = "/api/users/login";
@@ -127,6 +131,90 @@ class ApiManager {
     };
   }
 
+  static Future<http.Response> _executeRequest({
+    required Uri url,
+    required String method,
+    required Map<String, String> headersMap,
+    Map<String, dynamic>? body,
+  }) async {
+    Future<http.Response> send() {
+      switch (method) {
+        case "POST":
+          return http.post(
+            url,
+            headers: headersMap,
+            body: jsonEncode(body),
+          );
+        case "PUT":
+          return http.put(
+            url,
+            headers: headersMap,
+            body: body != null ? jsonEncode(body) : null,
+          );
+        case "DELETE":
+          return http.delete(url, headers: headersMap);
+        default:
+          return http.get(url, headers: headersMap);
+      }
+    }
+
+    Object? lastError;
+    for (var attempt = 0; attempt <= _maxRetries; attempt++) {
+      try {
+        return await send().timeout(_requestTimeout);
+      } on TimeoutException catch (e) {
+        lastError = e;
+      } on http.ClientException catch (e) {
+        lastError = e;
+      } catch (e) {
+        lastError = e;
+        break;
+      }
+
+      if (attempt < _maxRetries) {
+        await Future.delayed(Duration(seconds: 2 * (attempt + 1)));
+      }
+    }
+
+    throw lastError ?? Exception('Request failed');
+  }
+
+  static dynamic _decodeBody(String body) {
+    if (body.isEmpty) return {};
+    try {
+      return jsonDecode(body);
+    } catch (_) {
+      return {"message": "Invalid server response"};
+    }
+  }
+
+  static bool _isNetworkError(Object error) {
+    return error is TimeoutException ||
+        error is http.ClientException ||
+        error.toString().contains('Failed to fetch') ||
+        error.toString().contains('SocketException') ||
+        error.toString().contains('Connection refused');
+  }
+
+  static ApiResponseNew _networkErrorResponse(Object error) {
+    if (kDebugMode) {
+      print("Network error: $error");
+    }
+
+    final wakingUp = error is TimeoutException ||
+        error.toString().contains('Failed to fetch');
+
+    return ApiResponseNew(
+      statusCode: 0,
+      data: {
+        "message": wakingUp
+            ? "Server is waking up or unreachable. Please wait a moment and try again."
+            : "Network error. Please check your internet connection.",
+        "error": error.toString(),
+      },
+    );
+  }
+
   // Generic API Call Method
 
   static Future<ApiResponse> request({
@@ -138,38 +226,31 @@ class ApiManager {
     try {
       final Uri url = Uri.parse(baseUrl + endpoint);
       final headersMap = headers(token: token);
+      final response = await _executeRequest(
+        url: url,
+        method: method,
+        headersMap: headersMap,
+        body: body,
+      );
 
-      http.Response response;
-
-      switch (method) {
-        case "POST":
-          response = await http.post(
-            url,
-            headers: headersMap,
-            body: jsonEncode(body),
-          );
-          break;
-        case "PUT":
-          response = await http.put(
-            url,
-            headers: headersMap,
-            body: jsonEncode(body),
-          );
-          break;
-        case "DELETE":
-          response = await http.delete(url, headers: headersMap);
-          break;
-        default:
-          response = await http.get(url, headers: headersMap);
-      }
-
-      final decoded = jsonDecode(response.body);
+      final decoded = _decodeBody(response.body);
 
       return ApiResponse(
         statusCode: response.statusCode,
-        data: Map<String, dynamic>.from(decoded),
+        data: decoded is Map<String, dynamic>
+            ? decoded
+            : Map<String, dynamic>.from(decoded as Map),
       );
     } catch (e) {
+      if (_isNetworkError(e)) {
+        return ApiResponse(
+          statusCode: 0,
+          data: {
+            "message":
+                "Server is waking up or unreachable. Please wait a moment and try again.",
+          },
+        );
+      }
       return ApiResponse(
         statusCode: 500,
         data: {"message": "Something went wrong: $e"},
@@ -188,35 +269,14 @@ class ApiManager {
     try {
       final Uri url = Uri.parse(baseUrl + endpoint);
       final headersMap = headers(token: token);
+      final response = await _executeRequest(
+        url: url,
+        method: method,
+        headersMap: headersMap,
+        body: body,
+      );
 
-      http.Response response;
-
-      switch (method) {
-        case "POST":
-          response = await http.post(
-            url,
-            headers: headersMap,
-            body: jsonEncode(body),
-          );
-          break;
-        case "PUT":
-          response = await http.put(
-            url,
-            headers: headersMap,
-            body:
-                body != null
-                    ? jsonEncode(body)
-                    : null, // don’t send "null",//create problem  during PUT
-          );
-          break;
-        case "DELETE":
-          response = await http.delete(url, headers: headersMap);
-          break;
-        default:
-          response = await http.get(url, headers: headersMap);
-      }
-
-      final dynamic decoded = jsonDecode(response.body);
+      final dynamic decoded = _decodeBody(response.body);
 
       /// TOKEN EXPIRED HANDLING
       if (response.statusCode == 401 || response.statusCode == 403) {
@@ -229,7 +289,12 @@ class ApiManager {
 
       return ApiResponseNew(statusCode: response.statusCode, data: decoded);
     } catch (e) {
-      print("XCV " + endpoint + " " + e.toString());
+      if (_isNetworkError(e)) {
+        return _networkErrorResponse(e);
+      }
+      if (kDebugMode) {
+        print("API error on $endpoint: $e");
+      }
       return ApiResponseNew(
         statusCode: 500,
         data: {"message": "Something went wrong: $e"},
@@ -242,6 +307,7 @@ class ApiManager {
     SharedPreferencesService.setFirstTimeStatus(
       false,
     ); // for not showing onboard screen
+    SharedPreferencesService.setHasSeenDashboardWalkthrough(true);
     Get.offAll(() => LoginPage());
  //   Get.snackbar("Session Expired", "Please login again");
   }
