@@ -1071,7 +1071,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Center(
                                           child: Text(
-                                             books.type ?? "",
+                                             _translateActivityType(books.type ?? ""),
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
@@ -1884,6 +1884,18 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+}
+
+String _translateActivityType(String type) {
+  switch (type) {
+    case 'chapter_visited': return 'Chapitre consulté';
+    case 'chapter_started': return 'Chapitre commencé';
+    case 'chapter_completed': return 'Chapitre terminé';
+    case 'quiz_started': return 'Quiz commencé';
+    case 'quiz_completed': return 'Quiz terminé';
+    case 'quiz_in_progress': return 'Quiz en cours';
+    default: return type;
   }
 }
 

@@ -265,7 +265,7 @@ class _WalkthroughOverlayState extends State<WalkthroughOverlay> {
                   Icon(Icons.touch_app_rounded, size: 16, color: primarycolor),
                   const SizedBox(width: 6),
                   Text(
-                    'Tap the highlighted area to try it',
+                    'Appuyez sur la zone mise en évidence pour essayer',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -282,7 +282,7 @@ class _WalkthroughOverlayState extends State<WalkthroughOverlay> {
                   TextButton(
                     onPressed: _controller.skip,
                     child: Text(
-                      'Skip',
+                      'Passer',
                       style: TextStyle(
                         color: graytext,
                         fontWeight: FontWeight.w600,
@@ -294,7 +294,7 @@ class _WalkthroughOverlayState extends State<WalkthroughOverlay> {
                   TextButton(
                     onPressed: _controller.previous,
                     child: Text(
-                      'Back',
+                      'Retour',
                       style: TextStyle(
                         color: primarycolor,
                         fontWeight: FontWeight.w600,
@@ -317,7 +317,7 @@ class _WalkthroughOverlayState extends State<WalkthroughOverlay> {
                     ),
                   ),
                   child: Text(
-                    isLast ? 'Get Started' : 'Next',
+                    isLast ? 'Commencer' : 'Suivant',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
