@@ -9,7 +9,7 @@ class SearchInputField extends StatelessWidget {
 
   const SearchInputField({
     super.key,
-    this.hintText = 'Search books & quizzes',
+    this.hintText = 'Rechercher des livres et quiz',
     this.controller,
     this.focusNode, // ✅ Initialize here
     this.onTextChanged,

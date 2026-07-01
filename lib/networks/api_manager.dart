@@ -127,6 +127,7 @@ class ApiManager {
   static Map<String, String> headers({String? token}) {
     return {
       "Content-Type": "application/json",
+      "Accept-Language": "fr",
       if (token != null) "Authorization": "Bearer $token",
     };
   }

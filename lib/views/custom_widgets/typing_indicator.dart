@@ -38,7 +38,7 @@ class _TypingIndicatorState extends State<TypingIndicator> {
       children: [
         Text(
           //'AI Thinking$dots',
-          'Teacher is Thinking...',
+          "L'enseignant réfléchit...",
           style:  TextStyle(
             fontSize: 16,
             color: primarycolor,
