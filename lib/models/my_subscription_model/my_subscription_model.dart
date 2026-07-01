@@ -7,6 +7,7 @@ class SubscribedBookModel {
   final String? publisher;
   final String? bookCoverImgLink;
   final String? subscribedAt;
+  final bool isHidden;
 
   SubscribedBookModel({
     this.id,
@@ -17,6 +18,7 @@ class SubscribedBookModel {
     this.publisher,
     this.bookCoverImgLink,
     this.subscribedAt,
+    this.isHidden = false,
   });
 
   factory SubscribedBookModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class SubscribedBookModel {
       publisher: json['publisher'] as String?,
       bookCoverImgLink: json['bookCoverImgLink'] as String?,
       subscribedAt: json['subscribedAt'] as String?,
+      isHidden: json['isHidden'] == true || json['isHidden'] == 1,
     );
   }
 
@@ -42,6 +45,7 @@ class SubscribedBookModel {
       'publisher': publisher,
       'bookCoverImgLink': bookCoverImgLink,
       'subscribedAt': subscribedAt,
+      'isHidden': isHidden,
     };
   }
 }

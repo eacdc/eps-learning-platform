@@ -12,6 +12,7 @@ class BookList {
   final String bookId;
   //bool subscribed; // 🔑 New field (mutable)
   final bool isSubscribed;
+  final bool isHidden;
 
   BookList({
     required this.id,
@@ -25,6 +26,7 @@ class BookList {
     required this.updatedAt,
     required this.bookId,
     required this.isSubscribed,
+    this.isHidden = false,
    // this.subscribed = false, // 🔑 Default false
   });
 
@@ -41,6 +43,7 @@ class BookList {
       updatedAt: json['updatedAt'] ?? '',
       bookId: json['bookId'] ?? '',
       isSubscribed: json['isSubscribed'] ?? false,
+      isHidden: json['isHidden'] == true || json['isHidden'] == 1,
     );
   }
 
@@ -57,6 +60,7 @@ class BookList {
       'updatedAt': updatedAt,
       'bookId': bookId,
       'isSubscribed': isSubscribed,
+      'isHidden': isHidden,
       //'subscribed': subscribed,
     };
   }

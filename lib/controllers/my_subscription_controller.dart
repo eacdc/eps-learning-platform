@@ -181,6 +181,7 @@ class MysubscriptionController extends GetxController
           List<BookCollectionModel> booksCollection =
               (response.data["data"]["books"] as List)
                   .map((item) => BookCollectionModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           // mySubscriptionList.value = books;
@@ -285,6 +286,7 @@ class MysubscriptionController extends GetxController
           List<SubscribedBookModel> books =
               (response.data as List)
                   .map((item) => SubscribedBookModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           // mySubscriptionList.value = books;
@@ -387,6 +389,7 @@ class MysubscriptionController extends GetxController
           List<SubscribedBookModel> books =
               (response.data as List)
                   .map((item) => SubscribedBookModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           mySubscriptionList.value = books;
@@ -515,6 +518,7 @@ class MysubscriptionController extends GetxController
           List<SubscribedBookModel> books =
               (response.data as List)
                   .map((item) => SubscribedBookModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           mySubscriptionList.value = books;
