@@ -96,7 +96,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                         const SizedBox(height: 15),
                         Center(
                           child: Text(
-                            "Edit Profile",
+                            "Modifier le profil",
                             style: TextStyle(
                               fontSize: 18,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -150,16 +150,16 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InputField(
-                        title: "Full name",
-                        hintText: 'Enter your full name',
+                        title: "Nom complet",
+                        hintText: 'Entrez votre nom complet',
                         suffixIcon: SizedBox.shrink(),
                         controller: fullnameController,
                       ),
                       SizedBox(height: 16),
 
                       InputField(
-                        title: "Email Address",
-                        hintText: 'Enter your Email Address',
+                        title: "Adresse e-mail",
+                        hintText: 'Entrez votre adresse e-mail',
                         suffixIcon: SizedBox.shrink(),
                         // mandatory: true,
                         controller: emailController,
@@ -175,14 +175,14 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                         validator:
                             (val) =>
                                 (val!.isEmpty || val!.length < 10)
-                                    ? "Enter valid Email Address"
+                                    ? "Entrez une adresse e-mail valide"
                                     : null,
                       ),
                       SizedBox(height: 16),
 
                       InputField(
-                        title: "Phone number",
-                        hintText: 'Enter your phone number',
+                        title: "Numéro de téléphone",
+                        hintText: 'Entrez votre numéro de téléphone',
                         suffixIcon: SizedBox.shrink(),
                         controller: phonenoController,
                       ),
@@ -190,7 +190,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       CustomGradiantButton(
                         loading: widget.profileController.isLoading.value,
                         buttonColor: primarycolor,
-                        textValue: 'Save Changes',
+                        textValue: 'Enregistrer les modifications',
                         textColor: onprimary,
                         onPressed: () {
                           final _fullname = fullnameController.text;
@@ -258,18 +258,18 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     BuildContext context,
   ) {
     if (_fullname.isEmpty || _fullname.trim().length < 4) {
-      SnackBarHelper.showFailureSnackBarGetx("Please enter your valid name");
+      SnackBarHelper.showFailureSnackBarGetx("Veuillez entrer un nom valide");
       return false;
     }
 
     if (_email.isEmpty || !_isValidEmail(_email)) {
-      SnackBarHelper.showFailureSnackBarGetx("Please enter a valid Emailid");
+      SnackBarHelper.showFailureSnackBarGetx("Veuillez entrer une adresse e-mail valide");
       return false;
     }
 
     if (_phonenumber.isEmpty || !_isValidMobile(_phonenumber)) {
       SnackBarHelper.showFailureSnackBarGetx(
-        "Please enter a valid Mobile number",
+        "Veuillez entrer un numéro de téléphone valide",
       );
       return false;
     }

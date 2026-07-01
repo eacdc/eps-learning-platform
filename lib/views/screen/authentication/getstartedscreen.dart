@@ -185,7 +185,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        "Continue with Google",
+                                        "Continuer avec Google",
                                         style: heading6.copyWith(
                                           color:
                                               Theme.of(
@@ -203,7 +203,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            "Sign up or login with Google to continue",
+                            "Inscrivez-vous ou connectez-vous avec Google pour continuer",
                             style: TextStyle(
                               color:
                                   Theme.of(context).colorScheme.onSurfaceVariant,
@@ -270,7 +270,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to fetch Google account details. Please try again.",
+        "Impossible de récupérer les détails du compte Google. Veuillez réessayer.",
       );
       return;
     }
@@ -280,7 +280,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to verify Google sign-in token. Please try again.",
+        "Impossible de vérifier le jeton Google. Veuillez réessayer.",
       );
       return;
     }
@@ -296,7 +296,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
     if (response.statusCode != 200) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        response.data["message"] ?? "Unable to continue with Google",
+        response.data["message"] ?? "Impossible de continuer avec Google",
       );
       return;
     }
@@ -311,7 +311,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
       Get.to(() => LoginPage());
       SnackBarHelper.showSuccessSnackBar(
         context,
-        "Google account found. Select username and enter password to sign in.",
+        "Compte Google trouvé. Sélectionnez votre nom d'utilisateur et entrez le mot de passe pour vous connecter.",
       );
     }
   }
@@ -320,7 +320,7 @@ class _GateStatrtedScreenState extends State<GateStatrtedScreen> {
     _handlingGoogleEvent = false;
     SnackBarHelper.showFailureSnackBar(
       context,
-      "Google sign-in failed. Please try again.",
+      "La connexion Google a échoué. Veuillez réessayer.",
     );
   }
 }

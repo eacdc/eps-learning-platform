@@ -55,7 +55,7 @@ class NotificationDetailsSheet extends StatelessWidget {
                     const SizedBox(height: 15),
                     Center(
                       child: Text(
-                        "Notification Details",
+                        "Détails de la notification",
                         style: TextStyle(
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.onSurface,

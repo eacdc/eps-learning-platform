@@ -79,11 +79,11 @@ List<Widget> get _actionWidget => [
 
   final List<String> _pagesname = [
     // Center(child: Text("Home")),
-    "Home",
-    "My Library",
+    "Accueil",
+    "Ma Bibliothèque",
     "Quiz",
     "Collection",
-    "My Profile",
+    "Mon Profil",
   ];
 
   void _onItemTapped(int index) {
@@ -399,7 +399,7 @@ List<Widget> get _actionWidget => [
                                       SizedBox(width: 2),
                                       Text(
                                         _selectedIndex == 2 && _isLearnMode
-                                            ? "Learn"
+                                            ? "Apprendre"
                                             : (_pagesname[_selectedIndex] ?? ""),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
@@ -471,7 +471,7 @@ List<Widget> get _actionWidget => [
                           svgon: "assets/icons/svg_home_on.svg",
                           svgoff: "assets/icons/svg_home_off.svg",
                           icon: Icons.home_outlined,
-                          label: "Home",
+                          label: "Accueil",
                           index: 0,
                           itemKey: walkthroughController.navHomeKey,
                         ),
@@ -481,7 +481,7 @@ List<Widget> get _actionWidget => [
                           svgon: "assets/icons/svg_bookmark_on.svg",
                           svgoff: "assets/icons/svg_bookmark_off.svg",
                           icon: Icons.bookmark_border,
-                          label: "My Library",
+                          label: "Bibliothèque",
                           index: 1,
                           itemKey: walkthroughController.navLibraryKey,
                         ),
@@ -496,6 +496,7 @@ List<Widget> get _actionWidget => [
                           icon: Icons.article_outlined,
                           label: "Collection",
                           index: 3,
+
                           itemKey: walkthroughController.navCollectionKey,
                         ),
                       ),
@@ -504,7 +505,7 @@ List<Widget> get _actionWidget => [
                           svgon: "assets/icons/svg_profile_on.svg",
                           svgoff: "assets/icons/svg_profile_off.svg",
                           icon: Icons.person_outline,
-                          label: "Profile",
+                          label: "Profil",
                           index: 4,
                           itemKey: walkthroughController.navProfileKey,
                         ),
@@ -527,7 +528,7 @@ List<Widget> get _actionWidget => [
                         children: [
                           _buildCenterFAB(
                             icon: Icons.menu_book_rounded,
-                            label: 'Learn',
+                            label: 'Apprendre',
                             onTap: () {
                               dashboardController.setCenterMode(true);
                               _onItemTapped(2);
@@ -541,6 +542,7 @@ List<Widget> get _actionWidget => [
                             label: 'Quiz',
                             onTap: () {
                               dashboardController.setCenterMode(false);
+
                               _onItemTapped(2);
                               dashboardController.collapseClassroom();
                             },
@@ -592,7 +594,7 @@ List<Widget> get _actionWidget => [
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Classroom',
+                            'Classe',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,

@@ -110,7 +110,7 @@ class _SignupPageState extends State<SignupPage> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to fetch Google account details. Please try again.",
+        "Impossible de récupérer les détails du compte Google. Veuillez réessayer.",
       );
       return;
     }
@@ -120,7 +120,7 @@ class _SignupPageState extends State<SignupPage> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to verify Google sign-in token. Please try again.",
+        "Impossible de vérifier le jeton Google. Veuillez réessayer.",
       );
       return;
     }
@@ -136,7 +136,7 @@ class _SignupPageState extends State<SignupPage> {
     if (response.statusCode != 200) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        response.data["message"] ?? "Unable to continue with Google",
+        response.data["message"] ?? "Impossible de continuer avec Google",
       );
       return;
     }
@@ -149,7 +149,7 @@ class _SignupPageState extends State<SignupPage> {
     }
     SnackBarHelper.showSuccessSnackBar(
       context,
-      "Google account verified. Complete the form to create account.",
+      "Compte Google vérifié. Complétez le formulaire pour créer votre compte.",
     );
   }
 
@@ -158,7 +158,7 @@ class _SignupPageState extends State<SignupPage> {
     if (!mounted) return;
     SnackBarHelper.showFailureSnackBar(
       context,
-      "Google sign-in failed. Please try again.",
+      "La connexion Google a échoué. Veuillez réessayer.",
     );
   }
 
@@ -237,7 +237,7 @@ class _SignupPageState extends State<SignupPage> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Welcome to EPS Learning",
+                            "Bienvenue sur EPS Learning",
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 22,
@@ -250,7 +250,7 @@ class _SignupPageState extends State<SignupPage> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Let’s join to EPS Digital Learning ecosystem & experience smart learning. It’s Free!",
+                            "Rejoignez l’écosystème EPS Digital Learning et découvrez l’apprentissage intelligent. C’est gratuit !",
                             style: TextStyle(
                               color:
                                   Theme.of(
@@ -274,8 +274,8 @@ class _SignupPageState extends State<SignupPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               InputField(
-                                title: "Username (Used for login)",
-                                hintText: 'Create a user name',
+                                title: "Nom d'utilisateur (utilisé pour la connexion)",
+                                hintText: "Créez un nom d'utilisateur",
                                 suffixIcon: _buildUsernameSuffixIcon(
                                   signupController,
                                 ),
@@ -299,23 +299,23 @@ class _SignupPageState extends State<SignupPage> {
                                 validator:
                                     (val) =>
                                         (val == null || val.trim().length < 2)
-                                            ? "Enter a valid username"
+                                            ? "Entrez un nom d'utilisateur valide"
                                             : null,
                               ),
                               _buildUsernameMessage(signupController),
                               SizedBox(height: 16),
 
                               InputField(
-                                title: "Full name",
-                                hintText: 'Enter your full name',
+                                title: "Nom complet",
+                                hintText: 'Entrez votre nom complet',
                                 suffixIcon: SizedBox.shrink(),
                                 controller: fullnameController,
                               ),
                               SizedBox(height: 16),
 
                               InputField(
-                                title: "Email Address",
-                                hintText: 'Enter your Email Address',
+                                title: "Adresse e-mail",
+                                hintText: 'Entrez votre adresse e-mail',
                                 suffixIcon: _buildSuffixIcon(),
                                 // mandatory: true,
                                 controller: emailController,
@@ -333,14 +333,14 @@ class _SignupPageState extends State<SignupPage> {
                                 validator:
                                     (val) =>
                                         (val == null || val.trim().isEmpty)
-                                            ? "Enter valid Email Address"
+                                            ? "Entrez une adresse e-mail valide"
                                             : null,
                               ),
                               SizedBox(height: 16),
 
                               InputField(
-                                title: "Phone number",
-                                hintText: 'Enter your phone number',
+                                title: "Numéro de téléphone",
+                                hintText: 'Entrez votre numéro de téléphone',
                                 suffixIcon: SizedBox.shrink(),
                                 controller: phonenoController,
                               ),
@@ -348,8 +348,8 @@ class _SignupPageState extends State<SignupPage> {
 
                               IgnorePointer(
                                 child: CommonDropdownButton(
-                                  title: "Select your role",
-                                  hintText: "Select your role",
+                                  title: "Sélectionnez votre rôle",
+                                  hintText: "Sélectionnez votre rôle",
                                   //chosenValue: shiftList.isNotEmpty ? shiftList.first : null,
                                   chosenValue: role,
                                   itemsList: roleList,
@@ -373,8 +373,8 @@ class _SignupPageState extends State<SignupPage> {
                               SizedBox(height: 16),
 
                               CommonDropdownButton(
-                                title: "Select your grade",
-                                hintText: "Select your grade",
+                                title: "Sélectionnez votre niveau",
+                                hintText: "Sélectionnez votre niveau",
                                 //chosenValue: shiftList.isNotEmpty ? shiftList.first : null,
                                 chosenValue: grade,
                                 itemsList: gradeList,
@@ -398,7 +398,7 @@ class _SignupPageState extends State<SignupPage> {
 
                               InputField(
                                 title: "Password",
-                                hintText: 'Create a strong password',
+                                hintText: 'Créez un mot de passe solide',
                                 controller: passwordController,
                                 obscureText: !passwordVisible,
                                 suffixIcon: IconButton(
@@ -422,7 +422,7 @@ class _SignupPageState extends State<SignupPage> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  "At least 8 characters with a combination of letters and numbers",
+                                  "Au moins 8 caractères avec une combinaison de lettres et de chiffres",
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
                                     fontSize: 12,
@@ -437,8 +437,8 @@ class _SignupPageState extends State<SignupPage> {
 
                               SizedBox(height: 16),
                               InputField(
-                                title: "Confirm Password",
-                                hintText: 'Confirm your password',
+                                title: "Confirmer le mot de passe",
+                                hintText: 'Confirmez votre mot de passe',
                                 controller: conPasswordController,
                                 obscureText: !passwordVisible,
                                 suffixIcon: IconButton(
@@ -509,7 +509,7 @@ class _SignupPageState extends State<SignupPage> {
                               CustomGradiantButton(
                                 loading: signupController.isLoading.value,
                                 buttonColor: primarycolor,
-                                textValue: 'Sign Up',
+                                textValue: "S'inscrire",
                                 textColor: onprimary,
                                 onPressed: () {
                                   /*     final form = _formKey.currentState;
@@ -623,8 +623,8 @@ class _SignupPageState extends State<SignupPage> {
                                           Text(
                                             signupController.googleToken.value
                                                 .isNotEmpty
-                                                ? "Google verified"
-                                                : "Signup with Google",
+                                                ? "Google vérifié"
+                                                : "S'inscrire avec Google",
                                             style: heading6.copyWith(
                                               color:
                                                   Theme.of(
@@ -656,7 +656,7 @@ class _SignupPageState extends State<SignupPage> {
                                     ),
                                     child: RichText(
                                       text: TextSpan(
-                                        text: 'Already have an account?  ',
+                                        text: 'Vous avez déjà un compte ?  ',
                                         style: TextStyle(
                                           color:
                                               Theme.of(
@@ -672,7 +672,7 @@ class _SignupPageState extends State<SignupPage> {
                                   text: 'bold',
                                   style: TextStyle(fontWeight: FontWeight.bold)), */
                                           TextSpan(
-                                            text: 'Sign In',
+                                            text: 'Se connecter',
                                             style: TextStyle(
                                               color: primarycolor,
                                               fontWeight: FontWeight.w700,
@@ -692,8 +692,8 @@ class _SignupPageState extends State<SignupPage> {
                                 child: Text(
                                   textAlign: TextAlign.center,
                                   signupController.googleToken.value.isNotEmpty
-                                      ? "Google account verified. Complete the fields below to create your account."
-                                      : "By signing up to create an account I accept Eduline’s Terms of Service & Privacy Policy",
+                                      ? "Compte Google vérifié. Complétez les champs ci-dessous pour créer votre compte."
+                                      : "En vous inscrivant, vous acceptez les conditions d’utilisation et la politique de confidentialité d’EPS",
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -863,7 +863,7 @@ class _SignupPageState extends State<SignupPage> {
         !_isValidUsername(_username)) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid Username",
+        "Veuillez entrer un nom d'utilisateur valide",
       );
       return false;
     }
@@ -871,7 +871,7 @@ class _SignupPageState extends State<SignupPage> {
     if (_fullname.isEmpty || _fullname.trim().length < 4) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter your valid name",
+        "Veuillez entrer votre nom complet",
       );
       return false;
     }
@@ -879,7 +879,7 @@ class _SignupPageState extends State<SignupPage> {
     if (_email.isEmpty || !_isValidEmail(_email)) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid Emailid",
+        "Veuillez entrer une adresse e-mail valide",
       );
       return false;
     }
@@ -887,25 +887,25 @@ class _SignupPageState extends State<SignupPage> {
     if (_phonenumber.isEmpty || !_isValidMobile(_phonenumber)) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid Mobile number",
+        "Veuillez entrer un numéro de téléphone valide",
       );
       return false;
     }
 
     if (_role == null) {
-      SnackBarHelper.showFailureSnackBar(context, "Please enter a valid Role");
+      SnackBarHelper.showFailureSnackBar(context, "Veuillez sélectionner un rôle valide");
       return false;
     }
 
     if (_grade == null) {
-      SnackBarHelper.showFailureSnackBar(context, "Please enter a valid Grade");
+      SnackBarHelper.showFailureSnackBar(context, "Veuillez sélectionner un niveau valide");
       return false;
     }
 
     if (_password.isEmpty || !_isValidPassword(_password)) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid Password",
+        "Veuillez entrer un mot de passe valide",
       );
       return false;
     }
@@ -913,7 +913,7 @@ class _SignupPageState extends State<SignupPage> {
     if (_password != _conpassword) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Password and Confirm Password do not match",
+        "Le mot de passe et la confirmation ne correspondent pas",
       );
       return false;
     }

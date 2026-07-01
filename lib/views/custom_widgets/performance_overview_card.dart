@@ -70,7 +70,7 @@ final double notStartedPercentage =
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Performance Overview',
+                  'Aperçu des performances',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 DropdownButton<String>(
@@ -151,15 +151,15 @@ final double notStartedPercentage =
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat("$completed/$totalChapters", 'Completed', Colors.green),
+                _buildStat("$completed/$totalChapters", 'Terminé', Colors.green),
                 _buildStat(
                   "$inProgress/$totalChapters",
-                  'In Progress',
+                  'En cours',
                   Colors.orange,
                 ),
                 _buildStat(
                   "$notStarted/$totalChapters",
-                  'Not Started',
+                  'Non commencé',
                   Colors.red,
                 ),
               ],

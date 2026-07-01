@@ -120,11 +120,11 @@ class _CollectionPageState extends State<CollectionPage> {
           title: bookData.title,
           desc:
               bookData.isSubscribed
-                  ? 'Do you want to unsubscribe this book?'
-                  : 'Scan the QR code in this book to subscribe.',
+                  ? 'Voulez-vous vous désabonner de ce livre ?'
+                  : 'Scannez le QR code dans ce livre pour vous abonner.',
           bookImage: bookData.bookCoverImgLink,
-          positiveText: bookData.isSubscribed ? 'Unsubscribe' : "Scan QR",
-          negativeText: "Cancel",
+          positiveText: bookData.isSubscribed ? 'Se désabonner' : "Scanner QR",
+          negativeText: "Annuler",
           onPositiveCallback: () async {
             if (bookData.isSubscribed) {
               collectionController.unsubscribeBook(
@@ -548,7 +548,7 @@ class _CollectionPageState extends State<CollectionPage> {
 
                               SizedBox(width: 8),
                               Text(
-                                "Filter",
+                                "Filtrer",
 
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.surface,
@@ -616,7 +616,7 @@ class _CollectionPageState extends State<CollectionPage> {
                               ),
                               SizedBox(width: 8),
                               Text(
-                                "Sorting",
+                                "Trier",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.surface,
                                   fontWeight: FontWeight.w500,
@@ -720,7 +720,7 @@ Widget bookGridItem({
                   ),
                   child: const Center(
                     child: Text(
-                      "View Chapter",
+                      "Voir le chapitre",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 13,
@@ -737,7 +737,7 @@ Widget bookGridItem({
                 onTap: onSubscribe,
                 child: Center(
                   child: Text(
-                    isSubscribed ? "Unsubscribe" : "Subscribe",
+                    isSubscribed ? "Se désabonner" : "S'abonner",
                     style: TextStyle(
                       color: primarycolor,
                       fontWeight: FontWeight.w500,
@@ -842,7 +842,7 @@ Widget bookListItem({
                         ),
                         child: Center(
                           child: const Text(
-                            "View Chapter",
+                            "Voir le chapitre",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -863,7 +863,7 @@ Widget bookListItem({
                 onTap: onSubscribe,
                 child: Center(
                   child: Text(
-                    isSubscribed ? "Unsubscribe" : "Subscribe",
+                    isSubscribed ? "Se désabonner" : "S'abonner",
 
                     style: TextStyle(
                       color: primarycolor,
@@ -951,7 +951,7 @@ void _showChapterBottomsheet(
                               const SizedBox(height: 15),
                               Center(
                                 child: Text(
-                                  "Book Details",
+                                  "Détails du livre",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color:
@@ -1084,7 +1084,7 @@ void _showChapterBottomsheet(
                                       Row(
                                         children: [
                                           Text(
-                                            "Subject - ",
+                                            "Matière - ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -1115,7 +1115,7 @@ void _showChapterBottomsheet(
                                       Row(
                                         children: [
                                           Text(
-                                            "Publisher - ",
+                                            "Éditeur - ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -1146,7 +1146,7 @@ void _showChapterBottomsheet(
                                       Row(
                                         children: [
                                           Text(
-                                            "Grade - ",
+                                            "Niveau - ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -1200,7 +1200,7 @@ void _showChapterBottomsheet(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Chapters :",
+                              "Chapitres :",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -1253,7 +1253,7 @@ void _showChapterBottomsheet(
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  "No Chapters Found",
+                                  "Aucun chapitre trouvé",
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: primarycolor,
@@ -1461,7 +1461,7 @@ void _showSortBottomsheet(
                                   const SizedBox(height: 15),
                                   Center(
                                     child: Text(
-                                      "Sort",
+                                      "Trier",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color:
@@ -1520,7 +1520,7 @@ void _showSortBottomsheet(
                               children: [
                                 // Sort By
                                 Text(
-                                  "Sort By :",
+                                  "Trier par :",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -1589,7 +1589,7 @@ void _showSortBottomsheet(
 
                                 // Sort Order
                                 Text(
-                                  "Sort Order :",
+                                  "Ordre de tri :",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -1665,7 +1665,7 @@ void _showSortBottomsheet(
                                   Expanded(
                                     child: SecondaryButton(
                                       buttonColor: primarycolor,
-                                      textValue: "Clear",
+                                      textValue: "Effacer",
                                       textColor: primarycolor,
                                       onPressed: () {
                                         collectionController.clearSorts();
@@ -1683,7 +1683,7 @@ void _showSortBottomsheet(
                                   Expanded(
                                     child: PrimaryButton(
                                       buttonColor: primarycolor,
-                                      textValue: "Apply",
+                                      textValue: "Appliquer",
                                       textColor: whitecolor,
                                       onPressed: () {
                                         Navigator.of(
@@ -1776,7 +1776,7 @@ void _showFilterBottomsheet(
                                   const SizedBox(height: 15),
                                   Center(
                                     child: Text(
-                                      "Filter",
+                                      "Filtrer",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color:
@@ -1835,7 +1835,7 @@ void _showFilterBottomsheet(
                               children: [
                                 // Sort By
                                 Text(
-                                  "Subject :",
+                                  "Matière :",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -1906,7 +1906,7 @@ void _showFilterBottomsheet(
 
                                 // Sort Order
                                 Text(
-                                  "Grade :",
+                                  "Niveau :",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -1986,7 +1986,7 @@ void _showFilterBottomsheet(
                                   Expanded(
                                     child: SecondaryButton(
                                       buttonColor: primarycolor,
-                                      textValue: "Clear",
+                                      textValue: "Effacer",
                                       textColor: primarycolor,
                                       onPressed: () {
                                         collectionController.clearFilters();
@@ -2004,7 +2004,7 @@ void _showFilterBottomsheet(
                                   Expanded(
                                     child: PrimaryButton(
                                       buttonColor: primarycolor,
-                                      textValue: "Apply",
+                                      textValue: "Appliquer",
                                       textColor: whitecolor,
                                       onPressed: () {
                                         Navigator.of(

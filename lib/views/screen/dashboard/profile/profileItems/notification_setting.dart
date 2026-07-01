@@ -50,7 +50,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                         ),
                       ),
                        Text(
-                        'Notifications Settings',
+                        'Paramètres de notifications',
                         style: TextStyle(
                           color:  Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
@@ -84,7 +84,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             textAlign: TextAlign.start,
-                            "General",
+                            "Général",
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -95,7 +95,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       ),
                       SizedBox(height: 8),
                       NotificationSwitchWidget(
-                        title: 'New Book Add Alerts',
+                        title: 'Alertes nouveaux livres',
                         value: _newBookAddAlerts,
                         onChanged: (newValue) {
                           setState(() {
@@ -104,7 +104,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                         },
                       ),
                       NotificationSwitchWidget(
-                        title: 'Popular Quizzes & Books',
+                        title: 'Quiz et livres populaires',
                         value: _popularQuizzesAndBooks,
                         onChanged: (newValue) {
                           setState(() {
@@ -127,7 +127,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             textAlign: TextAlign.start,
-                            "Badge Counter",
+                            "Compteur de badge",
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -138,7 +138,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       ),
                       SizedBox(height: 8),
                        NotificationSwitchWidget(
-                        title: 'Show Badge Icon',
+                        title: 'Afficher l\'icône de badge',
                         value: _showBadgeIcon,
                         onChanged: (newValue) {
                           setState(() {
@@ -147,7 +147,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                         },
                       ),
                       NotificationSwitchWidget(
-                        title: 'Include Muted Chat',
+                        title: 'Inclure les chats silencieux',
                         value: _includeMutedChat,
                         onChanged: (newValue) {
                           setState(() {
@@ -157,7 +157,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       ),
                      
                       NotificationSwitchWidget(
-                        title: 'Count Unread Message',
+                        title: 'Compter les messages non lus',
                         value: _countUnreadMessage,
                         onChanged: (newValue) {
                           setState(() {
@@ -190,7 +190,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                       ),
                       SizedBox(height: 8),
                       NotificationSwitchWidget(
-                        title: 'Books Recommendations',
+                        title: 'Recommandations de livres',
                         value: _booksRecommendations,
                         onChanged: (newValue) {
                           setState(() {
@@ -199,7 +199,7 @@ class _NottificationSettingPageState extends State<NottificationSettingPage> {
                         },
                       ),
                       NotificationSwitchWidget(
-                        title: 'Announcements From Publisher',
+                        title: 'Annonces de l\'éditeur',
                         value: _announcementsFromPublisher,
                         onChanged: (newValue) {
                           setState(() {

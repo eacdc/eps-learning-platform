@@ -30,7 +30,7 @@ class SearchField extends StatelessWidget {
             width: 8,
           ),
           Text(
-            'Search books & quizzes',
+            'Rechercher des livres et quiz',
             style: TextStyle(
               color: lightgreytext2,
               fontSize: 17.0,

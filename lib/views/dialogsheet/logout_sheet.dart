@@ -50,7 +50,7 @@ class LogoutSheet extends StatelessWidget {
                     const SizedBox(height: 15),
                     Center(
                       child: Text(
-                        "Logout",
+                        "Se déconnecter",
                         style: TextStyle(
                           fontSize: 18,
                           color: Theme.of(context).colorScheme.onSurface,
@@ -101,7 +101,7 @@ class LogoutSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "Are you sure you want to logout?",
+                    "Êtes-vous sûr de vouloir vous déconnecter ?",
                     style: TextStyle(
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -115,7 +115,7 @@ class LogoutSheet extends StatelessWidget {
                       Expanded(
                         child: PrimaryButton(
                           buttonColor: primarycolor,
-                          textValue: "Yes,Logout",
+                          textValue: "Oui, se déconnecter",
                           textColor: whitecolor,
                           onPressed: () {
                             print('Confirmed');
@@ -135,7 +135,7 @@ class LogoutSheet extends StatelessWidget {
                       Expanded(
                         child: SecondaryButton(
                           buttonColor: primarycolor,
-                          textValue: "Cancel",
+                          textValue: "Annuler",
                           textColor: primarycolor,
                           onPressed: () {
                             Navigator.of(context).pop();

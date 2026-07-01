@@ -110,7 +110,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           ),
                         ),
                          Text(
-                          'Notification',
+                          'Notifications',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,

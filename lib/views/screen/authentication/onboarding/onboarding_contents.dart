@@ -12,20 +12,20 @@ class OnboardingContents {
 
 List<OnboardingContents> contents = [
   OnboardingContents(
-    title: "Discover a platform for smart learning ",
+    title: "Découvrez une plateforme pour un apprentissage intelligent",
     image: "assets/images/onboard1.png",
-    desc: "Embark on a personalized learning journey where every quiz, challenge, and achievement brings you closer to mastering your subjects.",
+    desc: "Embarquez dans un parcours d'apprentissage personnalisé où chaque quiz, défi et réussite vous rapproche de la maîtrise de vos matières.",
   ),
   OnboardingContents(
-    title: "Stay organised with books & quizzes",
+    title: "Restez organisé avec des livres et des quiz",
     image: "assets/images/onboard2.png",
     desc:
-        "Easily manage your study materials by subscribing to relevant books. Keep track of your progress and dive into specific chapters whenever you're ready to learn.",
+        "Gérez facilement vos supports d'étude en vous abonnant à des livres pertinents. Suivez vos progrès et plongez dans des chapitres spécifiques quand vous êtes prêt à apprendre.",
   ),
   OnboardingContents(
-    title: "Level up your Learning to new heights",
+    title: "Élevez votre apprentissage vers de nouveaux sommets",
     image: "assets/images/onboard3.png",
     desc:
-        "Elevate your skills and achieve your academic goals with ease and efficiency",
+        "Développez vos compétences et atteignez vos objectifs académiques avec facilité et efficacité",
   ),
 ];

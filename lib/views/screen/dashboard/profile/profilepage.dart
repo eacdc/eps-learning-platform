@@ -29,8 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final List<Widget> itemWidgets = [
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_profile_logo.png',
-      title: 'Detailed Profile',
-      description: 'Information account',
+      title: 'Profil détaillé',
+      description: 'Informations du compte',
       onTap: () {
         print('User Profile clicked');
         Get.to(DetailedProfilePage());
@@ -38,8 +38,8 @@ class _ProfilePageState extends State<ProfilePage> {
     ),
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_account_security_logo.png',
-      title: 'Account & Security',
-      description: 'Information about your account',
+      title: 'Compte et sécurité',
+      description: 'Informations sur votre compte',
       onTap: () {
         print('Settings clicked');
         Get.to(AccountSecurityPage());
@@ -48,8 +48,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_progress_score.png',
-      title: 'Progress & Scores',
-      description: 'Check current progress & scores',
+      title: 'Progrès et scores',
+      description: 'Vérifier les progrès et scores actuels',
       onTap: () {
         print('Settings clicked');
         Get.to(ProgressScorePage()); // Navigate to ProgressScorePage
@@ -58,8 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_notification_setting.png',
-      title: 'Notifications Settings',
-      description: 'check notifications & updates ',
+      title: 'Paramètres de notifications',
+      description: 'Vérifier les notifications et mises à jour',
       onTap: () {
         print('Settings clicked');
         Get.to(NottificationSettingPage());
@@ -68,8 +68,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_helpcenter_logo.png',
-      title: 'Help Center & Support',
-      description: 'Get support from experts',
+      title: 'Centre d\'aide et support',
+      description: 'Obtenir de l\'aide d\'experts',
       onTap: () {
         print('Settings clicked');
         Get.to(HelpCenterPage());
@@ -78,8 +78,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     InfoItem(
       iconPath: 'assets/icons/profileicon/png_privacy_policy_logo.png',
-      title: 'Privacy Policy',
-      description: 'Our privacy policy',
+      title: 'Politique de confidentialité',
+      description: 'Notre politique de confidentialité',
       onTap: () {
         print('Settings clicked');
         Get.to(PrivacyPolicyPage());
@@ -211,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ]
                                   : [
                                     Text(
-                                      'Hi, $name',
+                                      'Bonjour, $name',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
@@ -282,7 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     child: Text(
-                      'Logout',
+                      'Se déconnecter',
                       style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ),

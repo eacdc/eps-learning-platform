@@ -120,7 +120,7 @@ class _UpdateProfilePicSheetState extends State<UpdateProfilePicSheet> {
                         const SizedBox(height: 15),
                         Center(
                           child: Text(
-                            "Profile Picture",
+                            "Photo de profil",
                             style: TextStyle(
                               fontSize: 18,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -214,7 +214,7 @@ class _UpdateProfilePicSheetState extends State<UpdateProfilePicSheet> {
                                     selectedImageFile != null
                                         /// ? selectedImageFile!.name
                                         ? basename(selectedImageFile!.path)
-                                        : 'Select Profile Image',
+                                        : 'Sélectionner une image de profil',
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 14,
@@ -240,7 +240,7 @@ class _UpdateProfilePicSheetState extends State<UpdateProfilePicSheet> {
                             () => CustomGradiantButton(
                               loading: imageuploadController.isLoading.value,
                               buttonColor: primarycolor,
-                              textValue: 'Update',
+                              textValue: 'Mettre à jour',
                               textColor: onprimary,
                               onPressed: () {
                                 if (selectedImageFile != null) {

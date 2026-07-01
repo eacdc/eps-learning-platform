@@ -102,7 +102,7 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                         ),
                       ),
                       Text(
-                        'Account Security',
+                        'Compte et sécurité',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
@@ -129,8 +129,8 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InputField(
-                        title: "Curent Password",
-                        hintText: 'Enter current password',
+                        title: "Mot de passe actuel",
+                        hintText: 'Entrez le mot de passe actuel',
                         controller: currentPasswordController,
                         obscureText: !passwordVisible,
                         suffixIcon: IconButton(
@@ -154,8 +154,8 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                       SizedBox(height: 16),
 
                       InputField(
-                        title: "New Password",
-                        hintText: 'Create a strong password',
+                        title: "Nouveau mot de passe",
+                        hintText: 'Créez un mot de passe fort',
                         controller: passwordController,
                         obscureText: !passwordVisible,
                         suffixIcon: IconButton(
@@ -179,7 +179,7 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          "At least 8 characters with a combination of letters and numbers",
+                          "Au moins 8 caractères avec une combinaison de lettres et de chiffres",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             fontSize: 12,
@@ -192,8 +192,8 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
 
                       SizedBox(height: 16),
                       InputField(
-                        title: "Confirm Password",
-                        hintText: 'Confirm your password',
+                        title: "Confirmer le mot de passe",
+                        hintText: 'Confirmez votre mot de passe',
                         controller: conPasswordController,
                         obscureText: !passwordVisible,
                         suffixIcon: IconButton(
@@ -221,7 +221,7 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
               CustomGradiantButton(
                 loading: forgotPasswordController.isLoading.value,
                 buttonColor: primarycolor,
-                textValue: 'Change Password',
+                textValue: 'Changer le mot de passe',
                 textColor: onprimary,
                 onPressed: () {
                   final String _currentPasssword =
@@ -232,19 +232,19 @@ class _AccountSecurityPageState extends State<AccountSecurityPage> {
                   if (_currentPasssword.length < 4) {
                     SnackBarHelper.showFailureSnackBar(
                       context,
-                      "Please Enter Valid Current Password",
+                      "Veuillez entrer un mot de passe actuel valide",
                     );
                   } else if (_newpassword.isEmpty ||
                       !_isValidPassword(_newpassword)) {
                     SnackBarHelper.showFailureSnackBar(
                       context,
-                      "Please enter a valid Password ",
+                      "Veuillez entrer un mot de passe valide",
                     );
                   } else if (_confirmPassword.isEmpty ||
                       _newpassword != _confirmPassword) {
                     SnackBarHelper.showFailureSnackBar(
                       context,
-                      "Password and Confirm Password do not match",
+                      "Le mot de passe et la confirmation ne correspondent pas",
                     );
                   } else {
                     forgotPasswordController.changePassword(

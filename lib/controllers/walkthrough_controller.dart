@@ -33,17 +33,17 @@ class WalkthroughController extends GetxController {
     return [
       const WalkthroughStep(
         id: 'welcome',
-        title: 'Welcome to Test Your Learning!',
+        title: 'Bienvenue sur Test Your Learning !',
         description:
-            'Take a quick tour to discover quiz generation, learning tools, and progress tracking.',
+            'Faites une visite rapide pour découvrir la génération de quiz, les outils d\'apprentissage et le suivi des progrès.',
         tooltipPosition: WalkthroughTooltipPosition.center,
         icon: Icons.waving_hand_rounded,
       ),
       WalkthroughStep(
         id: 'home_stats',
-        title: 'Track Your Progress',
+        title: 'Suivez vos progrès',
         description:
-            'View quizzes in progress, completed quizzes, points earned, and study hours at a glance.',
+            'Consultez d\'un coup d\'œil les quiz en cours, les quiz terminés, les points gagnés et les heures d\'étude.',
         targetKey: homeStatsKey,
         tabIndex: 0,
         tooltipPosition: WalkthroughTooltipPosition.below,
@@ -51,9 +51,9 @@ class WalkthroughController extends GetxController {
       ),
       WalkthroughStep(
         id: 'classroom_fab',
-        title: 'Start Learning or Quizzing',
+        title: 'Commencer à apprendre ou à faire des quiz',
         description:
-            'Tap Classroom to open Learn and Quiz modes. Try tapping it now!',
+            'Appuyez sur Classroom pour ouvrir les modes Apprendre et Quiz. Essayez d\'appuyer maintenant !',
         targetKey: classroomFabKey,
         tabIndex: 0,
         waitForTargetTap: true,
@@ -62,9 +62,9 @@ class WalkthroughController extends GetxController {
       ),
       WalkthroughStep(
         id: 'learn_quiz_modes',
-        title: 'Learn vs Quiz',
+        title: 'Apprendre vs Quiz',
         description:
-            'Choose Learn for AI-guided study, or Quiz to test your knowledge with interactive questions.',
+            'Choisissez Apprendre pour une étude guidée par l\'IA, ou Quiz pour tester vos connaissances avec des questions interactives.',
         targetKey: learnQuizRowKey,
         tabIndex: 0,
         expandClassroom: true,
@@ -73,27 +73,27 @@ class WalkthroughController extends GetxController {
       ),
       WalkthroughStep(
         id: 'my_library',
-        title: 'My Library',
+        title: 'Ma bibliothèque',
         description:
-            'Access your subscribed books and chapters. Pick a book to start a quiz or learning session.',
+            'Accédez à vos livres et chapitres abonnés. Choisissez un livre pour commencer un quiz ou une session d\'apprentissage.',
         targetKey: navLibraryKey,
         tooltipPosition: WalkthroughTooltipPosition.above,
         icon: Icons.bookmark_rounded,
       ),
       WalkthroughStep(
         id: 'collection',
-        title: 'Browse & Subscribe',
+        title: 'Parcourir et s\'abonner',
         description:
-            'Explore the book collection and subscribe to new titles for quizzes and learning.',
+            'Explorez la collection de livres et abonnez-vous à de nouveaux titres pour les quiz et l\'apprentissage.',
         targetKey: navCollectionKey,
         tooltipPosition: WalkthroughTooltipPosition.above,
         icon: Icons.collections_bookmark_rounded,
       ),
       WalkthroughStep(
         id: 'performance',
-        title: 'Performance Overview',
+        title: 'Aperçu des performances',
         description:
-            'Review your chapter-wise performance and see how you improve over time.',
+            'Consultez vos performances par chapitre et voyez comment vous progressez au fil du temps.',
         targetKey: performanceOverviewKey,
         tabIndex: 0,
         tooltipPosition: WalkthroughTooltipPosition.above,
@@ -101,18 +101,18 @@ class WalkthroughController extends GetxController {
       ),
       WalkthroughStep(
         id: 'progress_scores',
-        title: 'Detailed Progress & Scores',
+        title: 'Progrès et scores détaillés',
         description:
-            'Open your Profile, then tap Progress & Scores for in-depth assessment results and rankings.',
+            'Ouvrez votre profil, puis appuyez sur Progrès et scores pour des résultats d\'évaluation approfondis et des classements.',
         targetKey: navProfileKey,
         tooltipPosition: WalkthroughTooltipPosition.above,
         icon: Icons.emoji_events_rounded,
       ),
       const WalkthroughStep(
         id: 'complete',
-        title: "You're All Set!",
+        title: "Vous êtes prêt !",
         description:
-            'You are ready to explore. Start a quiz, track your progress, and keep learning!',
+            'Vous êtes prêt à explorer. Commencez un quiz, suivez vos progrès et continuez à apprendre !',
         tooltipPosition: WalkthroughTooltipPosition.center,
         icon: Icons.check_circle_rounded,
       ),

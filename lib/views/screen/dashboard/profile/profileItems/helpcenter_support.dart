@@ -58,7 +58,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                       ),
                     ),
                      Text(
-                      'Help Center',
+                      'Centre d\'aide',
                       style: TextStyle(
                         color:  Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -82,11 +82,11 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      toggleButton("FAQ's", showFaq, () {
+                      toggleButton("FAQ", showFaq, () {
                         setState(() => showFaq = true);
                       }),
                       const SizedBox(width: 16),
-                      toggleButton("Help Center", !showFaq, () {
+                      toggleButton("Centre d'aide", !showFaq, () {
                         setState(() => showFaq = false);
                       }),
                     ],
@@ -160,7 +160,7 @@ class FaqWidget extends StatelessWidget {
                 child: Text(
                   textAlign: TextAlign.start,
 
-                  "Frequently Asked\nQuestion",
+                  "Questions\nFréquemment Posées",
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     color:  Theme.of(context).colorScheme.onSurface,
@@ -285,7 +285,7 @@ class HelpCenterWidget extends StatelessWidget {
   final List<Widget> itemWidgets = [
     HelpCenterItem(
       iconPath: 'assets/icons/score_progress/png_hc_customer.png',
-      title: 'Customer Service',
+      title: 'Service client',
       description: '1274-555 666 (Toll-free)',
       onTap: () {
         print('User Profile clicked');

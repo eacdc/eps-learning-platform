@@ -93,7 +93,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                         ),
                       ),
                        Text(
-                        'Privacy Policy',
+                        'Politique de confidentialité',
                         style: TextStyle(
                           color:  Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,

@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(height: 15),
                                 Center(
                                   child: Text(
-                                    "Book Details",
+                                    "Détails du livre",
                                     style: TextStyle(
                                       fontSize: 16,
                                       color:
@@ -252,7 +252,7 @@ class _HomePageState extends State<HomePage> {
                                         Row(
                                           children: [
                                             Text(
-                                              "Subject - ",
+                                              "Matière - ",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color:
@@ -308,7 +308,7 @@ class _HomePageState extends State<HomePage> {
                                         Row(
                                           children: [
                                             Text(
-                                              "Grade - ",
+                                              "Niveau - ",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color:
@@ -362,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Chapters :",
+                                "Chapitres :",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color:
@@ -419,7 +419,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   SizedBox(height: 2),
                                   Text(
-                                    "No Chapters Found",
+                                    "Aucun chapitre trouvé",
                                     style: TextStyle(
                                       fontSize: 15,
                                       color: primarycolor,
@@ -534,7 +534,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         child: const Text(
-                                          'Start Quiz',
+                                          'Commencer le quiz',
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Colors.white,
@@ -755,7 +755,7 @@ class _HomePageState extends State<HomePage> {
                                     loop: 1,
                                     period: Duration(seconds: 3),
                                     child: Text(
-                                      "Hello, user!",
+                                      "Bonjour !",
                                       style: TextStyle(
                                         color: lightwhite1,
                                         fontSize: 15,
@@ -767,7 +767,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               SizedBox(height: 8),
                               Text(
-                                "Let’s learn something new today!",
+                                "Apprenons quelque chose de nouveau aujourd’hui !",
                                 style: TextStyle(
                                   color: lightwhite1,
                                   fontSize: 16,
@@ -811,7 +811,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff069CDD),
                       value: 'n/a',
                       iconPath: 'assets/icons/png_dash_progressquiz.png',
-                      description: 'Quizzes In progress',
+                      description: 'Quiz en cours',
                       onTap: () => print('Tapped Total Sales'),
                     ),
                     buildDashboardItem(
@@ -819,7 +819,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff8DC900),
                       value: 'n/a',
                       iconPath: 'assets/icons/png_dash_compltedquiz.png',
-                      description: 'Completed Quizzes',
+                      description: 'Quiz terminés',
                       onTap: () => print('Tapped New Users'),
                     ),
                     buildDashboardItem(
@@ -827,7 +827,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff948DFF),
                       value: 'n/a',
                       iconPath: 'assets/icons/png_dash_totalhour.png',
-                      description: 'Total Hours spent',
+                      description: 'Heures totales',
                       onTap: () => print('Tapped New Users'),
                     ),
                     buildDashboardItem(
@@ -835,7 +835,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff00D5AA),
                       value: 'n/a',
                       iconPath: 'assets/icons/png_dash_pointearn.png',
-                      description: 'Points earned',
+                      description: 'Points gagnés',
                       onTap: () => print('Tapped New Users'),
                     ),
                   ],
@@ -861,7 +861,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff069CDD),
                       value: quizInProgress,
                       iconPath: 'assets/icons/png_dash_progressquiz.png',
-                      description: 'Quizzes In progress',
+                      description: 'Quiz en cours',
                       onTap: () => print('Tapped Total Sales'),
                     ),
                     buildDashboardItem(
@@ -869,7 +869,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff8DC900),
                       value: quizCompleted,
                       iconPath: 'assets/icons/png_dash_compltedquiz.png',
-                      description: 'Completed Quizzes',
+                      description: 'Quiz terminés',
                       onTap: () => print('Tapped New Users'),
                     ),
 
@@ -878,7 +878,7 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff00D5AA),
                       value: pointsEarned,
                       iconPath: 'assets/icons/png_dash_pointearn.png',
-                      description: 'Points earned',
+                      description: 'Points gagnés',
                       onTap: () => print('Tapped New Users'),
                     ),
 
@@ -887,12 +887,13 @@ class _HomePageState extends State<HomePage> {
                       bottomColor: const Color(0xff948DFF),
                       value: totalHours,
                       iconPath: 'assets/icons/png_dash_totalhour.png',
-                      description: 'Total Hours spent',
+                      description: 'Heures totales',
                       onTap: () => print('Tapped New Users'),
                       subItem: true,
-                      subItem1Title: "Learning",
+                      subItem1Title: "Apprentissage",
                       subItem1Desc: totalLearningHours,
                       subItem2Title: "Quiz",
+
                       subItem2Desc: totalQuizHours,
                     ),
                   ],
@@ -905,7 +906,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
                       Text(
-                        "Recent Activity",
+                        "Activité récente",
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
@@ -1111,7 +1112,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             child: Text(
                                               //"${books.chaptersCompleted ?? 0}/${books.chaptersAttempted ?? 0} Chapters",
-                                              "Continue Quiz",
+                                              "Continuer le quiz",
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w600,
@@ -1227,7 +1228,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'My Ranking',
+                      'Mon classement',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -1236,7 +1237,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'View Leaderboard',
+                      'Voir le classement',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withAlpha(200),
@@ -1325,7 +1326,7 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(height: 15),
                                 Center(
                                   child: Text(
-                                    "Leaderboard",
+                                    "Classement",
                                     style: TextStyle(
                                       fontSize: 18,
                                       color:
@@ -1401,7 +1402,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    "No Ranking Data Found",
+                                    "Aucune donnée de classement trouvée",
                                     style: TextStyle(
                                       fontSize: 15,
                                       color: primarycolor,
@@ -1429,7 +1430,7 @@ class _HomePageState extends State<HomePage> {
                               if (rankingData.usersAbove.isNotEmpty) ...[
                                 _buildSectionHeader(
                                   context,
-                                  "Top Performers 🏆",
+                                  "Meilleurs élèves 🏆",
                                 ),
                                 const SizedBox(height: 8),
                                 ...rankingData.usersAbove.map(
@@ -1443,7 +1444,7 @@ class _HomePageState extends State<HomePage> {
                               ],
 
                               // Current User Highlight
-                              _buildSectionHeader(context, "Your Position"),
+                              _buildSectionHeader(context, "Votre position"),
                               const SizedBox(height: 8),
                               _buildCurrentUserCard(
                                 context,
@@ -1456,7 +1457,7 @@ class _HomePageState extends State<HomePage> {
                               if (rankingData.usersBelow.isNotEmpty) ...[
                                 _buildSectionHeader(
                                   context,
-                                  "Close Competitors",
+                                  "Concurrents proches",
                                 ),
                                 const SizedBox(height: 8),
                                 ...rankingData.usersBelow.map(
@@ -1544,7 +1545,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Rank ${userRanking.rank}',
+                      'Rang ${userRanking.rank}',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -1568,18 +1569,19 @@ class _HomePageState extends State<HomePage> {
               _buildStatItem(
                 icon: Icons.star,
                 label: 'Points',
+
                 value: '${userRanking.points}',
               ),
               Container(width: 1, height: 40, color: Colors.white38),
               _buildStatItem(
                 icon: Icons.quiz,
-                label: 'Quiz Time',
+                label: 'Temps de quiz',
                 value: '${userRanking.quizTimeHours.toStringAsFixed(1)}h',
               ),
               Container(width: 1, height: 40, color: Colors.white38),
               _buildStatItem(
                 icon: Icons.school,
-                label: 'Learning',
+                label: 'Apprentissage',
                 value: '${userRanking.learningTimeHours.toStringAsFixed(1)}h',
               ),
             ],
@@ -1829,7 +1831,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
-                        'YOU',
+                        'VOUS',
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.white,

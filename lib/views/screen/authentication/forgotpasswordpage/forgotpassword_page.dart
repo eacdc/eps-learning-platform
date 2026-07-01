@@ -102,7 +102,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to fetch Google account details. Please try again.",
+        "Impossible de récupérer les détails du compte Google. Veuillez réessayer.",
       );
       return;
     }
@@ -112,7 +112,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to verify Google sign-in token. Please try again.",
+        "Impossible de vérifier le jeton Google. Veuillez réessayer.",
       );
       return;
     }
@@ -131,7 +131,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     if (result.usernames.isEmpty) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "No account found linked to this Google email (${result.email}).",
+        "Aucun compte associé à cet e-mail Google (${result.email}).",
       );
       return;
     }
@@ -152,7 +152,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     if (!mounted) return;
     SnackBarHelper.showFailureSnackBar(
       context,
-      "Google sign-in failed. Please try again.",
+      "La connexion Google a échoué. Veuillez réessayer.",
     );
   }
 
@@ -182,7 +182,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           _resetVerification();
           SnackBarHelper.showFailureSnackBar(
             context,
-            "Reset session expired. Please verify with Google again.",
+            "La session a expiré. Veuillez vérifier à nouveau avec Google.",
           );
         }
       });
@@ -216,7 +216,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Select account to reset",
+                "Sélectionnez le compte à réinitialiser",
                 style: TextStyle(
                   color: Theme.of(ctx).colorScheme.onSurface,
                   fontSize: 18,
@@ -225,8 +225,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Multiple accounts found for $email. "
-                "Choose the one you want to reset the password for.",
+                "Plusieurs comptes trouvés pour $email. "
+                "Choisissez celui dont vous souhaitez réinitialiser le mot de passe.",
                 style: TextStyle(
                   color: Theme.of(ctx).colorScheme.onSurfaceVariant,
                   fontSize: 13,
@@ -309,7 +309,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                   // Title
                   Text(
-                    "Reset password",
+                    "Réinitialiser le mot de passe",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 22,
@@ -319,8 +319,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   const SizedBox(height: 8),
                   Text(
                     _googleVerified
-                        ? "Google verified. Enter and confirm your new password."
-                        : "First verify your identity with Google to continue.",
+                        ? "Google vérifié. Entrez et confirmez votre nouveau mot de passe."
+                        : "Vérifiez d'abord votre identité avec Google pour continuer.",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 14,
@@ -371,7 +371,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       ),
                                       const SizedBox(width: 10),
                                       Text(
-                                        "Verify with Google",
+                                        "Vérifier avec Google",
                                         style: heading6.copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -423,7 +423,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  "Session expires in $_countdownLabel",
+                                  "Session expire dans $_countdownLabel",
                                   style: TextStyle(
                                     color: _tokenSecondsLeft < 60
                                         ? Colors.red
@@ -451,7 +451,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     // Username (locked, from Google verification)
                     InputField(
-                      title: "Username",
+                      title: "Nom d'utilisateur",
                       hintText: _selectedUsername,
                       readOnly: true,
                       suffixIcon: const Icon(
@@ -479,7 +479,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             _tokenSecondsLeft,
                           ),
                           child: Text(
-                            "Switch account",
+                            "Changer de compte",
                             style: TextStyle(
                               color: primarycolor,
                               fontSize: 12,
@@ -492,8 +492,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       const SizedBox(height: 16),
 
                     InputField(
-                      title: "New Password",
-                      hintText: "Create a new password (min 8 characters)",
+                      title: "Nouveau mot de passe",
+                      hintText: "Créez un nouveau mot de passe (min. 8 caractères)",
                       controller: passwordController,
                       obscureText: forgotPasswordController.hidePassword.value,
                       suffixIcon: IconButton(
@@ -518,7 +518,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     InputField(
                       title: "Confirm Password",
-                      hintText: "Confirm your new password",
+                      hintText: "Confirmez votre nouveau mot de passe",
                       controller: conPasswordController,
                       obscureText: forgotPasswordController.hidePassword.value,
                       suffixIcon: IconButton(
@@ -543,7 +543,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     CustomGradiantButton(
                       buttonColor: primarycolor,
-                      textValue: "Reset Password",
+                      textValue: "Réinitialiser le mot de passe",
                       textColor: onprimary,
                       loading: forgotPasswordController.isLoading.value,
                       onPressed: () {
@@ -553,7 +553,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         if (_tokenSecondsLeft <= 0) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
-                            "Reset session expired. Please verify with Google again.",
+                            "La session a expiré. Veuillez vérifier à nouveau avec Google.",
                           );
                           _resetVerification();
                           return;
@@ -561,14 +561,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         if (password.length < 8) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
-                            "Password must be at least 8 characters",
+                            "Le mot de passe doit contenir au moins 8 caractères",
                           );
                           return;
                         }
                         if (password != confirmPassword) {
                           SnackBarHelper.showFailureSnackBar(
                             context,
-                            "Password and Confirm Password do not match",
+                            "Le mot de passe et la confirmation ne correspondent pas",
                           );
                           return;
                         }

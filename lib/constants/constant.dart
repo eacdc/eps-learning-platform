@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class Constants {
   static const String appname = "EPS Digital Learning";
-  static const String appdesc = "INDIA's Most Loved Learning App Platform";
+  static const String appdesc = "La plateforme d’apprentissage la plus appréciée en Inde";
   static const String copyright =
-      "EPS Digital Learning 2026. All rights reserved.";
+      "EPS Digital Learning 2026. Tous droits réservés.";
   static const String getstarted_title =
-      "Let’s explore smart learning with our professional Platform!";
+      "Explorons l’apprentissage intelligent avec notre plateforme professionnelle !";
   static const String getstarted_desc =
-      "With our smart lessons & quizzes, you will be able to learn from real-world experience";
+      "Avec nos leçons et quiz intelligents, vous pourrez apprendre grâce à des expériences du monde réel";
   //static const String fontFamily = "Gabarito";
   static const String fontFamily = "Manrope";
 

@@ -8,11 +8,11 @@ class SortOption {
 }
 
 final List<SortOption> sortOptions = [
-  SortOption(label: "Title", value: "title"),
-  SortOption(label: "Subject", value: "subject"),
-  SortOption(label: "Grade", value: "grade"),
-  SortOption(label: "Publisher", value: "publisher"),
-  SortOption(label: "Date Created", value: "createdAt"),
+  SortOption(label: "Titre", value: "title"),
+  SortOption(label: "Matière", value: "subject"),
+  SortOption(label: "Niveau", value: "grade"),
+  SortOption(label: "Éditeur", value: "publisher"),
+  SortOption(label: "Date de création", value: "createdAt"),
 
 ];
 
@@ -29,9 +29,9 @@ class SortOrderOption {
 }
 
 final List<SortOrderOption> sortOrderOptions = [
-  SortOrderOption(label: "Ascending", value: "asc", icon: Icons.arrow_upward),
+  SortOrderOption(label: "Croissant", value: "asc", icon: Icons.arrow_upward),
   SortOrderOption(
-    label: "Descending",
+    label: "Décroissant",
     value: "desc",
     icon: Icons.arrow_downward,
   ),
@@ -46,9 +46,9 @@ class SubjectOption {
 }
 
 final List<SubjectOption> subjectOptions = [
-  SubjectOption(label: "Science", value: "science"),
-  SubjectOption(label: "Math", value: "Math"),
-  SubjectOption(label: "Physics", value: "physics"),
+  SubjectOption(label: "Sciences", value: "science"),
+  SubjectOption(label: "Mathématiques", value: "Math"),
+  SubjectOption(label: "Physique", value: "physics"),
 
 
 ];
@@ -67,18 +67,18 @@ final List<SubjectOption> subjectOptions = [
 
 final List<CustomerType> customerTypeList = [
   CustomerType(
-    name: "Domestic",
+    name: "National",
     value: 1,
-    desc: "Domestic Customer",
+    desc: "Client national",
     icon: "assets/icons/png_domestic.png",
     subscription_price: 500.00,
     subscription_period: 365,
     maximum_service: 30,
   ),
   CustomerType(
-    name: "Corporate",
+    name: "Entreprise",
     value: 2,
-    desc: "Corporate Customer",
+    desc: "Client entreprise",
     icon: "assets/icons/png_corporate.png",
     subscription_price: 1000.00,
     subscription_period: 365,
@@ -91,9 +91,9 @@ CustomerType getCustomerTypeById(int? id) {
     (customertype) => customertype.value == id,
     orElse:
         () => CustomerType(
-          name: "Unknown",
+          name: "Inconnu",
           value: 0,
-          desc: "Unknown Customer",
+          desc: "Client inconnu",
           icon: "assets/icons/png_domestic.png",
           subscription_price: 500.00,
           subscription_period: 365,

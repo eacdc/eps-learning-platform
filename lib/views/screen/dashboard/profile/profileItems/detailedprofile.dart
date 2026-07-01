@@ -65,7 +65,7 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
                         ),
                       ),
                        Text(
-                        'Detailed Profile',
+                        'Profil détaillé',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
@@ -241,7 +241,7 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
                                     ),
                                   )
                                   : Text(
-                                    'Hii, $name',
+                                    'Bonjour, $name',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
@@ -278,19 +278,19 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
 
                         // TitleDescWidget for displaying user information
                         TitleDescWidget(
-                          title: 'Full Name',
+                          title: 'Nom complet',
                           desc: fullname,
                           isLoading: isLoading,
                         ),
                         SizedBox(height: 16),
                         TitleDescWidget(
-                          title: 'Email Address',
+                          title: 'Adresse e-mail',
                           desc: email,
                           isLoading: isLoading,
                         ),
                         SizedBox(height: 16),
                         TitleDescWidget(
-                          title: 'Phone Number',
+                          title: 'Numéro de téléphone',
                           desc: phone,
                           isLoading: isLoading,
                         ),
@@ -305,7 +305,7 @@ class _DetailedProfilePageState extends State<DetailedProfilePage> {
                     : CustomGradiantButton(
                       loading: false,
                       buttonColor: primarycolor,
-                      textValue: 'Edit Profile',
+                      textValue: 'Modifier le profil',
                       textColor: onprimary,
                       onPressed: () {
                         showModalBottomSheet(

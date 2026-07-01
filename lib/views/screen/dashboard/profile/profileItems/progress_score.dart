@@ -86,7 +86,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                         ),
                       ),
                       Text(
-                        'Scores & Progress',
+                        'Scores et progrès',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
@@ -157,7 +157,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                                   value: booksStarted,
                                   iconPath:
                                       'assets/icons/score_progress/png_sp_books_started.png',
-                                  description: 'Books Started',
+                                  description: 'Livres commencés',
                                   onTap: () => print('Tapped Total Sales'),
                                 ),
                                 buildDashboardItem(
@@ -166,7 +166,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                                   value: chaptersCompleted,
                                   iconPath:
                                       'assets/icons/score_progress/png_sp_completed_chapter.png',
-                                  description: 'Completed Chapters',
+                                  description: 'Chapitres terminés',
                                   onTap: () => print('Tapped New Users'),
                                 ),
                                 buildDashboardItem(
@@ -175,7 +175,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                                   value: quizzesTaken,
                                   iconPath:
                                       'assets/icons/score_progress/png_sp_message.png',
-                                  description: 'Quizzes Taken',
+                                  description: 'Quiz effectués',
                                   onTap: () => print('Tapped New Users'),
                                 ),
                                 buildDashboardItem(
@@ -184,7 +184,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                                   value: overallScore,
                                   iconPath:
                                       'assets/icons/score_progress/png_sp_overalscore.png',
-                                  description: 'Overall Score',
+                                  description: 'Score global',
                                   onTap: () => print('Tapped New Users'),
                                 ),
                               ],
@@ -199,7 +199,7 @@ class _ProgressScorePageState extends State<ProgressScorePage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: const [
                                   Text(
-                                    "Assesment Data",
+                                    "Données d'évaluation",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16,

@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to fetch Google account details. Please try again.",
+        "Impossible de récupérer les détails du compte Google. Veuillez réessayer.",
       );
       return;
     }
@@ -131,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
       _handlingGoogleEvent = false;
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Unable to verify Google sign-in token. Please try again.",
+        "Impossible de vérifier le jeton Google. Veuillez réessayer.",
       );
       return;
     }
@@ -157,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       SnackBarHelper.showFailureSnackBar(
         context,
-        response.data["message"] ?? "Google login failed",
+        response.data["message"] ?? "La connexion Google a échoué",
       );
     }
   }
@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
     SnackBarHelper.showFailureSnackBar(
       context,
-      "Google sign-in failed. Please try again.",
+      "La connexion Google a échoué. Veuillez réessayer.",
     );
   }
 
@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Choose an account",
+                  "Choisir un compte",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
@@ -196,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Select your username, then enter the password to continue.",
+                  "Sélectionnez votre nom d'utilisateur, puis entrez le mot de passe pour continuer.",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 13,
@@ -213,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                       emailController.text = user.username;
                       SnackBarHelper.showSuccessSnackBar(
                         this.context,
-                        "Username selected. Enter password to sign in.",
+                        "Nom d'utilisateur sélectionné. Entrez le mot de passe pour vous connecter.",
                       );
                     },
                   ),
@@ -231,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode != 200) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        response.data["message"] ?? "Unable to find usernames for this email",
+        response.data["message"] ?? "Impossible de trouver des comptes pour cet e-mail",
       );
       return;
     }
@@ -242,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
         context,
         discovery.message.isNotEmpty
             ? discovery.message
-            : "No usernames found for this email",
+            : "Aucun compte trouvé pour cet e-mail",
       );
       return;
     }
@@ -262,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Select your username",
+                  "Sélectionnez votre nom d'utilisateur",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
@@ -291,7 +291,7 @@ class _LoginPageState extends State<LoginPage> {
                       } else {
                         SnackBarHelper.showSuccessSnackBar(
                           this.context,
-                          "Username selected. Enter password to sign in.",
+                          "Nom d'utilisateur sélectionné. Entrez le mot de passe pour vous connecter.",
                         );
                       }
                     },
@@ -366,7 +366,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Align(
                         alignment: Alignment.center,
                         child: Text(
-                          "Welcome Back!",
+                          "Bienvenue !",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 24,
@@ -378,7 +378,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 8),
 
                     Text(
-                      "Please login first to start your journey!!",
+                      "Veuillez vous connecter pour commencer votre parcours !",
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontSize: 14,
@@ -414,8 +414,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                            */
                           InputField(
-                            title: "Username or Email ID",
-                            hintText: 'Enter your username or email ID',
+                            title: "Nom d'utilisateur ou e-mail",
+                            hintText: "Entrez votre nom d'utilisateur ou e-mail",
                             suffixIcon: _buildSuffixIcon(),
                             controller: emailController,
                             prefixIcon: Icon(
@@ -431,13 +431,13 @@ class _LoginPageState extends State<LoginPage> {
                             validator:
                                 (val) =>
                                     (val == null || val.trim().length < 2)
-                                        ? "Enter a valid username or email ID"
+                                        ? "Entrez un nom d'utilisateur ou e-mail valide"
                                         : null,
                           ),
                           SizedBox(height: 16),
                           InputField(
-                            title: "Password",
-                            hintText: 'Enter your password',
+                            title: "Mot de passe",
+                            hintText: 'Entrez votre mot de passe',
                             controller: passwordController,
                             obscureText: !passwordVisible,
                             suffixIcon: IconButton(
@@ -484,7 +484,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   Text(
-                                    'Remember Me',
+                                    'Se souvenir de moi',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -506,7 +506,7 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Align(
                                   alignment: Alignment.centerRight,
                                   child: Text(
-                                    "Forgot Password? ",
+                                    "Mot de passe oublié ? ",
                                     style: TextStyle(
                                       color:
                                           Theme.of(
@@ -526,7 +526,7 @@ class _LoginPageState extends State<LoginPage> {
                           CustomGradiantButton(
                             loading: loginController.isLoading.value,
                             buttonColor: primarycolor,
-                            textValue: 'Sign In',
+                            textValue: 'Se connecter',
                             textColor: onprimary,
                             onPressed: () {
                               /*     final form = _formKey.currentState;
@@ -543,7 +543,7 @@ class _LoginPageState extends State<LoginPage> {
                                   !_isValidLoginIdentifier(identifier)) {
                                 SnackBarHelper.showFailureSnackBar(
                                   context,
-                                  "Please enter a valid username or email ID",
+                                  "Veuillez entrer un nom d'utilisateur ou un e-mail valide",
                                 );
                                 return;
                               }
@@ -601,7 +601,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        "Login with Google",
+                                        "Se connecter avec Google",
                                         style: heading6.copyWith(
                                           color:
                                               Theme.of(
@@ -631,7 +631,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 child: RichText(
                                   text: TextSpan(
-                                    text: 'New to EPS?  ',
+                                    text: 'Nouveau sur EPS ?  ',
                                     style: TextStyle(
                                       color:
                                           Theme.of(
@@ -647,7 +647,7 @@ class _LoginPageState extends State<LoginPage> {
                               text: 'bold',
                               style: TextStyle(fontWeight: FontWeight.bold)), */
                                       TextSpan(
-                                        text: 'Create Account',
+                                        text: 'Créer un compte',
                                         style: TextStyle(
                                           color: primarycolor,
                                           fontWeight: FontWeight.w700,
@@ -893,7 +893,7 @@ class _LoginPageState extends State<LoginPage> {
     if (identifier.isEmpty || !_isValidLoginIdentifier(identifier)) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid username or email ID",
+        "Veuillez entrer un nom d'utilisateur ou un e-mail valide",
       );
       return false;
     }
@@ -901,7 +901,7 @@ class _LoginPageState extends State<LoginPage> {
     if (password.isEmpty || password.length < 6) {
       SnackBarHelper.showFailureSnackBar(
         context,
-        "Please enter a valid password",
+        "Veuillez entrer un mot de passe valide",
       );
 
       return false;

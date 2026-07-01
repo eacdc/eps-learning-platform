@@ -194,9 +194,9 @@ class _MySubscriptionPageState extends State<QuizPage> {
                             onSubscribe: () {
                               Get.defaultDialog(
                                 title: bookData.title ?? "",
-                                middleText: 'Do you want to unsubscribe?',
-                                textCancel: 'Cancel',
-                                textConfirm: 'Unsubscribe',
+                                middleText: 'Voulez-vous vous désabonner ?',
+                                textCancel: 'Annuler',
+                                textConfirm: 'Se désabonner',
                                 confirmTextColor: Colors.white,
                                 buttonColor: primarycolor,
                                 onConfirm: () {
@@ -326,7 +326,7 @@ Widget bookListItem({
                         ),
                         child: Center(
                           child: const Text(
-                            "View Chapter",
+                            "Voir le chapitre",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -434,7 +434,7 @@ void _showChapterBottomsheet(
                               const SizedBox(height: 15),
                               Center(
                                 child: Text(
-                                  "Book Details",
+                                  "Détails du livre",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color:
@@ -567,7 +567,7 @@ void _showChapterBottomsheet(
                                       Row(
                                         children: [
                                           Text(
-                                            "Subject - ",
+                                            "Matière - ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -598,7 +598,7 @@ void _showChapterBottomsheet(
                                       Row(
                                         children: [
                                           Text(
-                                            "Publisher - ",
+                                            "Éditeur - ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -629,7 +629,7 @@ void _showChapterBottomsheet(
                                       Row(
                                         children: [
                                           Text(
-                                            "Grade - ",
+                                            "Niveau - ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -683,7 +683,7 @@ void _showChapterBottomsheet(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Chapters :",
+                              "Chapitres :",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -739,7 +739,7 @@ void _showChapterBottomsheet(
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  "No Chapters Found",
+                                  "Aucun chapitre trouvé",
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: primarycolor,
@@ -835,7 +835,7 @@ void _showChapterBottomsheet(
                                           Expanded(
                                             child: SecondaryButton(
                                               buttonColor: primarycolor,
-                                              textValue: "Learn",
+                                              textValue: "Apprendre",
                                               textColor: primarycolor,
                                               onPressed: () {
                                                 Navigator.pop(context);
@@ -859,7 +859,7 @@ void _showChapterBottomsheet(
                                           Expanded(
                                             child: PrimaryButton(
                                               buttonColor: primarycolor,
-                                              textValue: "Start Quiz",
+                                              textValue: "Commencer le quiz",
                                               textColor: whitecolor,
                                               startIcon: "assets/images/quiz.png",
                                               onPressed: () {
