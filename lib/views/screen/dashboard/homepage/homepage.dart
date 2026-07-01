@@ -851,7 +851,7 @@ class _HomePageState extends State<HomePage> {
                     maxCrossAxisExtent: 200,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
-                    childAspectRatio: 1.5,
+                    childAspectRatio: 1.3,
 
                     ///crossAxisCount: 2, // Adjust the number of columns as needed
                   ),
@@ -1904,8 +1904,6 @@ Widget buildDashboardItem({
     onTap: onTap,
     borderRadius: BorderRadius.circular(12),
     child: Container(
-      // height: subItem ? 130 : 100,
-      height: 100,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
