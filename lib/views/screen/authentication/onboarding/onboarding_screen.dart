@@ -164,7 +164,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   _controller.jumpToPage(2);
                                 },
                                 child:  Text(
-                                  "SKIP",
+                                  "PASSER",
                                   style: TextStyle(color: primarycolor),
                                 ),
                                 style: TextButton.styleFrom(
@@ -182,7 +182,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     curve: Curves.easeIn,
                                   );
                                 },
-                                child: const Text("NEXT"),
+                                child: const Text("SUIVANT"),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: primarycolor,
                                   foregroundColor: whitecolor,

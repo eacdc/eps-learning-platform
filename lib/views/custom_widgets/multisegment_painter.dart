@@ -41,7 +41,7 @@ class MultiSegmentCircle extends StatelessWidget {
              totalHoursSpent.toString(),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Text('hours', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            Text('heures', style: TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
       ),

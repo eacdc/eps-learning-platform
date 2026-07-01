@@ -17,11 +17,11 @@ class PerformanceOverviewCard extends StatefulWidget {
 }
 
 class _PerformanceOverviewCardState extends State<PerformanceOverviewCard> {
-String selectedPeriod = 'Last 7 Days';
+String selectedPeriod = '7 derniers jours';
 final List<String> periods = [
-  'Last 7 Days',
-  'Last 30 Days',
-  'Last 90 Days',
+  '7 derniers jours',
+  '30 derniers jours',
+  '90 derniers jours',
 ];
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,7 @@ final double notStartedPercentage =
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'hours',
+                    'heures',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],

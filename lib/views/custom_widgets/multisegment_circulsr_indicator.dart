@@ -30,7 +30,7 @@ class MultiSegmentCircularIndicator extends StatelessWidget {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             Text(
-              "hours",
+              "heures",
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

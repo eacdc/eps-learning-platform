@@ -186,13 +186,13 @@ class ScoreController extends GetxController {
         int days;
 
         switch (filter) {
-          case 'Last 7 Days':
+          case '7 derniers jours':
             days = 7;
             break;
-          case 'Last 30 Days':
+          case '30 derniers jours':
             days = 30;
             break;
-          case 'Last 90 Days':
+          case '90 derniers jours':
             days = 90;
             break;
           default:
