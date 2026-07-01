@@ -33,7 +33,7 @@ class WalkthroughController extends GetxController {
     return [
       const WalkthroughStep(
         id: 'welcome',
-        title: 'Bienvenue sur Test Your Learning !',
+        title: 'Bienvenue sur EPS Digital Learning !',
         description:
             'Faites une visite rapide pour découvrir la génération de quiz, les outils d\'apprentissage et le suivi des progrès.',
         tooltipPosition: WalkthroughTooltipPosition.center,
