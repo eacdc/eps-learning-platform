@@ -2033,8 +2033,10 @@ class _SubItemWidget extends StatelessWidget {
         const SizedBox(height: 0),
         Text(
           title ?? "",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 9,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
