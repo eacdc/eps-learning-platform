@@ -75,6 +75,9 @@ class ApiManager {
   static const String updateProfile = "/api/users/profile";
   static const String updateProfilePic = "/api/users/upload-profile-picture";
 
+  static String appVersion(String platform) =>
+      "/api/app/version?platform=$platform";
+
   static const String privacyPolicy = "/api/static/privacy-policy";
   static const String faq = "/api/static/faq";
   static const String termsService = "/api/static/terms-of-service";

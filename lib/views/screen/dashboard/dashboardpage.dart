@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/dashboard_controller.dart';
+import 'package:test_your_learing/controllers/version_controller.dart';
 import 'package:test_your_learing/controllers/walkthrough_controller.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_dashboard_switch.dart';
@@ -28,6 +29,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final dashboardController = Get.put(DashboardController());
   final walkthroughController = Get.put(WalkthroughController());
+  final versionController = Get.put(VersionController());
   final themeController = Get.find<ThemeController>();
 
   //int _selectedIndex = 0;
@@ -275,6 +277,7 @@ List<Widget> get _actionWidget => [
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       walkthroughController.tryStartWalkthrough();
+      versionController.checkForUpdate(context);
     });
   }
 

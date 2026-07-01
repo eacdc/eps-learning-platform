@@ -15,6 +15,10 @@ class Constants {
 
   static const String proxyURL = "https://cors-anywhere.herokuapp.com/";
 
+  /// Fallback Play Store link (used if the backend doesn't return a store URL).
+  static const String playStoreUrl =
+      "https://play.google.com/store/apps/details?id=com.eps.digitallearning";
+
   static const String googleLoginClientId = "43576243758-jgmscr24u9849k36ur0s9984s9t8hi80.apps.googleusercontent.com";
   static const String googleLoginServerClientId = "43576243758-mv4cqlgbnjkgpjhthgjand7p71aaea1q.apps.googleusercontent.com";
 
