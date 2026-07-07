@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
+import 'package:test_your_learing/constants/constant.dart';
 import 'package:test_your_learing/models/response_model/api_response.dart';
 import 'package:test_your_learing/models/response_model/api_response_new.dart';
 
@@ -131,6 +132,7 @@ class ApiManager {
     return {
       "Content-Type": "application/json",
       "Accept-Language": "fr",
+      "X-Publisher": Constants.publisher,
       if (token != null) "Authorization": "Bearer $token",
     };
   }

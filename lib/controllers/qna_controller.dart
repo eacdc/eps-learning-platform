@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:test_your_learing/constants/constant.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -435,7 +436,10 @@ class QnaController extends GetxController
 
     // Add headers
     // request.headers['Authorization'] = 'Bearer $token';
-    request.headers.addAll({'Authorization': 'Bearer $token'});
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+      'X-Publisher': Constants.publisher,
+    });
 
     // Add form fields
     request.fields['userId'] = userId;

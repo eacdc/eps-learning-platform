@@ -12,6 +12,11 @@ class Constants {
   //static const String fontFamily = "Gabarito";
   static const String fontFamily = "Manrope";
 
+  /// Publisher code for this build. Sent as the X-Publisher header on every
+  /// API request so the backend scopes content/accounts to this publisher.
+  /// French build = "JD", English build = "EPS".
+  static const String publisher = "JD";
+
 
   static const String proxyURL = "https://cors-anywhere.herokuapp.com/";
 

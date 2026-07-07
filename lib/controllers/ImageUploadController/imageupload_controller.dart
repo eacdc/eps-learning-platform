@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:test_your_learing/constants/constant.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -33,6 +34,7 @@ class ImageuploadController extends GetxController {
 
     // Add headers
     request.headers['Authorization'] = 'Bearer $token';
+    request.headers['X-Publisher'] = Constants.publisher;
 
     // Add form fields
     //request.fields['fullname'] = fullname;
