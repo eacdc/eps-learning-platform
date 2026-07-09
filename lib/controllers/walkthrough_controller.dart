@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:test_your_learing/constants/constant.dart';
 import 'package:test_your_learing/controllers/dashboard_controller.dart';
 import 'package:test_your_learing/helper/sharedpreference_helper.dart';
 import 'package:test_your_learing/models/walkthrough_model/walkthrough_step.dart';
@@ -31,9 +32,9 @@ class WalkthroughController extends GetxController {
 
   List<WalkthroughStep> _buildSteps() {
     return [
-      const WalkthroughStep(
+      WalkthroughStep(
         id: 'welcome',
-        title: 'Bienvenue sur EPS Digital Learning !',
+        title: 'Bienvenue sur ${Constants.appname} !',
         description:
             'Faites une visite rapide pour découvrir la génération de quiz, les outils d\'apprentissage et le suivi des progrès.',
         tooltipPosition: WalkthroughTooltipPosition.center,

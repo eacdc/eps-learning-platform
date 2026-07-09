@@ -53,9 +53,10 @@ class VersionController extends GetxController {
         return;
       }
 
-      final storeUrl = version.androidStoreUrl.isNotEmpty
-          ? version.androidStoreUrl
-          : Constants.playStoreUrl;
+      // Always send the user to THIS build's own Play Store listing. The
+      // backend's androidStoreUrl is shared across publishers (EPS/JD) and
+      // would otherwise route the French app to the English listing.
+      final storeUrl = Constants.playStoreUrl;
 
       if (!context.mounted) return;
 

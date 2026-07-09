@@ -163,7 +163,9 @@ class UpdateSheet extends StatelessWidget {
               ),
             ],
 
-            const SizedBox(height: 20),
+            // Add the device's bottom inset (gesture nav bar) so the last
+            // button is never clipped on phones with on-screen navigation.
+            SizedBox(height: 20 + MediaQuery.of(context).padding.bottom),
           ],
         ),
       ),
