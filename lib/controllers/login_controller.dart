@@ -13,6 +13,29 @@ class LoginController extends GetxController {
   var getStartLoading = false.obs;
   var loginResponse = Rxn<LoginResponse>();
 
+  /// The backend still returns some auth errors in English (e.g. "Invalid
+  /// username or password"). Map the common ones to French so the French app
+  /// never shows English text. Unknown messages fall back to a generic French
+  /// error rather than leaking an English string.
+  String _localizedLoginError(int statusCode, dynamic backendMessage) {
+    final msg = (backendMessage ?? "").toString().toLowerCase();
+
+    if (msg.contains("invalid") ||
+        msg.contains("incorrect") ||
+        msg.contains("password") ||
+        msg.contains("username") ||
+        statusCode == 401) {
+      return "Nom d'utilisateur ou mot de passe incorrect";
+    }
+    if (msg.contains("another") || msg.contains("publisher")) {
+      return "Ce compte appartient à une autre application.";
+    }
+    if (msg.contains("not found") || statusCode == 404) {
+      return "Compte introuvable";
+    }
+    return "Échec de la connexion. Veuillez réessayer.";
+  }
+
   Future<ApiResponse> loginUser(
     String username,
     String password,
@@ -30,17 +53,17 @@ class LoginController extends GetxController {
       if (response.statusCode == 200) {
         loginResponse.value = LoginResponse.fromJson(response.data);
         await _persistSession(loginResponse.value!);
-        SnackBarHelper.showSuccessSnackBar(context, "Login Successful");
+        SnackBarHelper.showSuccessSnackBar(context, "Connexion réussie");
         Get.offAll(() => DashboardPage());
       } else {
         SnackBarHelper.showFailureSnackBar(
           context,
-          response.data["message"] ?? "Login failed",
+          _localizedLoginError(response.statusCode, response.data["message"]),
         );
       }
       return response;
     } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      SnackBarHelper.showFailureSnackBar(context, "Une erreur inattendue s'est produite");
       return ApiResponse(
         statusCode: 500,
         data: {"message": "Unexpected error: $e"},
@@ -64,7 +87,7 @@ class LoginController extends GetxController {
       );
       return response;
     } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      SnackBarHelper.showFailureSnackBar(context, "Une erreur inattendue s'est produite");
       return ApiResponse(
         statusCode: 500,
         data: {"message": "Unexpected error: $e"},
@@ -97,7 +120,7 @@ class LoginController extends GetxController {
       }
       return response;
     } catch (e) {
-      SnackBarHelper.showFailureSnackBar(context, "Unexpected error: $e");
+      SnackBarHelper.showFailureSnackBar(context, "Une erreur inattendue s'est produite");
       return ApiResponse(
         statusCode: 500,
         data: {"message": "Unexpected error: $e"},
