@@ -309,7 +309,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                                   ),
                                                 ),
                                                 child: Text(
-                                                  "Start Quiz",
+                                                  "Commencer le quiz",
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     color: primarycolor,
@@ -920,7 +920,7 @@ class _ChatWidgetState extends State<ChatWidget>
                     textInputAction: TextInputAction.newline,
 
                     decoration: InputDecoration(
-                      hintText: 'Type your message...',
+                      hintText: 'Tapez votre message...',
                       hintStyle: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 14,
@@ -1273,7 +1273,7 @@ class Avatar extends StatelessWidget {
                                     textInputAction: TextInputAction.newline,
 
                                     decoration: InputDecoration(
-                                      hintText: 'Type your message...',
+                                      hintText: 'Tapez votre message...',
                                       hintStyle: TextStyle(
                                         color: gray,
                                         fontSize: 14,
