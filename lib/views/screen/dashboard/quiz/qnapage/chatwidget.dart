@@ -294,7 +294,7 @@ class _ChatWidgetState extends State<ChatWidget>
                                             ? SizedBox.shrink()
                                             : InkWell(
                                               onTap: () {
-                                                sendMessage("Let's Start");
+                                                sendMessage("Commençons");
                                               },
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
