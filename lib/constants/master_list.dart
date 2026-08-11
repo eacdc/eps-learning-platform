@@ -45,12 +45,15 @@ class SubjectOption {
   SubjectOption({required this.label, required this.value});
 }
 
+// The `value` is what gets sent as the ?subject= filter. The backend now
+// matches this against the *translated* subject it returns, so it must be the
+// French subject string (identical to the label / to book.subject as shown),
+// NOT an English key. Sending English here yields zero results in the French
+// build.
 final List<SubjectOption> subjectOptions = [
-  SubjectOption(label: "Sciences", value: "science"),
-  SubjectOption(label: "Mathématiques", value: "Math"),
-  SubjectOption(label: "Physique", value: "physics"),
-
-
+  SubjectOption(label: "Sciences", value: "Sciences"),
+  SubjectOption(label: "Mathématiques", value: "Mathématiques"),
+  SubjectOption(label: "Physique", value: "Physique"),
 ];
 
 

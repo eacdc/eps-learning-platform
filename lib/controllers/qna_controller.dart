@@ -439,6 +439,9 @@ class QnaController extends GetxController
     request.headers.addAll({
       'Authorization': 'Bearer $token',
       'X-Publisher': Constants.publisher,
+      // Localize backend responses/errors for this build (omit for English).
+      if (Constants.languageCode != 'en')
+        'Accept-Language': Constants.languageCode,
     });
 
     // Add form fields

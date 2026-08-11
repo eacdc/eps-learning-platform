@@ -131,7 +131,11 @@ class ApiManager {
   static Map<String, String> headers({String? token}) {
     return {
       "Content-Type": "application/json",
-      "Accept-Language": "fr",
+      // Send the build language on every request so the backend localizes
+      // content and error messages. English is the backend default, so the
+      // header is omitted for "en" to keep the exact pre-i18n behaviour.
+      if (Constants.languageCode != "en")
+        "Accept-Language": Constants.languageCode,
       "X-Publisher": Constants.publisher,
       if (token != null) "Authorization": "Bearer $token",
     };

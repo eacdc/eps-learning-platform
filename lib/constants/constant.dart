@@ -17,6 +17,13 @@ class Constants {
   /// French build = "JD", English build = "EPS".
   static const String publisher = "JD";
 
+  /// Content language for this build. Sent as the Accept-Language header on
+  /// every API request so the backend returns localized content, labels and
+  /// error messages. French build = "fr", English build = "en".
+  /// When set to "en" the header is omitted entirely (the backend default is
+  /// English), which reproduces the original pre-i18n behaviour exactly.
+  static const String languageCode = "fr";
+
 
   static const String proxyURL = "https://cors-anywhere.herokuapp.com/";
 
