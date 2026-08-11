@@ -307,7 +307,7 @@ class _AskAiWidgetState extends State<AskAiWidget>
                                               color: primarycolor.withAlpha(20),
                                             ),
                                             child: Text(
-                                              "Start Learning",
+                                              "Commencer l'apprentissage",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: primarycolor,
@@ -771,7 +771,7 @@ class _AskAiWidgetState extends State<AskAiWidget>
                   textInputAction: TextInputAction.newline,
           
                   decoration: InputDecoration(
-                    hintText: 'Type your message...',
+                    hintText: 'Tapez votre message...',
                     hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
                     /* border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(12),
@@ -1126,7 +1126,7 @@ class Avatar extends StatelessWidget {
                                     textInputAction: TextInputAction.newline,
 
                                     decoration: InputDecoration(
-                                      hintText: 'Type your message...',
+                                      hintText: 'Tapez votre message...',
                                       hintStyle: TextStyle(
                                         color: gray,
                                         fontSize: 14,
