@@ -170,7 +170,7 @@ class LogoutSheet extends StatelessWidget {
                       ), */
                     ],
                   ),
-                  SizedBox(height: 24),
+                  SizedBox(height: 24 + MediaQuery.of(context).padding.bottom),
                 ],
               ),
             ),
