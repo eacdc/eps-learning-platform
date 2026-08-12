@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Constants {
-  static const String appname = "JD Editions Digital Learning";
+  static const String appname = "JD Editions Apprentissage";
   static const String appdesc = "La plateforme d’apprentissage la plus appréciée en Inde";
   static const String copyright =
-      "JD Editions Digital Learning 2026. Tous droits réservés.";
+      "JD Editions Apprentissage 2026. Tous droits réservés.";
   static const String getstarted_title =
       "Explorons l’apprentissage intelligent avec notre plateforme professionnelle !";
   static const String getstarted_desc =
@@ -16,6 +16,13 @@ class Constants {
   /// API request so the backend scopes content/accounts to this publisher.
   /// French build = "JD", English build = "EPS".
   static const String publisher = "JD";
+
+  /// Content language for this build. Sent as the Accept-Language header on
+  /// every API request so the backend returns localized content, labels and
+  /// error messages. French build = "fr", English build = "en".
+  /// When set to "en" the header is omitted entirely (the backend default is
+  /// English), which reproduces the original pre-i18n behaviour exactly.
+  static const String languageCode = "fr";
 
 
   static const String proxyURL = "https://cors-anywhere.herokuapp.com/";

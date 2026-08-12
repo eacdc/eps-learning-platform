@@ -35,6 +35,10 @@ class ImageuploadController extends GetxController {
     // Add headers
     request.headers['Authorization'] = 'Bearer $token';
     request.headers['X-Publisher'] = Constants.publisher;
+    // Localize backend responses/errors for this build (omit for English).
+    if (Constants.languageCode != 'en') {
+      request.headers['Accept-Language'] = Constants.languageCode;
+    }
 
     // Add form fields
     //request.fields['fullname'] = fullname;

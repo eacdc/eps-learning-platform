@@ -13,27 +13,31 @@ class LoginController extends GetxController {
   var getStartLoading = false.obs;
   var loginResponse = Rxn<LoginResponse>();
 
-  /// The backend still returns some auth errors in English (e.g. "Invalid
-  /// username or password"). Map the common ones to French so the French app
-  /// never shows English text. Unknown messages fall back to a generic French
-  /// error rather than leaking an English string.
+  /// The backend now localizes error messages (it returns French when this
+  /// build sends Accept-Language: fr), so we surface the backend message
+  /// directly instead of matching on English text — which would break the
+  /// moment the message arrives translated. When the backend gives us no
+  /// usable message we fall back on the status code alone (never on the text).
   String _localizedLoginError(int statusCode, dynamic backendMessage) {
-    final msg = (backendMessage ?? "").toString().toLowerCase();
+    final msg = (backendMessage ?? "").toString().trim();
 
-    if (msg.contains("invalid") ||
-        msg.contains("incorrect") ||
-        msg.contains("password") ||
-        msg.contains("username") ||
-        statusCode == 401) {
-      return "Nom d'utilisateur ou mot de passe incorrect";
+    // Prefer the backend's (already localized) message when present.
+    if (msg.isNotEmpty) {
+      return msg;
     }
-    if (msg.contains("another") || msg.contains("publisher")) {
-      return "Ce compte appartient à une autre application.";
+
+    // No message body: derive a French fallback purely from the status code.
+    switch (statusCode) {
+      case 401:
+      case 400:
+        return "Nom d'utilisateur ou mot de passe incorrect";
+      case 403:
+        return "Ce compte appartient à une autre application.";
+      case 404:
+        return "Compte introuvable";
+      default:
+        return "Échec de la connexion. Veuillez réessayer.";
     }
-    if (msg.contains("not found") || statusCode == 404) {
-      return "Compte introuvable";
-    }
-    return "Échec de la connexion. Veuillez réessayer.";
   }
 
   Future<ApiResponse> loginUser(
