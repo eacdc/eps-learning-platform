@@ -142,7 +142,7 @@ class NotificationDetailsSheet extends StatelessWidget {
                       style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8 + MediaQuery.of(context).padding.bottom),
                 ],
               ),
             ),
