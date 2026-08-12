@@ -294,7 +294,7 @@ class _AskAiWidgetState extends State<AskAiWidget>
                                         ? SizedBox.shrink()
                                         : InkWell(
                                           onTap: () {
-                                            sendMessage("Let's Start");
+                                            sendMessage("Commençons");
                                           },
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
