@@ -338,16 +338,18 @@ class _WalkthroughOverlayState extends State<WalkthroughOverlay> {
     if (rect == null) {
       return Positioned(
         left: screenSize.width * 0.05,
-        bottom: 24,
+        bottom: 24 + MediaQuery.of(context).padding.bottom,
         child: card,
       );
     }
 
     final showAbove = step.tooltipPosition == WalkthroughTooltipPosition.above;
     final cardHeightEstimate = 220.0;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
     final top = showAbove
         ? (rect.top - cardHeightEstimate - 16).clamp(16.0, screenSize.height)
-        : (rect.bottom + 16).clamp(16.0, screenSize.height - cardHeightEstimate);
+        : (rect.bottom + 16)
+            .clamp(16.0, screenSize.height - cardHeightEstimate - bottomInset);
 
     return Positioned(
       left: screenSize.width * 0.05,

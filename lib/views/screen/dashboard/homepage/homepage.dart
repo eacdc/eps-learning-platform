@@ -616,8 +616,24 @@ class _HomePageState extends State<HomePage> {
       /* final recentBooks =
           homeController.recent_activity.value?.data?.recentBooks ?? []; */
 
-   final recentactivity =
-          scoreController.all_unified_score.value?.data?.recent?.activities ?? []; 
+      final userName = SharedPreferencesService.getName().trim();
+      final greetingName = userName.isEmpty ? "there" : userName;
+
+      // Show each chapter only once in Recent Activity. The backend can return
+      // several activities for the same chapter (e.g. a visit and a quiz
+      // session); keep only the first (most recent) entry per chapter.
+      final rawActivities =
+          scoreController.all_unified_score.value?.data?.recent?.activities ?? [];
+      final seenChapterIds = <String>{};
+      final recentactivity = rawActivities.where((activity) {
+        // Keep only chapter-related activities; quiz cards (e.g.
+        // quiz_completed) are not shown in Recent Activity.
+        final type = (activity.type ?? '').toLowerCase();
+        if (!type.startsWith('chapter')) return false;
+        final key = (activity.chapterId ?? activity.chapterTitle ?? '').trim();
+        if (key.isEmpty) return true;
+        return seenChapterIds.add(key);
+      }).toList();
 
       /*    final scoreboard = homeController.scoreboard.value?.data?.summary;
      
@@ -755,7 +771,7 @@ class _HomePageState extends State<HomePage> {
                                     loop: 1,
                                     period: Duration(seconds: 3),
                                     child: Text(
-                                      "Hello, user!",
+                                      "Hello, $greetingName!",
                                       style: TextStyle(
                                         color: lightwhite1,
                                         fontSize: 15,
@@ -851,7 +867,7 @@ class _HomePageState extends State<HomePage> {
                     maxCrossAxisExtent: 200,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
-                    childAspectRatio: 1.5,
+                    childAspectRatio: 1.3,
 
                     ///crossAxisCount: 2, // Adjust the number of columns as needed
                   ),
@@ -1070,7 +1086,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Center(
                                           child: Text(
-                                             books.type ?? "",
+                                             _activityTypeLabel(books.type),
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
@@ -1177,6 +1193,28 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     });
+  }
+
+  /// Turns a raw backend activity type (e.g. "chapter_visited",
+  /// "quiz_completed") into a human-readable label. Known types get a curated
+  /// label; anything else falls back to a de-underscored, capitalized form.
+  String _activityTypeLabel(String? type) {
+    final raw = (type ?? "").trim();
+    if (raw.isEmpty) return "";
+
+    const labels = {
+      "chapter_visited": "Chapter visited",
+      "chapter_completed": "Chapter completed",
+      "quiz_started": "Quiz started",
+      "quiz_completed": "Quiz completed",
+      "quiz_in_progress": "Quiz in progress",
+    };
+    final known = labels[raw.toLowerCase()];
+    if (known != null) return known;
+
+    final words = raw.replaceAll('_', ' ').trim();
+    if (words.isEmpty) return "";
+    return words[0].toUpperCase() + words.substring(1);
   }
 
   Widget buildRankingButton(
@@ -1902,8 +1940,6 @@ Widget buildDashboardItem({
     onTap: onTap,
     borderRadius: BorderRadius.circular(12),
     child: Container(
-      // height: subItem ? 130 : 100,
-      height: 100,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
@@ -2021,8 +2057,10 @@ class _SubItemWidget extends StatelessWidget {
         const SizedBox(height: 0),
         Text(
           title ?? "",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 9,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),

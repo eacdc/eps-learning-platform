@@ -13,6 +13,7 @@ class SharedPreferencesService {
   static const String _keyAccessToken = 'access_token';
   static const String _keyHasSeenDashboardWalkthrough =
       'hasSeenDashboardWalkthrough';
+  static const String _keyDismissedUpdateBuild = 'dismissedUpdateBuild';
 
 
   /// Initialize SharedPreferences
@@ -38,6 +39,15 @@ class SharedPreferencesService {
 
   static bool getHasSeenDashboardWalkthrough() {
     return _prefs.getBool(_keyHasSeenDashboardWalkthrough) ?? false;
+  }
+
+  /// Dismissed update build (so an optional update prompt doesn't nag every launch)
+  static void setDismissedUpdateBuild(int build) {
+    _prefs.setInt(_keyDismissedUpdateBuild, build);
+  }
+
+  static int getDismissedUpdateBuild() {
+    return _prefs.getInt(_keyDismissedUpdateBuild) ?? 0;
   }
 
   /// Login Status

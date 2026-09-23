@@ -250,7 +250,7 @@ class _SignupPageState extends State<SignupPage> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Let’s join to EPS Digital Learning ecosystem & experience smart learning. It’s Free!",
+                            "Let’s join to ${Constants.appname} ecosystem & experience smart learning. It’s Free!",
                             style: TextStyle(
                               color:
                                   Theme.of(

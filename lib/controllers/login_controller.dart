@@ -110,6 +110,7 @@ class LoginController extends GetxController {
   Future<void> _persistSession(LoginResponse response) async {
     await FlutterSecureStorage().write(key: "auth_token", value: response.token);
     SharedPreferencesService.setUserId(response.userId);
+    SharedPreferencesService.setName(response.name);
     SharedPreferencesService.setGrade(response.grade);
     SharedPreferencesService.setAccessToken(response.token);
     SharedPreferencesService.setLoginStatus(true);
