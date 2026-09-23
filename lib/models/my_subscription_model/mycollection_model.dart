@@ -56,6 +56,7 @@ class BookCollectionModel {
   final String? lastAccessed;
   final UserProgress? userProgress;
   final RecentActivity? recentActivity;
+  final bool isHidden;
 
   BookCollectionModel({
     this.bookId,
@@ -70,6 +71,7 @@ class BookCollectionModel {
     this.lastAccessed,
     this.userProgress,
     this.recentActivity,
+    this.isHidden = false,
   });
 
   factory BookCollectionModel.fromJson(Map<String, dynamic> json) {
@@ -90,6 +92,7 @@ class BookCollectionModel {
       recentActivity: json['recentActivity'] != null
           ? RecentActivity.fromJson(json['recentActivity'])
           : null,
+      isHidden: json['isHidden'] == true || json['isHidden'] == 1,
     );
   }
 }

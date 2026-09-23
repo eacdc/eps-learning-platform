@@ -160,7 +160,9 @@ class CollectionController extends GetxController
             response.data,
           );
 
-          final newData = bookData.data?.books ?? [];
+          final newData = (bookData.data?.books ?? [])
+              .where((book) => !book.isHidden)
+              .toList();
           if (newData.isNotEmpty) {
             (pageNumber == 1)
                 ? (bookCollectionList
@@ -259,6 +261,7 @@ class CollectionController extends GetxController
           List<BookList> books =
               (response.data as List)
                   .map((item) => BookList.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           bookCollectionList.value = books;
@@ -413,6 +416,7 @@ class CollectionController extends GetxController
           List<SubscribedBookModel> subscribebooks =
               (response.data as List)
                   .map((item) => SubscribedBookModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           mySubscriptionList.value = subscribebooks;
@@ -486,6 +490,7 @@ class CollectionController extends GetxController
           List<SubscribedBookModel> books =
               (response.data as List)
                   .map((item) => SubscribedBookModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           mySubscriptionList.value = books;
@@ -553,6 +558,7 @@ class CollectionController extends GetxController
           List<SubscribedBookModel> books =
               (response.data as List)
                   .map((item) => SubscribedBookModel.fromJson(item))
+                  .where((book) => !book.isHidden)
                   .toList();
           // use books
           mySubscriptionList.value = books;
