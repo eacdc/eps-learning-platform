@@ -626,6 +626,10 @@ class _HomePageState extends State<HomePage> {
           scoreController.all_unified_score.value?.data?.recent?.activities ?? [];
       final seenChapterIds = <String>{};
       final recentactivity = rawActivities.where((activity) {
+        // On ne garde que les activités liées à un chapitre ; les cartes de
+        // quiz (par ex. quiz_completed) ne sont pas affichées.
+        final type = (activity.type ?? '').toLowerCase();
+        if (!type.startsWith('chapter')) return false;
         final key = (activity.chapterId ?? activity.chapterTitle ?? '').trim();
         if (key.isEmpty) return true;
         return seenChapterIds.add(key);
