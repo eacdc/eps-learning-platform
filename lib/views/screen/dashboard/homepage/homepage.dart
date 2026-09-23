@@ -616,8 +616,24 @@ class _HomePageState extends State<HomePage> {
       /* final recentBooks =
           homeController.recent_activity.value?.data?.recentBooks ?? []; */
 
-   final recentactivity =
-          scoreController.all_unified_score.value?.data?.recent?.activities ?? []; 
+      final userName = SharedPreferencesService.getName().trim();
+
+      // N'affiche chaque chapitre qu'une seule fois dans l'activité récente. Le
+      // backend peut renvoyer plusieurs activités pour le même chapitre (par
+      // ex. une consultation et une session de quiz) ; on ne garde que la
+      // première (la plus récente) par chapitre.
+      final rawActivities =
+          scoreController.all_unified_score.value?.data?.recent?.activities ?? [];
+      final seenChapterIds = <String>{};
+      final recentactivity = rawActivities.where((activity) {
+        // On ne garde que les activités liées à un chapitre ; les cartes de
+        // quiz (par ex. quiz_completed) ne sont pas affichées.
+        final type = (activity.type ?? '').toLowerCase();
+        if (!type.startsWith('chapter')) return false;
+        final key = (activity.chapterId ?? activity.chapterTitle ?? '').trim();
+        if (key.isEmpty) return true;
+        return seenChapterIds.add(key);
+      }).toList(); 
 
       /*    final scoreboard = homeController.scoreboard.value?.data?.summary;
      
@@ -755,7 +771,9 @@ class _HomePageState extends State<HomePage> {
                                     loop: 1,
                                     period: Duration(seconds: 3),
                                     child: Text(
-                                      "Bonjour !",
+                                      userName.isEmpty
+                                          ? "Bonjour !"
+                                          : "Bonjour, $userName !",
                                       style: TextStyle(
                                         color: lightwhite1,
                                         fontSize: 15,
