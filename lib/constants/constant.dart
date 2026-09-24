@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Constants {
-  static const String appname = "EPS Digital Learning";
+  static const String appname = "BigBooks Digital Learning";
   static const String appdesc = "INDIA's Most Loved Learning App Platform";
   static const String copyright =
-      "EPS Digital Learning 2026. All rights reserved.";
+      "BigBooks Digital Learning 2026. All rights reserved.";
   static const String getstarted_title =
       "Let’s explore smart learning with our professional Platform!";
   static const String getstarted_desc =
@@ -14,15 +14,15 @@ class Constants {
 
   /// Publisher code for this build. Sent as the X-Publisher header on every
   /// API request so the backend scopes content/accounts to this publisher.
-  /// English build = "EPS", French build = "JD".
-  static const String publisher = "EPS";
+  /// English build = "EPS", French build = "JD", BigBooks build = "BIGBOOKS".
+  static const String publisher = "BIGBOOKS";
 
 
   static const String proxyURL = "https://cors-anywhere.herokuapp.com/";
 
   /// Fallback Play Store link (used if the backend doesn't return a store URL).
   static const String playStoreUrl =
-      "https://play.google.com/store/apps/details?id=com.eps.digitallearning";
+      "https://play.google.com/store/apps/details?id=com.bigbooks.digitallearning";
 
   static const String googleLoginClientId = "43576243758-jgmscr24u9849k36ur0s9984s9t8hi80.apps.googleusercontent.com";
   static const String googleLoginServerClientId = "43576243758-mv4cqlgbnjkgpjhthgjand7p71aaea1q.apps.googleusercontent.com";
