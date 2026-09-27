@@ -8,6 +8,7 @@ import 'package:test_your_learing/constants/colors.dart';
 import 'package:test_your_learing/controllers/dashboard_controller.dart';
 import 'package:test_your_learing/controllers/version_controller.dart';
 import 'package:test_your_learing/controllers/walkthrough_controller.dart';
+import 'package:test_your_learing/helper/review_helper.dart';
 import 'package:test_your_learing/theme.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_dashboard_switch.dart';
 import 'package:test_your_learing/views/custom_widgets/custom_switch.dart';
@@ -278,6 +279,7 @@ List<Widget> get _actionWidget => [
     WidgetsBinding.instance.addPostFrameCallback((_) {
       walkthroughController.tryStartWalkthrough();
       versionController.checkForUpdate(context);
+      ReviewHelper.maybeAskForReview();
     });
   }
 
