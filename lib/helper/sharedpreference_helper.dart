@@ -14,6 +14,8 @@ class SharedPreferencesService {
   static const String _keyHasSeenDashboardWalkthrough =
       'hasSeenDashboardWalkthrough';
   static const String _keyDismissedUpdateBuild = 'dismissedUpdateBuild';
+  static const String _keyAppOpenCount = 'appOpenCount';
+  static const String _keyReviewRequested = 'reviewRequested';
 
 
   /// Initialize SharedPreferences
@@ -48,6 +50,26 @@ class SharedPreferencesService {
 
   static int getDismissedUpdateBuild() {
     return _prefs.getInt(_keyDismissedUpdateBuild) ?? 0;
+  }
+
+  /// Number of times the app has been opened (used to time the Play Store
+  /// in-app review prompt).
+  static void setAppOpenCount(int count) {
+    _prefs.setInt(_keyAppOpenCount, count);
+  }
+
+  static int getAppOpenCount() {
+    return _prefs.getInt(_keyAppOpenCount) ?? 0;
+  }
+
+  /// Whether the in-app review prompt has already been requested (so it is
+  /// only ever asked once).
+  static void setReviewRequested(bool requested) {
+    _prefs.setBool(_keyReviewRequested, requested);
+  }
+
+  static bool getReviewRequested() {
+    return _prefs.getBool(_keyReviewRequested) ?? false;
   }
 
   /// Login Status
