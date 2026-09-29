@@ -32,6 +32,14 @@ class QnaController extends GetxController
   var showNextSessionMsg = false.obs;
   var nextSesionMsg = "".obs;
 
+  /// Restart state (from /chat/chapter-stats, /chat/cooldown-status and the
+  /// /chat/new-session response). `canRestart` decides whether the Restart
+  /// button is shown — do NOT use canStartNewSession for that.
+  var canRestart = false.obs;
+  var restartBlockedReason = Rxn<String>();
+  var sessionCount = 0.obs;
+  var isRestarting = false.obs;
+
   var pageNo = 1.obs;
   var agentName = "closurechat.ai";
   var closedSessionStatus = "closed";
@@ -638,6 +646,82 @@ class QnaController extends GetxController
     }
     return value.toString(); // keep decimal if it exists
   }
+
+/// Reads whether the user may restart this chapter's quiz (from
+/// /chat/chapter-stats). Called when the quiz screen opens.
+void fetchRestartStatus({
+  required String token,
+  required String chapterId,
+}) async {
+  try {
+    final response = await ApiManager.requestNew(
+      endpoint: ApiManager.getChatStats(chapterId),
+      method: "GET",
+      token: token,
+    );
+    if (response.isSuccess && response.data is Map) {
+      canRestart.value = response.data['canRestart'] == true;
+      restartBlockedReason.value = response.data['restartBlockedReason'];
+      sessionCount.value = response.data['sessionCount'] ?? sessionCount.value;
+    }
+  } catch (_) {
+    // Non-critical; leave the button hidden if we cannot read the status.
+  }
+}
+
+/// Starts a fresh quiz session for this chapter. The current attempt is closed
+/// server-side (best marks are kept), so we clear the chat and let the user
+/// begin again. Called after the user confirms the Restart dialog.
+void restartQuizSession({
+  required String token,
+  required BuildContext context,
+  required String chapterId,
+  required String userId,
+}) async {
+  if (isRestarting.value) return;
+  isRestarting.value = true;
+  try {
+    final response = await ApiManager.requestNew(
+      endpoint: ApiManager.newQuizSession,
+      method: "POST",
+      body: {"userId": userId, "chapterId": chapterId},
+      token: token,
+    );
+
+    final data = response.data;
+    if (response.isSuccess && data is Map && data['success'] == true) {
+      // Fresh session: clear the chat so the "Let's Start" trigger reappears.
+      chatMessageList.clear();
+      hideChatBox.value = false;
+      showNextSessionMsg.value = false;
+      nextSesionMsg.value = "";
+      canRestart.value = data['canRestart'] == true;
+      sessionCount.value = data['sessionNumber'] ?? sessionCount.value;
+      SnackBarHelper.showSuccessSnackBarGetx("Nouvelle session de quiz démarrée");
+    } else {
+      // Refused (e.g. cooldown / session limit) or an error — the backend
+      // sends a localized reason/message.
+      if (data is Map) {
+        canRestart.value = data['canRestart'] == true;
+        restartBlockedReason.value =
+            data['restartBlockedReason'] ?? restartBlockedReason.value;
+      }
+      final String msg =
+          (data is Map
+                  ? (data['reason'] ??
+                      data['error'] ??
+                      data['message'])
+                  : null)
+              ?.toString() ??
+          "Impossible de recommencer le quiz. Veuillez réessayer.";
+      SnackBarHelper.showFailureSnackBarGetx(msg);
+    }
+  } catch (e) {
+    SnackBarHelper.showFailureSnackBarGetx(e.toString());
+  } finally {
+    isRestarting.value = false;
+  }
+}
 
 void handelChatSessionState({
   String? agentName,

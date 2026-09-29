@@ -92,6 +92,11 @@ class _ChatWidgetState extends State<ChatWidget>
         chapterId: widget.chapterId,
       );
 
+      qnaController.fetchRestartStatus(
+        token: token,
+        chapterId: widget.chapterId,
+      );
+
       _focusNode.addListener(() async {
         if (_focusNode.hasFocus) {
           // If you remove the delay sometimes the scroll doesnt animate completely at the end
@@ -140,6 +145,41 @@ class _ChatWidgetState extends State<ChatWidget>
     _audioPlayer.dispose();
     qnaController.dispose();
     super.dispose();
+  }
+
+  Future<void> _confirmRestartQuiz() async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text("Recommencer le quiz ?"),
+          content: const Text(
+            "Votre tentative actuelle sera terminée et une nouvelle session de quiz "
+            "commencera. Vos meilleures notes sont conservées, mais la progression "
+            "de cette tentative sera clôturée.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text("Annuler"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text("Recommencer"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      qnaController.restartQuizSession(
+        token: token,
+        context: context,
+        chapterId: widget.chapterId,
+        userId: userId,
+      );
+    }
   }
 
   void sendMessage(String text) {
@@ -216,6 +256,63 @@ class _ChatWidgetState extends State<ChatWidget>
               ), */
               child: Column(
                 children: [
+                  Obx(
+                    () =>
+                        qnaController.canRestart.value
+                            ? Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  8,
+                                  12,
+                                  0,
+                                ),
+                                child: InkWell(
+                                  onTap:
+                                      qnaController.isRestarting.value
+                                          ? null
+                                          : _confirmRestartQuiz,
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 7,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: primarycolor.withAlpha(20),
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                        color: primarycolor.withAlpha(90),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.refresh_rounded,
+                                          size: 16,
+                                          color: primarycolor,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          qnaController.isRestarting.value
+                                              ? "Redémarrage..."
+                                              : "Recommencer le quiz",
+                                          style: TextStyle(
+                                            color: primarycolor,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
                   /*  InkWell(
                     onTap: () {
                       //_scrollToBottom();
