@@ -10,6 +10,12 @@ class BookChapterModel {
   final String chapterId;
   final int v;
 
+  /// Whether the Learn ("ask a doubt") experience is available for this
+  /// chapter. MCQ-only chapters have no knowledge base, so the backend sends
+  /// `learnEnabled: false` and Learn must be hidden. A missing field means
+  /// enabled (older/cached responses stay working).
+  final bool learnEnabled;
+
   BookChapterModel({
     required this.id,
     required this.bookId,
@@ -21,6 +27,7 @@ class BookChapterModel {
     required this.updatedAt,
     required this.chapterId,
     required this.v,
+    this.learnEnabled = true,
   });
 
   factory BookChapterModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +44,7 @@ class BookChapterModel {
       updatedAt: json['updatedAt'],
       chapterId: json['chapterId'],
       v: json['__v'],
+      learnEnabled: json['learnEnabled'] ?? true,
     );
   }
 
@@ -52,6 +60,7 @@ class BookChapterModel {
       'updatedAt': updatedAt,
       'chapterId': chapterId,
       '__v': v,
+      'learnEnabled': learnEnabled,
     };
   }
 }
