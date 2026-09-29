@@ -42,6 +42,7 @@ class ApiManager {
   static const String bookCollectionFilterSearch =
       "/api/books/search-with-status";
   static const String sendChat = "/api/chat/send";
+  static const String newQuizSession = "/api/chat/new-session";
   static const String sendAudio = "/api/chat/transcribe";
   static const String mySubscriptionList =
       "/api/subscriptions/my-subscriptions"; // not Used
