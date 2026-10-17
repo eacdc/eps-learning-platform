@@ -829,9 +829,15 @@ void _showChapterBottomsheet(
 
                                   Obx(() {
                                     final isLearnMode = Get.find<DashboardController>().isLearnMode.value;
+                                    // Learn is only offered when the chapter
+                                    // actually supports it. For MCQ-only
+                                    // chapters (learnEnabled == false) we fall
+                                    // back to the quiz even in Learn mode.
+                                    final showLearn =
+                                        isLearnMode && chapterdata.learnEnabled;
                                     return Row(
                                       children: [
-                                        if (isLearnMode)
+                                        if (showLearn)
                                           Expanded(
                                             child: SecondaryButton(
                                               buttonColor: primarycolor,
@@ -855,7 +861,7 @@ void _showChapterBottomsheet(
                                               startIcon: "assets/images/learn.png",
                                             ),
                                           ),
-                                        if (!isLearnMode)
+                                        if (!showLearn)
                                           Expanded(
                                             child: PrimaryButton(
                                               buttonColor: primarycolor,

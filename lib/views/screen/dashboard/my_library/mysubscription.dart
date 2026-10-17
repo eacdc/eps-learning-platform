@@ -1326,30 +1326,36 @@ void _showChapterBottomsheet(
                                   SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      Expanded(
-                                        child: SecondaryButton(
-                                          buttonColor: primarycolor,
-                                          textValue: "Learn",
-                                          textColor: primarycolor,
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Get.to(
-                                              () => const AskAiPage(),
-                                              arguments: {
-                                                'chapterId':
-                                                    chapterdata.id ?? '',
-                                                'chapterName':
-                                                    chapterdata.title ?? '',
-                                                'bookId':
-                                                    chapterdata.bookId ?? '',
-                                              },
-                                            );
-                                          },
-                                          height: 34,
-                                          startIcon: "assets/images/learn.png",
+                                      // Learn is hidden for MCQ-only chapters
+                                      // (learnEnabled == false); the quiz then
+                                      // takes the full width.
+                                      if (chapterdata.learnEnabled) ...[
+                                        Expanded(
+                                          child: SecondaryButton(
+                                            buttonColor: primarycolor,
+                                            textValue: "Learn",
+                                            textColor: primarycolor,
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              Get.to(
+                                                () => const AskAiPage(),
+                                                arguments: {
+                                                  'chapterId':
+                                                      chapterdata.id ?? '',
+                                                  'chapterName':
+                                                      chapterdata.title ?? '',
+                                                  'bookId':
+                                                      chapterdata.bookId ?? '',
+                                                },
+                                              );
+                                            },
+                                            height: 34,
+                                            startIcon:
+                                                "assets/images/learn.png",
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 24),
+                                        SizedBox(width: 24),
+                                      ],
                                       Expanded(
                                         child: PrimaryButton(
                                           buttonColor: primarycolor,
